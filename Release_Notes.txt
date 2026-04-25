@@ -15,8 +15,8 @@ Copyright 2001 - 2026 by Joe Taylor, K1JT, and the WSJT Development Team
                              May 4, 2026
                       -------------------------
 
-WSJT-X 3.0.1 is primaruily a bug-fix release, with the following
-changes since release 3.0.0:
+WSJT-X 3.0.1 is a bug-fix release; installation packages include QMAP
+but not MAP65. Code has the following changes since release 3.0.0:
 
  - In posts sent to PSKReporter, version 3.0.0 incorrectly identified
    itself as "WSJT-X v3.0.0 i+". Corrected.
