@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!--
+        Hardened-runtime exception required by an app that bundles its own
+        Qt frameworks (and other third-party dylibs). Without this, dyld
+        refuses to load any framework whose code-signing Team ID does not
+        match the main executable's. That blocks every Qt framework load
+        when the app is ad-hoc signed (each ad-hoc signature has its own
+        pseudo-Team-ID derived from the CDHash, so no two ad-hoc binaries
+        ever match) and would also block bundled Qt loads under a real
+        Developer ID signature unless the same Team ID had signed Qt
+        upstream — which it didn't.
+
+        This is the standard entitlement set for any macOS app that ships
+        bundled non-system frameworks; notarization accepts it.
+    -->
+    <key>com.apple.security.cs.disable-library-validation</key>
+    <true/>
+</dict>
+</plist>
