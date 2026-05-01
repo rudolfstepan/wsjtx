@@ -1,14 +1,6 @@
-// Status=edited
-
-Debian, Ubuntu, and other Debian-based systems including Raspberry Pi OS:
-
-NOTE: Our binary installer packages are targeted for
-one contemporary version of a Linux distribution. Although these may
-work on newer Linux versions or even different distributions, it is
-unlikely that they work on older versions. Check the notes provided
-with the release for details of the targeted Linux distributions and
-versions. If the binary package is not compatible with your Linux
-distribution or version, you must build the application from sources.
+For Linux we provide `.AppImage` packages that will run on any x86-64
+or ARM64 Linux system, and also `.deb` or `.rpm` packages specifically
+built for Debian- or RedHat-based systems.
 
 * 64-bit Intel/AMD: {debian64}
 - To install:

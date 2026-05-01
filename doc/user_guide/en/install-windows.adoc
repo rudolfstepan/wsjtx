@@ -1,17 +1,15 @@
 // Status=edited
 
-Download and execute the package file {win64} (Windows 10 or later,
-64-bit) following these instructions:
-
-* Install _WSJT-X_ into its own directory, for example `C:\WSJTX` or `C:\WSJT\WSJTX`, rather than the conventional location `C:\Program
-  Files ...\WSJTX`.
+For 64-bit Windows 10 and later: Download and execute the package file
+{win64}. Install _WSJT-X_ into its own directory, for example
+`C:\WSJTX` or `C:\WSJT\WSJTX`, rather than the conventional location
+`C:\Program Files ...\WSJTX`.
 
 * All program files relating to _WSJT-X_ are stored in the chosen
   installation directory and its subdirectories.
 
 * Logs and other writeable files are normally found in the
   directory +
-
 `C:\Users\<username>\AppData\Local\WSJT-X`.
 
 TIP: Your computer may be configured so that this directory is
