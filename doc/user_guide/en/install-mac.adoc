@@ -1,8 +1,9 @@
 For *macOS 10.15* and later installers are provided for x86_64 (Intel)
 systems and for ARM64 (Apple silicon) systems. Download the correct
-package for your system from the {downloads}, double-click on the file name, and follow the
-on-screen prompts in the Installer app. Double-click and consult the
-`ReadMe` file for important installation notes.
+package for your system from the {downloads}, double-click on the file
+name, and follow the on-screen prompts in the Installer
+app. Double-click and consult the `ReadMe` file for important
+installation notes.
 
 If you have already installed a previous version, you can retain it by
 changing its name in the *Applications* folder (such as from _WSJT-X_ to
