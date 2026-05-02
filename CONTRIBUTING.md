@@ -42,7 +42,7 @@ Xcode command-line tools are also required (`xcode-select --install`).
 **Windows:**
 Windows builds use the [Hamlib SDK](https://sourceforge.net/projects/hamlib-sdk/), which provides all prerequisite libraries and MinGW tooling. See the INSTALL file for detailed Windows instructions.
 
-### Building Hamlib
+### First Step: Build Hamlib
 
 WSJT-X requires a specific Hamlib version. Check `ci.yml` in `.github/workflows/` for the current `hamlib_branch` value — this is what CI builds against and what your local build should match.
 
@@ -68,12 +68,7 @@ make install-strip
 
 ### Building WSJT-X
 
-**Team members** (with access to wsjtx-internal):
-```bash
-git clone https://github.com/WSJTX/wsjtx-internal.git ~/wsjtx-prefix/src
-```
-
-**External contributors** (fork the public repo first):
+Fork the public repo:
 ```bash
 git clone https://github.com/YOUR_USERNAME/wsjtx.git ~/wsjtx-prefix/src
 cd ~/wsjtx-prefix/src
