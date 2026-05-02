@@ -37,7 +37,8 @@ jobs:
             autoconf automake libtool pkg-config \
             texinfo \
             dpkg-dev fakeroot \
-            asciidoctor
+            asciidoctor \
+            rpm
 
       - name: Cache pFUnit
         id: pfunit-cache
@@ -163,6 +164,37 @@ jobs:
         with:
           name: wsjtx-${{ inputs.version }}-linux-${{ inputs.arch }}-deb
           path: wsjtx-build/wsjtx-${{ inputs.version }}-linux-${{ inputs.arch }}.deb
+          if-no-files-found: error
+
+      # RPM builds via the same CPack scaffolding the .deb step above
+      # uses. CMakeLists.txt:2014-2026 already auto-detects rpmbuild and
+      # sets the Fedora-style dependency list (qt5-qtbase >= 5.9, fftw-
+      # libs-single, boost-log, etc.); only the workflow side was
+      # missing. `-G RPM` is explicit so this step doesn't accidentally
+      # rebuild the .deb already produced above.
+      - name: Package RPM
+        working-directory: wsjtx-build
+        run: |
+          cpack -G RPM
+          ls -lh *.rpm
+
+      - name: Smoke-test RPM
+        working-directory: wsjtx-build
+        run: |
+          RPM=$(ls *.rpm | head -1)
+          echo "Querying $RPM"
+          rpm -qpi "$RPM"
+          rpm -qpR "$RPM"
+          rpm -qpl "$RPM" | head -40
+          # Confirm the core binaries are in the package.
+          rpm -qpl "$RPM" | grep -qE '/bin/wsjtx$'
+          rpm -qpl "$RPM" | grep -qE '/bin/jt9$'
+
+      - name: Upload RPM
+        uses: actions/upload-artifact@v7
+        with:
+          name: wsjtx-${{ inputs.version }}-linux-${{ inputs.arch }}-rpm
+          path: wsjtx-build/*.rpm
           if-no-files-found: error
 
       - name: Install to AppDir

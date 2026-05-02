@@ -207,7 +207,7 @@ jobs:
           # upload failures.
           FILES=$(find artifacts -maxdepth 2 -type f \
             \( -name "*.pkg" -o -name "*.AppImage" -o -name "*.deb" \
-               -o -name "*.exe" -o -name "*.tar.gz" \))
+               -o -name "*.exe" -o -name "*.tar.gz" -o -name "*.rpm" \))
           # SemVer pre-release tags contain a hyphen after the version
           # (e.g., v3.0.1-rc1, v3.0.1-rc2, v3.0.1-beta1). Flag those as
           # GitHub pre-releases so they don't appear as the latest stable.
@@ -305,7 +305,7 @@ jobs:
           # release, and public release mechanically aligned on one filter.
           FILES=$(find artifacts -maxdepth 2 -type f \
             \( -name "*.pkg" -o -name "*.AppImage" -o -name "*.deb" \
-               -o -name "*.exe" -o -name "*.tar.gz" \))
+               -o -name "*.exe" -o -name "*.tar.gz" -o -name "*.rpm" \))
           gh release create "$PUBLIC_TAG" \
             -R WSJTX/wsjtx \
             --title "WSJT-X ${VERSION}" \
