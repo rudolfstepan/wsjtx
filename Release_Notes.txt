@@ -33,6 +33,9 @@ but not MAP65. Code has the following changes since release 3.0.0:
 
  - Corrected band limits for the 2.5 mm and 2 mm bands.
 
+ - Correct faulty repositioning of SWR label in status bar, after a
+   mode switch.
+
 
 			Release: WSJT-X 3.0.0
                             April 8, 2026
