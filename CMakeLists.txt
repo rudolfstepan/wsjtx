@@ -233,6 +233,7 @@ set (wsjt_qt_CXXSRCS
   Transceiver/PollingTransceiver.cpp
   Transceiver/HamlibTransceiver.cpp
   Transceiver/TCITransceiver.cpp
+  Transceiver/HRDMessage.cpp
   Transceiver/HRDTransceiver.cpp
   Transceiver/DXLabSuiteCommanderTransceiver.cpp
   Network/NetworkMessage.cpp
