@@ -129,7 +129,7 @@ set_property (SOURCE ${libm65_C_and_CXXSRCS} APPEND PROPERTY OBJECT_DEPENDS ${CM
 #
 add_library (m65impl STATIC ${libm65_FSRCS} ${libm65_CSRCS} ${libm65_CXXSRCS})
 
-if (APPLE)
+if (APPLE OR WIN32)
   target_link_libraries (m65impl Qt5::Core wsjt_fort wsjt_cxx)
 elseif (WSJT_BUILD_FORTRAN_OPENMP)
   target_link_libraries (m65impl Qt5::Core wsjt_fort_omp wsjt_cxx)
