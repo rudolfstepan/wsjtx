@@ -134,6 +134,8 @@ program jt9
            exe_dir = optarg(:arglen)
         case ('a')
            data_dir = optarg(:arglen)
+        case ('r')
+           share_dir = optarg(:arglen)   ! read-only shipped-data dir (cty.dat, ALLCALL7.TXT, ...)
         case ('b')
            nsubmode = ichar (optarg(:1)) - ichar ('A')
         case ('t')
@@ -220,7 +222,7 @@ program jt9
      print *, 'Usage: jt9 [OPTIONS] file1 [file2 ...]'
      print *, '       Reads data from *.wav files.'
      print *, ''
-     print *, '       jt9 -s <key> [-w patience] [-m threads] [-e path] [-a path] [-t path]'
+     print *, '       jt9 -s <key> [-w patience] [-m threads] [-e path] [-a path] [-t path] [-r path]'
      print *, '       Gets data from shared memory region with key==<key>'
      print *, ''
      print *, 'OPTIONS:'
