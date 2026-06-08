@@ -151,6 +151,7 @@ option (WSJT_GENERATE_DOCS "Generate documentation files." ON)
 option (WSJT_RIG_NONE_CAN_SPLIT "Allow split operation with \"None\" as rig.")
 option (WSJT_TRACE_UDP "Debugging option that turns on UDP message protocol diagnostics.")
 option (WSJT_BUILD_UTILS "Build simulators and code demonstrators." ON)
+option (WSJT_BUILD_TESTS "Build test programs." ON)
 option (WSJT_FOX_OTP "Enable Fox OTP Verification Messages." ON)
 option (WSJT_SKIP_MAP65 "Skip building MAP65 EME decoder (legacy Fortran; fails on GCC 15)." OFF)
 CMAKE_DEPENDENT_OPTION (WSJT_QDEBUG_IN_RELEASE "Leave Qt debugging statements in Release configuration." OFF
@@ -1033,6 +1034,21 @@ find_package (Boost 1.62 REQUIRED COMPONENTS log_setup log)
 #
 find_package (OpenMP)
 
+if (APPLE)
+  set (WSJT_MACOS_LIBGOMP_LIBRARY "" CACHE FILEPATH "Path to the static GNU OpenMP runtime archive")
+  if (NOT WSJT_MACOS_LIBGOMP_LIBRARY)
+    execute_process (
+      COMMAND ${CMAKE_Fortran_COMPILER} -print-file-name=libgomp.a
+      OUTPUT_VARIABLE WSJT_MACOS_LIBGOMP_LIBRARY
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+      ERROR_QUIET
+      )
+  endif ()
+  if (NOT WSJT_MACOS_LIBGOMP_LIBRARY OR NOT EXISTS "${WSJT_MACOS_LIBGOMP_LIBRARY}")
+    message (FATAL_ERROR "Static GNU OpenMP runtime archive not found. Install a GNU Fortran/OpenMP runtime that provides libgomp.a, or set WSJT_MACOS_LIBGOMP_LIBRARY to the archive path. Deployable macOS builds intentionally link libgomp statically instead of bundling a package-manager libgomp dylib.")
+  endif ()
+endif ()
+
 #
 # fftw3 single precision library
 #
@@ -1265,7 +1281,8 @@ endif ()
 if (WSJT_GENERATE_DOCS)
   add_subdirectory (doc)
 endif (WSJT_GENERATE_DOCS)
-if (EXISTS ${CMAKE_SOURCE_DIR}/tests AND IS_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+if (WSJT_BUILD_TESTS AND EXISTS ${CMAKE_SOURCE_DIR}/tests AND IS_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+  enable_testing ()
   add_subdirectory (tests)
 endif ()
 
@@ -1598,13 +1615,12 @@ target_link_libraries (record_time_signal wsjt_cxx wsjt_qtmm wsjt_qt)
 add_executable (jt9 ${jt9_FSRCS} ${jt9_VERSION_RESOURCES})
 if (${OPENMP_FOUND} OR APPLE)
   if (APPLE)
-    # On  Mac  we don't  have  working  OpenMP  support in  the  C/C++
-    # compilers so we  have to manually set the  correct linking flags
-    # and libraries to get OpenMP support in jt9.
+    # On Mac we don't have working OpenMP support in the C/C++
+    # compilers so we have to manually set the correct flags to get
+    # OpenMP support in jt9.
     set_target_properties (jt9
       PROPERTIES
       Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/fortran_modules_omp
-      LINK_LIBRARIES "gomp;gcc_s.1" # assume GNU libgcc OpenMP
       )
     target_compile_options (jt9
       PRIVATE
@@ -1628,7 +1644,11 @@ if (${OPENMP_FOUND} OR APPLE)
       LINK_FLAGS -Wl,--stack,16777216
       )
   endif ()
-  target_link_libraries (jt9 wsjt_fort_omp wsjt_cxx fort_qt)
+  if (APPLE)
+    target_link_libraries (jt9 wsjt_fort_omp wsjt_cxx fort_qt "${WSJT_MACOS_LIBGOMP_LIBRARY}" gcc_s.1)
+  else ()
+    target_link_libraries (jt9 wsjt_fort_omp wsjt_cxx fort_qt)
+  endif ()
 else (${OPENMP_FOUND} OR APPLE)
   target_link_libraries (jt9 wsjt_fort wsjt_cxx fort_qt)
 endif (${OPENMP_FOUND} OR APPLE)

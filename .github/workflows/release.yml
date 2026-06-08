@@ -45,8 +45,24 @@ jobs:
           echo "Parity check PASSED."
 
   # ── Build all five platforms ───────────────────────────────────────
-  macos:
+  macos-arm64-qt:
     needs: prepare
+    uses: ./.github/workflows/prepare-macos-qt.yml
+    with:
+      arch: "arm64"
+      runner: "macos-15"
+      deployment_target: "11.0"
+
+  macos-intel-qt:
+    needs: prepare
+    uses: ./.github/workflows/prepare-macos-qt.yml
+    with:
+      arch: "x86_64"
+      runner: "macos-15-intel"
+      deployment_target: "10.13"
+
+  macos:
+    needs: [prepare, macos-arm64-qt]
     uses: ./.github/workflows/build-macos.yml
     with:
       version: ${{ needs.prepare.outputs.version }}
@@ -57,7 +73,7 @@ jobs:
     secrets: inherit
 
   macos-intel:
-    needs: prepare
+    needs: [prepare, macos-intel-qt]
     uses: ./.github/workflows/build-macos.yml
     with:
       version: ${{ needs.prepare.outputs.version }}
@@ -205,7 +221,7 @@ jobs:
           # that collide on basename across architectures — `gh release
           # create` uses basenames as asset names and duplicates cause
           # upload failures.
-          FILES=$(find artifacts -maxdepth 2 -type f \
+          mapfile -t files < <(find artifacts -maxdepth 2 -type f \
             \( -name "*.pkg" -o -name "*.AppImage" -o -name "*.deb" \
                -o -name "*.exe" -o -name "*.tar.gz" -o -name "*.rpm" \))
           # SemVer pre-release tags contain a hyphen after the version
@@ -219,7 +235,7 @@ jobs:
             --title "WSJT-X ${{ needs.prepare.outputs.version }}" \
             --generate-notes \
             $PRERELEASE_FLAG \
-            $FILES
+            "${files[@]}"
 
       # ── Public mirror: GA only ─────────────────────────────────────────
       # RC/beta tags (any tag carrying a '-' in the version, e.g.
@@ -303,11 +319,11 @@ jobs:
           # Same asset filter as the internal release. Re-find rather than
           # carrying a list — keeps the all-platforms-ready gate, internal
           # release, and public release mechanically aligned on one filter.
-          FILES=$(find artifacts -maxdepth 2 -type f \
+          mapfile -t files < <(find artifacts -maxdepth 2 -type f \
             \( -name "*.pkg" -o -name "*.AppImage" -o -name "*.deb" \
                -o -name "*.exe" -o -name "*.tar.gz" -o -name "*.rpm" \))
           gh release create "$PUBLIC_TAG" \
             -R WSJTX/wsjtx \
             --title "WSJT-X ${VERSION}" \
             --generate-notes \
-            $FILES
+            "${files[@]}"

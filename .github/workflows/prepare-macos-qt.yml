@@ -1,0 +1,73 @@
+name: Prepare macOS Qt
+
+on:
+  workflow_call:
+    inputs:
+      arch:
+        description: "Target architecture (arm64 or x86_64)"
+        required: true
+        type: string
+      runner:
+        description: "GitHub Actions runner label"
+        required: true
+        type: string
+      deployment_target:
+        description: "macOS deployment target version"
+        required: true
+        type: string
+
+jobs:
+  qt-cache-key:
+    runs-on: ubuntu-latest
+    outputs:
+      key: ${{ steps.qt-key.outputs.key }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Compute Qt cache key
+        id: qt-key
+        run: |
+          .github/scripts/macos-qt-cache-key.sh \
+            --arch "${{ inputs.arch }}" \
+            --runner "${{ inputs.runner }}" \
+            --deployment-target "${{ inputs.deployment_target }}" \
+            --github-output
+
+  prepare:
+    needs: qt-cache-key
+    runs-on: ${{ inputs.runner }}
+    concurrency:
+      group: ${{ needs.qt-cache-key.outputs.key }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Restore Qt cache
+        id: qt-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: qt-prefix
+          key: ${{ needs.qt-cache-key.outputs.key }}
+
+      - name: Build Qt
+        if: steps.qt-cache.outputs.cache-hit != 'true'
+        run: |
+          .github/scripts/build-qt-macos.sh \
+            --arch "${{ inputs.arch }}" \
+            --deployment-target "${{ inputs.deployment_target }}" \
+            --prefix "${GITHUB_WORKSPACE}/qt-prefix"
+
+      - name: Verify Qt prefix
+        run: |
+          .github/scripts/verify-macos-artifacts.sh \
+            --target "${{ inputs.deployment_target }}" \
+            --arch "${{ inputs.arch }}" \
+            --allow-prefix "${GITHUB_WORKSPACE}/qt-prefix" \
+            "${GITHUB_WORKSPACE}/qt-prefix"
+
+      - name: Save Qt cache
+        if: steps.qt-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: qt-prefix
+          key: ${{ needs.qt-cache-key.outputs.key }}
