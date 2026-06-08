@@ -10,11 +10,27 @@ if (APPLE)
   #
   # otool -l <binary> | grep -A3 LC_VERSION_MIN_MACOSX
   #
-  set (CMAKE_OSX_DEPLOYMENT_TARGET 10.12
-    CACHE STRING "Earliest version of macOS supported
+  if (NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+    if (DEFINED ENV{MACOSX_DEPLOYMENT_TARGET} AND NOT "$ENV{MACOSX_DEPLOYMENT_TARGET}" STREQUAL "")
+      set (_WSJTX_MACOS_DEPLOYMENT_TARGET "$ENV{MACOSX_DEPLOYMENT_TARGET}")
+    else ()
+      set (_WSJTX_MACOS_ARCHITECTURES "${CMAKE_OSX_ARCHITECTURES}")
+      if (NOT _WSJTX_MACOS_ARCHITECTURES)
+        execute_process (COMMAND uname -m
+          OUTPUT_VARIABLE _WSJTX_MACOS_ARCHITECTURES
+          OUTPUT_STRIP_TRAILING_WHITESPACE)
+      endif ()
 
-Earliest version we can support with Qt 5.12, C++11 & libc++ is 10.12.
-Do not override this if you intend to build an official deployable installer.")
+      if (_WSJTX_MACOS_ARCHITECTURES MATCHES "(^|;)arm64($|;)")
+        set (_WSJTX_MACOS_DEPLOYMENT_TARGET 11.0)
+      else ()
+        set (_WSJTX_MACOS_DEPLOYMENT_TARGET 10.13)
+      endif ()
+    endif ()
+
+    set (CMAKE_OSX_DEPLOYMENT_TARGET "${_WSJTX_MACOS_DEPLOYMENT_TARGET}"
+      CACHE STRING "Earliest macOS version supported by the target architecture")
+  endif ()
 endif (APPLE)
 
 #
