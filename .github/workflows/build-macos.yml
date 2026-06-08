@@ -257,6 +257,7 @@ jobs:
             -DWSJT_MACOS_LIBGOMP_LIBRARY="${{ steps.fc.outputs.libgomp }}" \
             -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
             -DWSJT_SKIP_MANPAGES=ON \
+            -DWSJT_SKIP_BUNDLE_FIXUP=ON \
             -DWSJT_BUILD_TESTS=ON \
             -Wno-dev
 
