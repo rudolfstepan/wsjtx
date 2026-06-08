@@ -31,6 +31,15 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Resolve source revision
+        id: source_revision
+        run: |
+          source_revision="${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}"
+          if [ -z "$source_revision" ]; then
+            source_revision="$(git rev-parse HEAD)"
+          fi
+          echo "sha=${source_revision}" >> "$GITHUB_OUTPUT"
+
       - name: Verify macOS build tuple
         run: |
           case "${{ inputs.arch }}:${{ inputs.runner }}:${{ inputs.deployment_target }}" in
@@ -255,6 +264,7 @@ jobs:
             -DCMAKE_OSX_DEPLOYMENT_TARGET=${{ inputs.deployment_target }} \
             -DCMAKE_EXE_LINKER_FLAGS="-Wl,-headerpad_max_install_names ${{ steps.fc.outputs.runtime_link_flags }}" \
             -DWSJT_MACOS_LIBGOMP_LIBRARY="${{ steps.fc.outputs.libgomp }}" \
+            -DWSJT_SOURCE_REVISION="${{ steps.source_revision.outputs.sha }}" \
             -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
             -DWSJT_SKIP_MANPAGES=ON \
             -DWSJT_SKIP_BUNDLE_FIXUP=ON \
