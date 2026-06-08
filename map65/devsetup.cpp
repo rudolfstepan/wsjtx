@@ -29,7 +29,6 @@ DevSetup::~DevSetup()
 void DevSetup::initDlg()
 {
   int k,id;
-  int valid_devices=0;
   int minChan[MAXDEVICES];
   int maxChan[MAXDEVICES];
   int minSpeed[MAXDEVICES];
@@ -43,10 +42,9 @@ void DevSetup::initDlg()
     if(96000 >= minSpeed[id] && 96000 <= maxSpeed[id]) {
       m_inDevList[k]=id;
       k++;
-      sprintf(s,"%2d   %d  %-49s",id,maxChan[id],hostAPI_DeviceName[id]);
+      snprintf(s,sizeof(s),"%2d   %d  %-49s",id,maxChan[id],hostAPI_DeviceName[id]);
       QString t(s);
       ui.comboBoxSndIn->addItem(t);
-      valid_devices++;
     }
   }
 
@@ -64,8 +62,8 @@ void DevSetup::initDlg()
     if(nchout>=2) {
       m_outDevList[k]=id;
       k++;
-      sprintf((char*)(pa_device_name),"%s",pdi->name);
-      sprintf((char*)(pa_device_hostapi),"%s",
+      snprintf(pa_device_name,sizeof(pa_device_name),"%s",pdi->name);
+      snprintf(pa_device_hostapi,sizeof(pa_device_hostapi),"%s",
               Pa_GetHostApiInfo(pdi->hostApi)->name);
 
       p1=(char*)"";
@@ -80,7 +78,7 @@ void DevSetup::initDlg()
       p=strstr(pa_device_hostapi,"WDM-KS");
       if(p!=NULL) p1=(char*)"WDM-KS";
 
-      sprintf(p2,"%2d   %-8s  %-39s",id,p1,pa_device_name);
+      snprintf(p2,sizeof(p2),"%2d   %-8s  %-39s",id,p1,pa_device_name);
       QString t(p2);
       ui.comboBoxSndOut->addItem(t);
     }

@@ -52,8 +52,8 @@ int pa_get_device_info (int  n,
   if(n >= Pa_GetDeviceCount() ) return -1;
   deviceInfo = Pa_GetDeviceInfo(n);
   if (deviceInfo->maxInputChannels==0) return -1;
-  sprintf((char*)(pa_device_name),"%s",deviceInfo->name);
-  sprintf((char*)(pa_device_hostapi),"%s",
+  snprintf(static_cast<char*>(pa_device_name),128,"%s",deviceInfo->name);
+  snprintf(static_cast<char*>(pa_device_hostapi),128,"%s",
           Pa_GetHostApiInfo( deviceInfo->hostApi )->name);
   speed_warning=0;
 
@@ -187,7 +187,7 @@ void paInputDevice(int id, char* hostAPI_DeviceName, int* minChan,
   int pa_device_min_channels;
   char p2[256];
   char *p,*p1;
-  static int iret, valid_dev_cnt;
+  int iret;
 
   iret=pa_get_device_info (id,
                           &pa_device_name,
@@ -200,8 +200,6 @@ void paInputDevice(int id, char* hostAPI_DeviceName, int* minChan,
                           &pa_device_min_channels);
 
   if (iret >= 0 ) {
-    valid_dev_cnt++;
-
     p1=(char*)"";
     p=strstr(pa_device_hostapi,"MME");
     if(p!=NULL) p1=(char*)"MME";
@@ -214,7 +212,7 @@ void paInputDevice(int id, char* hostAPI_DeviceName, int* minChan,
     p=strstr(pa_device_hostapi,"WDM-KS");
     if(p!=NULL) p1=(char*)"WDM-KS";
 
-    sprintf(p2,"%-8s %-39s",p1,pa_device_name);
+    snprintf(p2,sizeof(p2),"%-8s %-39s",p1,pa_device_name);
     for(i=0; i<50; i++) {
       hostAPI_DeviceName[i]=p2[i];
       if(p2[i]==0) break;
