@@ -3404,7 +3404,7 @@ void MainWindow::fastSink(qint64 frames)
 #else
         QString audioPath = app_sounds_directory (m_config.voicesPath());
         if (m_config.alert_DXcall() && play_DXcall) QSound::play(audioPath + "DXcall.wav");  // for Linux and macOS
-        else if (m_config.alert_DXcall() && play_Wanted) QSound::play(audioPath + "Wanted.wav");  // for Linux and macOS
+        else if (m_config.alert_Wanted() && play_Wanted) QSound::play(audioPath + "Wanted.wav");  // for Linux and macOS
 #endif
         play_DXcall = false;
         play_Wanted = false;
@@ -7233,7 +7233,7 @@ void MainWindow::readFromStdout()                             //readFromStdout
 #else
             QString audioPath = app_sounds_directory (m_config.voicesPath());
             if (m_config.alert_DXcall() && play_DXcall) QSound::play(audioPath + "DXcall.wav");  // for Linux and macOS
-            else if (m_config.alert_DXcall() && play_Wanted) QSound::play(audioPath + "Wanted.wav");  // for Linux and macOS
+            else if (m_config.alert_Wanted() && play_Wanted) QSound::play(audioPath + "Wanted.wav");  // for Linux and macOS
 #endif
             play_DXcall = false;
             play_Wanted = false;
