@@ -1,0 +1,6 @@
+add_executable (test_packjt77_hash_vectors
+  test_packjt77_hash_vectors.f90)
+target_include_directories (test_packjt77_hash_vectors PRIVATE ${CMAKE_BINARY_DIR})
+target_link_libraries (test_packjt77_hash_vectors wsjt_fort wsjt_cxx)
+
+add_test (NAME test_packjt77_hash_vectors COMMAND test_packjt77_hash_vectors)
