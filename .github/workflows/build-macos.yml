@@ -24,6 +24,16 @@ on:
         description: "macOS deployment target version"
         required: true
         type: string
+      release_channel:
+        description: "Build release channel: DEVEL, RC, or GA"
+        required: false
+        type: string
+        default: "DEVEL"
+      rc_number:
+        description: "Release candidate number when release_channel is RC"
+        required: false
+        type: string
+        default: ""
 
 jobs:
   build:
@@ -269,6 +279,8 @@ jobs:
             -DWSJT_SKIP_MANPAGES=ON \
             -DWSJT_SKIP_BUNDLE_FIXUP=ON \
             -DWSJT_BUILD_TESTS=ON \
+            -DWSJT_RELEASE_CHANNEL="${{ inputs.release_channel }}" \
+            -DWSJT_RC_NUMBER="${{ inputs.rc_number }}" \
             -Wno-dev
 
       - name: Verify resolved dependency prefixes
@@ -975,6 +987,8 @@ jobs:
 
           pkgbuild --analyze --root "${PAYLOAD}" "$RUNNER_TEMP/components.plist"
           /usr/libexec/PlistBuddy -c "Set :0:BundleIsRelocatable false" "$RUNNER_TEMP/components.plist" 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Set :0:BundleIsVersionChecked false" "$RUNNER_TEMP/components.plist" 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Set :0:BundleOverwriteAction upgrade" "$RUNNER_TEMP/components.plist" 2>/dev/null || true
 
           pkgbuild \
             --root "${PAYLOAD}" \
@@ -1001,6 +1015,9 @@ jobs:
           CHECK_PAYLOAD="$RUNNER_TEMP/pkg-check"
           rm -rf "$CHECK_PAYLOAD"
           pkgutil --expand-full "$PKG_OUT" "$CHECK_PAYLOAD"
+          [ "$(/usr/libexec/PlistBuddy -c "Print :0:BundleIsRelocatable" "$RUNNER_TEMP/components.plist")" = "false" ]
+          [ "$(/usr/libexec/PlistBuddy -c "Print :0:BundleIsVersionChecked" "$RUNNER_TEMP/components.plist")" = "false" ]
+          [ "$(/usr/libexec/PlistBuddy -c "Print :0:BundleOverwriteAction" "$RUNNER_TEMP/components.plist")" = "upgrade" ]
 
           APP_PAYLOAD="$CHECK_PAYLOAD/wsjtx-component.pkg/Payload/Applications/wsjtx.app"
           DATADIR="${APP_PAYLOAD}/Contents/Resources/wsjtx"

@@ -15,10 +15,30 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.v.outputs.version }}
+      release_channel: ${{ steps.v.outputs.release_channel }}
+      rc_number: ${{ steps.v.outputs.rc_number }}
     steps:
       - uses: actions/checkout@v6
       - id: v
-        run: echo "version=${GITHUB_REF_NAME#build/v}" >> "$GITHUB_OUTPUT"
+        run: |
+          VERSION="${GITHUB_REF_NAME#build/v}"
+          if [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            RELEASE_CHANNEL=GA
+            RC_NUMBER=""
+          elif [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc([1-9][0-9]*)$ ]]; then
+            RELEASE_CHANNEL=RC
+            RC_NUMBER="${BASH_REMATCH[1]}"
+          else
+            echo "::error::Unsupported release tag version: $VERSION"
+            echo "::error::Supported release tags are build/vX.Y.Z and build/vX.Y.Z-rcN."
+            exit 1
+          fi
+
+          {
+            echo "version=$VERSION"
+            echo "release_channel=$RELEASE_CHANNEL"
+            echo "rc_number=$RC_NUMBER"
+          } >> "$GITHUB_OUTPUT"
 
       # Enforce that the pushed tag's numeric version base
       # matches CMakeLists.txt:55 VERSION (first 3 components). CMake's
@@ -70,6 +90,8 @@ jobs:
       arch: "arm64"
       runner: "macos-15"
       deployment_target: "11.0"
+      release_channel: ${{ needs.prepare.outputs.release_channel }}
+      rc_number: ${{ needs.prepare.outputs.rc_number }}
     secrets: inherit
 
   macos-intel:
@@ -79,6 +101,8 @@ jobs:
       version: ${{ needs.prepare.outputs.version }}
       hamlib_branch: "4.7.1"
       arch: "x86_64"
+      release_channel: ${{ needs.prepare.outputs.release_channel }}
+      rc_number: ${{ needs.prepare.outputs.rc_number }}
       runner: "macos-15-intel"
       deployment_target: "10.13"
     secrets: inherit
@@ -90,6 +114,8 @@ jobs:
       version: ${{ needs.prepare.outputs.version }}
       hamlib_branch: "4.7.1"
       arch: "x86_64"
+      release_channel: ${{ needs.prepare.outputs.release_channel }}
+      rc_number: ${{ needs.prepare.outputs.rc_number }}
     secrets: inherit
 
   linux-arm:
@@ -99,6 +125,8 @@ jobs:
       version: ${{ needs.prepare.outputs.version }}
       hamlib_branch: "4.7.1"
       arch: "aarch64"
+      release_channel: ${{ needs.prepare.outputs.release_channel }}
+      rc_number: ${{ needs.prepare.outputs.rc_number }}
     secrets: inherit
 
   windows:
@@ -107,6 +135,8 @@ jobs:
     with:
       version: ${{ needs.prepare.outputs.version }}
       hamlib_branch: "4.7.1"
+      release_channel: ${{ needs.prepare.outputs.release_channel }}
+      rc_number: ${{ needs.prepare.outputs.rc_number }}
     secrets: inherit
 
   # ── Publish release + sync to public repo ──────────────────────────

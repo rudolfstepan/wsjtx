@@ -12,6 +12,16 @@ on:
         required: false
         type: string
         default: "4.7.0"
+      release_channel:
+        description: "Build release channel: DEVEL, RC, or GA"
+        required: false
+        type: string
+        default: "DEVEL"
+      rc_number:
+        description: "Release candidate number when release_channel is RC"
+        required: false
+        type: string
+        default: ""
 
 jobs:
   build:
@@ -164,6 +174,8 @@ jobs:
             -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
             -DWSJT_SKIP_MANPAGES=ON \
             -DWSJT_BUILD_TESTS=ON \
+            -DWSJT_RELEASE_CHANNEL="${{ inputs.release_channel }}" \
+            -DWSJT_RC_NUMBER="${{ inputs.rc_number }}" \
             -DPFUNIT_DIR="${{ steps.pfunit.outputs.pfunit_dir }}" \
             -DGFTL_DIR="${{ steps.pfunit.outputs.gftl_dir }}" \
             -DGFTL_SHARED_DIR="${{ steps.pfunit.outputs.gftl_shared_dir }}" \
