@@ -98,4 +98,3 @@ on Windows.
 
 - *High Resolution Monitors* are supported with better scaling of
 fonts and widget sizes.
-

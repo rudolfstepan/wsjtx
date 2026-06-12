@@ -48,18 +48,6 @@ damaged. The _OpenSSL_ DLLs must match the Qt libraries used to build
 the program and are normally installed with _WSJT-X_, so installing
 unrelated system-wide _OpenSSL_ DLLs is not the recommended fix.
 
-Install the package and accept the default options, including the
-option to copy the _OpenSSL_ DLLs to the Windows system
-directory. There is no obligation to donate to the _OpenSSL_
-project. Un-check all the donation options if desired. +
-
-NOTE: If you still get the same network error after installing the
-      _OpenSSL_ libraries then you also need to install the
-      {msvcpp_redist} component. From the download page select
-      `vcredist_x86.exe` for use with the 32-bit _WSJT-X_ build or
-      `vcredist_x64.exe` with the 64-bit build, then run it to
-      install.
-
 TIP: If you cannot update or reinstall _WSJT-X_, or do not have an
      Internet connection on the computer used to run
      _WSJT-X_ {VERSION_MAJOR}.{VERSION_MINOR}, you can download
