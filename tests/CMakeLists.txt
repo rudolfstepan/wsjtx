@@ -24,6 +24,10 @@ add_test (test_qt_helpers test_qt_helpers)
 add_subdirectory (unit/hrd)
 add_subdirectory (unit/packjt77)
 
+add_executable (test_http_user_agent test_http_user_agent.cpp)
+target_link_libraries (test_http_user_agent wsjt_qt Qt5::Test)
+add_test (test_http_user_agent test_http_user_agent)
+
 add_executable (test_bwf_file test_bwf_file.cpp)
 target_link_libraries (test_bwf_file wsjt_qt wsjt_qtmm Qt5::Test Qt5::Multimedia)
 add_test (test_bwf_file test_bwf_file)
