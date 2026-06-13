@@ -24,17 +24,17 @@ testing.  The program analyzes received passbands up to 5 kHz wide and
 runs equally well on Windows, Macintosh, and Linux systems.
 
 *Version Numbers* for our programs have major, minor, and patch
-numbers separated by periods: for example, _WSJT-X 2.7.0. Temporary
+numbers separated by periods: for example, _WSJT-X 3.0.0_. Temporary
 release candidates are sometimes made in advance of a new
 general-availability (GA) release, in order to obtain user
 feedback. Release candidates are given version labels such as
-2.7.0-rc1, 2.7.0-rc2, etc., leading up to the general availability
-(GA) release of version 2.7.0. Release candidates should be used only
+3.0.0-rc1, 3.0.0-rc2, etc., leading up to the general availability
+(GA) release of version 3.0.0. Release candidates should be used only
 during a defined testing period, and they carry an implicit obligation
 to provide feedback to the program developers. Release candidates
 should not be used on the air after a GA release with the same number.
 
-*_MAP65_* and *_QMAP_* are companion programs written by K1JT to
+*_MAP65_* and *_QMAP_* are companion programs originally written by K1JT to
 facilitate Earth-Moon-Earth (EME, or "Moonbounce") communication with
 digital protocols developed for _WSJT_ and _WSJT-X_. When used with
 radio-frequency hardware providing coherent signal channels for two
