@@ -28,6 +28,10 @@ add_executable (test_http_user_agent test_http_user_agent.cpp)
 target_link_libraries (test_http_user_agent wsjt_qt Qt5::Test)
 add_test (test_http_user_agent test_http_user_agent)
 
+add_executable (test_emulate_split_transceiver test_emulate_split_transceiver.cpp)
+target_link_libraries (test_emulate_split_transceiver Boost::log wsjt_qt Qt5::Test Qt5::Network Qt5::Widgets)
+add_test (test_emulate_split_transceiver test_emulate_split_transceiver)
+
 add_executable (test_bwf_file test_bwf_file.cpp)
 target_link_libraries (test_bwf_file wsjt_qt wsjt_qtmm Qt5::Test Qt5::Multimedia)
 add_test (test_bwf_file test_bwf_file)

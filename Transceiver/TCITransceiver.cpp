@@ -711,7 +711,10 @@ void TCITransceiver::onMessageReceived(const QString &str)
             if (args.at(1) == "0" ) mode_ = args.at(2).toLower(); else mode_ = args.at(1).toLower();
           } else mode_ = args.at(1);
           if (started_mode_.isEmpty()) started_mode_ = mode_;
-          if (busy_mode_) return; // was tci_done1();
+          if (busy_mode_) {
+            if (requested_mode_.isEmpty() || requested_mode_ == mode_) tci_done8();
+            return;
+          }
           else if (!requested_mode_.isEmpty() && requested_mode_ != mode_ && !band_change) {
             sendTextMessage(mode_to_command(requested_mode_));
           }
@@ -1000,8 +1003,7 @@ void TCITransceiver::rig_split ()
   if (busy_split_) return;
   if (tci_timer5_->isActive()) mysleep5(0);
   busy_split_ = true;
-  const QString cmd = CmdSplitEnable + SmDP + rx_ + SmCM +  "false" + SmTZ;  // changed from below so split always false
-  //const QString cmd = CmdSplitEnable + SmDP + rx_ + SmCM + (requested_split_ ? "true" : "false") + SmTZ;
+  const QString cmd = CmdSplitEnable + SmDP + rx_ + SmCM + (requested_split_ ? "true" : "false") + SmTZ;
   sendTextMessage(cmd);
   mysleep5(500);
   busy_split_ = false;
@@ -1153,7 +1155,7 @@ void TCITransceiver::do_frequency (Frequency f, MODE m, bool no_ignore)
     if (!requested_mode_.isEmpty() && requested_mode_ != mode_ && !busy_mode_) {
       busy_mode_ = true;
       sendTextMessage(mode_to_command(requested_mode_));
-      mysleep7(1000);
+      mysleep8(1000);
       if (requested_mode_.isEmpty() || requested_mode_ == mode_) update_mode (m);
       else {
         printf("%s TCI failed set mode %s->%s",QDateTime::QDateTime::currentDateTimeUtc().toString("hh:mm:ss.zzz").toStdString().c_str(),mode_.toStdString().c_str(),requested_mode_.toStdString().c_str());
