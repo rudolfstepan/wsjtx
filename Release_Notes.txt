@@ -12,7 +12,7 @@
 Copyright 2001 - 2026 by Joe Taylor, K1JT, and the WSJT Development Team
 
                         Release: WSJT-X 3.0.2
-                            June 15, 2026
+                            June 19, 2026
                       -------------------------
 
 WSJT-X 3.0.2 is a bug-fix release. New installation packages for
