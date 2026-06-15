@@ -11,6 +11,64 @@
 
 Copyright 2001 - 2026 by Joe Taylor, K1JT, and the WSJT Development Team
 
+                        Release: WSJT-X 3.0.2
+                            June 15, 2026
+                      -------------------------
+
+WSJT-X 3.0.2 is a bug-fix release. New installation packages for
+Windows, Linux, and macOS systems include user applications WSJT-X,
+MAP65, and QMAP.
+
+Changes since release 3.0.1:
+
+ - Ham Radio Deluxe (HRD): fixes CAT-control failures reported with
+   the 3.0.1 Windows builds, where WSJT-X could fail to communicate
+   correctly with HRD. HRD reply handling has been made more robust
+   while preserving compatibility with existing HRD responses.
+
+ - OmniRig: fixes setups where WSJT-X could fail to set the rig
+   frequency at startup on slower rigs, including reports involving
+   the FTDX-101 family.
+
+ - Transceiver Control Interface (TCI): fixes silent transmit audio
+   for modes with transmit/receive periods other than 15 s.
+
+ - Wide Graph: “Erase reference spectrum” now properly clears stale
+   reference-spectrum correction so it no longer affects new waterfall
+   data.
+
+ - Callsign highlighting: highlighted callsigns can now be cleared
+   reliably, and background highlighting is correctly applied to the
+   second callsign on a decode line.
+
+ - WAV files: improves WAV/BWF file handling so malformed or truncated
+   recordings are handled robustly and no longer risk crashing WSJT-X.
+
+ - Windows: the installer now detects when WSJT-X is already running
+   and asks you to close it before upgrading, avoiding incomplete
+   installs caused by locked files.
+
+ - Windows: fixes clean installs where features depending on Transport
+   Layer Security (TLS) could fail. This bug could affect features
+   such as SuperFox verification, Update Hamlib, LoTW user-data
+   download, eQSL, and other HTTPS downloads/uploads, such as spotting
+   to LiveCQ.
+
+ - macOS: fixes packages that could miss required data files on fresh
+   installs, restoring FT8 callsign filtering, DXCC country names,
+   grid-to-state lookup, and astronomical-data lookup.
+
+ - Linux: fixes .deb installs on systems that already have
+   distribution packages for wsjtx-data, wsjtx-doc, or
+   wsjtx-improved-*, avoiding file conflicts and improper removal of
+   dependent packages such as JS8Call.
+
+ - Release builds: downloadable installers are now produced by an
+   automated build-and-package pipeline for Windows, macOS, and
+   Linux. This improves release consistency and catches
+   packaging/runtime problems before publication.
+
+
                         Release: WSJT-X 3.0.1
                              May 4, 2026
                       -------------------------
