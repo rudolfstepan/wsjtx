@@ -208,6 +208,26 @@ jobs:
           file wsjtx-build/jt9.exe
           test -x wsjtx-build/map65/map65.exe
 
+      - name: Stage install
+        run: |
+          WORKSPACE=$(cygpath "${GITHUB_WORKSPACE}")
+          cmake --install wsjtx-build --prefix "${WORKSPACE}/stage-main"
+          ls -la "${WORKSPACE}/stage-main/bin"
+
+      - name: Audit staged runtime DLL imports
+        run: |
+          WORKSPACE=$(cygpath "${GITHUB_WORKSPACE}")
+          test -f "${WORKSPACE}/stage-main/bin/map65.exe"
+          test -f "${WORKSPACE}/stage-main/bin/qmap.exe"
+          test -f "${WORKSPACE}/stage-main/bin/wsjtx.exe"
+          test -f "${WORKSPACE}/stage-main/bin/jt9.exe"
+          bash .github/scripts/audit-staged-dll-imports-windows.sh \
+            "${WORKSPACE}/stage-main/bin" \
+            "${WORKSPACE}/stage-main/bin/map65.exe" \
+            "${WORKSPACE}/stage-main/bin/qmap.exe" \
+            "${WORKSPACE}/stage-main/bin/wsjtx.exe" \
+            "${WORKSPACE}/stage-main/bin/jt9.exe"
+
       # Emit an NSIS installer containing the full CLI tool set
       # (wsjtx.exe, jt9, wsprd, fmtave, fcal, fmeasure + WSJT_BUILD_UTILS
       # ft8code/jt65code/... + rigctl wrappers + Qt runtime via bundle_fixup).
