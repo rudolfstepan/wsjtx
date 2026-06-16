@@ -170,6 +170,8 @@ jobs:
           ls -lh "$DEB"
           file "$DEB"
           dpkg-deb --info "$DEB" | head -20
+          dpkg-deb -c "$DEB" | grep -qE '/usr/bin/map65$'
+          dpkg-deb -f "$DEB" Depends | grep -Eq 'libportaudio|portaudio'
 
       - name: Upload .deb
         uses: actions/upload-artifact@v7
@@ -201,6 +203,8 @@ jobs:
           # Confirm the core binaries are in the package.
           rpm -qpl "$RPM" | grep -qE '/bin/wsjtx$'
           rpm -qpl "$RPM" | grep -qE '/bin/jt9$'
+          rpm -qpl "$RPM" | grep -qE '/bin/map65$'
+          rpm -qpR "$RPM" | grep -Eq 'libportaudio|portaudio'
 
       - name: Upload RPM
         uses: actions/upload-artifact@v7
@@ -215,6 +219,7 @@ jobs:
           # linuxdeploy's desktop/icon integration needs these exact paths.
           test -x AppDir/usr/bin/wsjtx
           test -x AppDir/usr/bin/jt9
+          test -x AppDir/usr/bin/map65
           test -x AppDir/usr/bin/ft8code
           test -f AppDir/usr/share/applications/wsjtx.desktop
           test -f AppDir/usr/share/pixmaps/wsjtx_icon.png
@@ -266,6 +271,7 @@ jobs:
           ./"$APPIMAGE" --appimage-extract >/dev/null
           test -x squashfs-root/usr/bin/wsjtx
           test -x squashfs-root/usr/bin/jt9
+          test -x squashfs-root/usr/bin/map65
           test -x squashfs-root/usr/bin/ft8code
           test -x squashfs-root/usr/bin/wsprd
           file squashfs-root/usr/bin/wsjtx | grep -q "ELF 64-bit"

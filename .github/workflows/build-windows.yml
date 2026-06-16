@@ -206,6 +206,7 @@ jobs:
       - name: Verify binary
         run: |
           file wsjtx-build/jt9.exe
+          test -x wsjtx-build/map65/map65.exe
 
       # Emit an NSIS installer containing the full CLI tool set
       # (wsjtx.exe, jt9, wsprd, fmtave, fcal, fmeasure + WSJT_BUILD_UTILS
@@ -229,6 +230,7 @@ jobs:
             -D CPACK_PACKAGE_VERSION="${{ inputs.version }}" \
             -D CPACK_PACKAGE_FILE_NAME="wsjtx-${{ inputs.version }}-win64"
           ls -la *.exe
+          test -x map65/map65.exe
 
       # Self-signed ephemeral signing — the signing step is wired into the
       # pipeline, but the signature does NOT chain to a trusted root. This
@@ -279,5 +281,6 @@ jobs:
           name: wsjtx-${{ inputs.version }}-windows-x86_64
           path: |
             wsjtx-build/jt9.exe
+            wsjtx-build/map65/map65.exe
             wsjtx-build/wsprd.exe
             wsjtx-build/wsjtx.exe
