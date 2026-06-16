@@ -315,6 +315,8 @@ set (wsjtx_CXXSRCS
   WSJTXLogging.cpp
   logbook/logbook.cpp
   Network/PSKReporter.cpp
+  Network/PSKReporterConfiguration.cpp
+  Network/PSKReporterIPFIX.cpp
   Modulator/Modulator.cpp
   Detector/Detector.cpp
   widgets/logqso.cpp
@@ -1336,6 +1338,13 @@ if (${OPENMP_FOUND} OR APPLE)
   endif (APPLE)
 endif (${OPENMP_FOUND} OR APPLE)
 
+add_library (wsjt_fort_common INTERFACE)
+target_link_libraries (wsjt_fort_common INTERFACE wsjt_fort wsjt_cxx)
+
+function (wsjt_link_common_fortran tgt)
+  target_link_libraries (${tgt} PUBLIC wsjt_fort_common)
+endfunction ()
+
 if(WSJT_BUILD_UTILS) 
 
 add_executable (jt4sim lib/jt4sim.f90)
@@ -1671,13 +1680,11 @@ else (${OPENMP_FOUND} OR APPLE)
   target_link_libraries (jt9 wsjt_fort wsjt_cxx fort_qt)
 endif (${OPENMP_FOUND} OR APPLE)
 
-if (WIN32)
+if (NOT WSJT_SKIP_MAP65)
   find_package (Portaudio REQUIRED)
-  if (NOT WSJT_SKIP_MAP65)
-    add_subdirectory (map65)
-  endif ()
+  add_subdirectory (map65)
 endif ()
-  add_subdirectory (qmap)
+add_subdirectory (qmap)
 
 # build the main application
 generate_version_info (wsjtx_VERSION_RESOURCES
@@ -1863,6 +1870,13 @@ install (TARGETS qmap
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
   BUNDLE DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
   )
+
+if (NOT WSJT_SKIP_MAP65)
+  install (TARGETS map65
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
+    BUNDLE DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
+    )
+endif ()
 
 if(WSJT_BUILD_UTILS)
 install (TARGETS ft8code jt65code jt9code jt4code msk144code 
