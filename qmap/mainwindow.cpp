@@ -1254,8 +1254,10 @@ void MainWindow::sendLiveCQData(QList<QStringList>decodeList)
   QNetworkAccessManager *manager = new QNetworkAccessManager(this);
   QUrl url(theUrl);
   QNetworkRequest request(url);
-  request.setRawHeader("User-Agent", "QMAP v0.5");
-  request.setRawHeader("X-Custom-User-Agent", "QMAP v0.5");
+  QByteArray userAgent = (QCoreApplication::applicationName() + " v"
+                          + QCoreApplication::applicationVersion()).toUtf8();
+  request.setRawHeader("User-Agent", userAgent);
+  request.setRawHeader("X-Custom-User-Agent", userAgent);
   request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
   for (const QStringList &thePostLine : decodeList) {
