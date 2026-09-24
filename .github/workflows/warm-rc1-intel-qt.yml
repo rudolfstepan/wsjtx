@@ -1,0 +1,50 @@
+name: Warm RC1 Intel Qt Cache
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  warm:
+    runs-on: macos-15-intel
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: 567ad29ce6abf3d4a44f181cdbc7ceba0d73e5f4
+          persist-credentials: false
+      - name: Verify source and cache scope
+        id: qt-key
+        run: |
+          test "$GITHUB_REF" = refs/heads/master
+          test "$(git rev-parse HEAD)" = 567ad29ce6abf3d4a44f181cdbc7ceba0d73e5f4
+          key=$(.github/scripts/macos-qt-cache-key.sh \
+            --arch x86_64 --runner macos-15-intel --deployment-target 10.13)
+          test "$key" = qt-macos-x86_64-macos-15-intel-5.15.18-min10.13-epoch1-256cd71acab58abeaec531c0534095de84a0be5d9b144f11d52e5c4be728d10f
+          echo "key=$key" >> "$GITHUB_OUTPUT"
+      - name: Restore Qt cache
+        id: qt-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: qt-prefix
+          key: ${{ steps.qt-key.outputs.key }}
+      - name: Build Qt
+        if: steps.qt-cache.outputs.cache-hit != 'true'
+        run: |
+          .github/scripts/build-qt-macos.sh \
+            --arch x86_64 --deployment-target 10.13 \
+            --prefix "${GITHUB_WORKSPACE}/qt-prefix"
+      - name: Verify Qt prefix
+        run: |
+          .github/scripts/verify-macos-artifacts.sh \
+            --target 10.13 --arch x86_64 \
+            --allow-prefix "${GITHUB_WORKSPACE}/qt-prefix" \
+            "${GITHUB_WORKSPACE}/qt-prefix"
+      - name: Save Qt cache
+        if: steps.qt-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: qt-prefix
+          key: ${{ steps.qt-key.outputs.key }}
