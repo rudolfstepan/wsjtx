@@ -6,6 +6,9 @@ Prüfungen sind in [docs/FT2.md](docs/FT2.md) auf Deutsch und Englisch dokumenti
 
 Start im Projektordner:
 
+Für den Start per Doppelklick die Datei **start.bat** öffnen. Sie verwendet
+denselben Launcher und dasselbe Custom-Profil wie der PowerShell-Aufruf:
+
 ```powershell
 .\Start-Custom.ps1
 ```

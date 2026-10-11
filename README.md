@@ -4,6 +4,9 @@
 
 **build by OE3SRO**
 
+**Start per Doppelklick:** [start.bat](start.bat) im Projektordner öffnen.
+Sie startet das vorhandene Custom-Paket mit dem Profil `Custom`.
+
 Dieser [Fork](https://github.com/rudolfstepan/wsjtx) von
 [WSJTX/wsjtx](https://github.com/WSJTX/wsjtx) ergänzt WSJT-X um eine integrierte
 PSK-Reporter-Empfängerliste und praktische Anrufhilfen. Du siehst direkt in der

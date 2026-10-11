@@ -4,6 +4,9 @@
 
 **build by OE3SRO**
 
+**Start with a double-click:** open [start.bat](start.bat) in the repository
+directory. It launches the existing custom package with the `Custom` profile.
+
 This [fork](https://github.com/rudolfstepan/wsjtx) of
 [WSJTX/wsjtx](https://github.com/WSJTX/wsjtx) adds an integrated PSK Reporter
 receiver list and practical station calling tools to WSJT-X. See which
