@@ -16,6 +16,10 @@ das About-Fenster und der Splashscreen tragen den Zusatz **build by OE3SRO**.
 Der Custom-Build basiert derzeit auf **WSJT-X 3.0.2-devel**; die hier
 beschriebenen Build-Skripte und Paketprüfungen sind für Windows ausgelegt.
 
+Die [Änderungshistorie des Forks](docs/CHANGES.md) dokumentiert die Custom-
+Erweiterungen und ihre Implementierungscommits. Die [FT2-Dokumentation](docs/FT2.md)
+enthält Bedienung, technische Umsetzung, Quellen und den geprüften Buildstand.
+
 ## Neue Funktionen von OE3SRO
 
 | Funktion | Nutzen |

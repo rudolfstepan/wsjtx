@@ -16,6 +16,10 @@ About dialog, and splash screen include **build by OE3SRO**.
 The custom build currently uses **WSJT-X 3.0.2-devel** as its base; the build
 scripts and package checks described here target Windows.
 
+The [fork change history](docs/CHANGES.md) records the custom additions and
+their implementation commits. The [FT2 documentation](docs/FT2.md) covers
+operation, implementation, sources, and the verified build baseline.
+
 ## New features by OE3SRO
 
 | Feature | Benefit |

@@ -1,5 +1,9 @@
 # Eigene WSJT-X-Version mit PSK Reporter
 
+Die Änderungen gegenüber dem Original und ihre Quelltextbereiche stehen in
+[docs/CHANGES.md](docs/CHANGES.md). Die technische FT2-Implementierung und ihre
+Prüfungen sind in [docs/FT2.md](docs/FT2.md) auf Deutsch und Englisch dokumentiert.
+
 Start im Projektordner:
 
 ```powershell
