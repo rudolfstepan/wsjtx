@@ -1,5 +1,7 @@
 # OE3SRO Custom
 
+**Deutsch** | [English](README.en.md)
+
 **build by OE3SRO**
 
 Dieser [Fork](https://github.com/rudolfstepan/wsjtx) von
@@ -177,33 +179,76 @@ aller Mitwirkenden an WSJT-X auf. Empfangsdaten kommen von
 orientieren sich an der
 [GridTracker Call Roster](https://docs.gridtracker.org/latest/Making-GridTracker-Work-For-You/Using-Call-Roster.html).
 
-Die folgende ursprüngliche Projektbeschreibung sowie die Lizenz- und
-Markenhinweise bleiben erhalten.
+Die folgende Beschreibung des Originalprojekts sowie die Lizenz- und
+Markenhinweise sind auch in der englischen README enthalten.
 
 ---
 
-## Weak Signal Communication Software — Upstream
+## Software für Schwachsignal-Kommunikation — Originalprojekt
 
-### Programs
-*WSJT-X*, *MAP65*, and *QMAP* are open-source, multi-platform programs designed for weak-signal digital communication by amateur radio. *WSJT-X* works with a standard SSB transceiver, while *MAP65* and *QMAP* use wideband SDR-style hardware. The programs are open source, free of charge, and licensed under the GNU General Public License.
+### Programme
 
-*WSJT-X* implements communication protocols or "modes" called **FST4**, **FST4W**, **FT4**, **FT8**, **JT4**, **JT9**, **JT65**, **MSK144**, **Q65**, **WSPR**, and **Echo**. The first nine modes were designed for making reliable, confirmed QSOs in a wide variety of weak-signal propagation circumstances. These modes use timed Transmit/Receive sequences of specific lengths, synchronized with UTC. **WSPR** mode is for probing potential propagation paths with low-power transmissions, and **Echo** mode is for detecting and measuring reflections of your own signals from the Moon.
+*WSJT-X*, *MAP65* und *QMAP* sind quelloffene, plattformübergreifende Programme
+für digitale Schwachsignal-Kommunikation im Amateurfunk. *WSJT-X* arbeitet mit
+einem normalen SSB-Transceiver, während *MAP65* und *QMAP* breitbandige
+SDR-Hardware verwenden. Die Programme sind kostenlos und unter der GNU General
+Public License lizenziert.
 
-*MAP65* implements a wideband receiver for **JT65** and **Q65** signals, optimized for EME on the VHF/UHF bands. It can be used together with *Linrad* (by SM5BSZ) or with direct input from a soundcard, FUNcube Dongle, or similar hardware. The program decodes all **JT65** or **Q65** signals in a passband up to 90 kHz wide, producing a sorted band map of decoded callsigns. In a dual-polarization system, *MAP65* optimally matches the linear polarization angle of each signal, thereby eliminating problems with Faraday rotation and spatial polarization offsets. *MAP65* also handles T/R switching and generates suitable messages and audio waveforms for the selected mode.
+*WSJT-X* unterstützt die Betriebsarten **FST4**, **FST4W**, **FT4**, **FT8**,
+**JT4**, **JT9**, **JT65**, **MSK144**, **Q65**, **WSPR** und **Echo**. Die ersten
+neun Betriebsarten ermöglichen zuverlässige, bestätigte QSOs unter verschiedenen
+Schwachsignal-Ausbreitungsbedingungen. Sie verwenden mit UTC synchronisierte
+Sende- und Empfangssequenzen bestimmter Länge. **WSPR** untersucht mögliche
+Ausbreitungswege mit geringer Sendeleistung; **Echo** erkennt und misst
+Reflexionen des eigenen Signals vom Mond.
 
-*QMAP* is similar to *MAP65* in providing wideband reception of signals over a full EME sub-band. It works cooperatively with *WSJT-X*, supporting the **Q65** mode in both 30-second and 60-second submodes. The *QMAP* + *WSJT-X* combination provides full rig control and Doppler compensation for the EME (Earth-Moon-Earth) path.
+*MAP65* ist ein breitbandiger Empfänger für **JT65** und **Q65**, optimiert
+für EME auf VHF und UHF. Es arbeitet mit *Linrad* von SM5BSZ oder direkt mit
+einer Soundkarte, einem FUNcube Dongle oder ähnlicher Hardware. Das Programm
+decodiert alle **JT65**- oder **Q65**-Signale in einem bis zu 90 kHz breiten
+Durchlassbereich und erzeugt eine sortierte Bandübersicht der Rufzeichen.
+Bei Systemen mit zwei Polarisationen passt es den linearen Polarisationswinkel
+jedes Signals optimal an und gleicht damit Faraday-Rotation und räumliche
+Polarisationsunterschiede aus. Es übernimmt auch die Sende-/Empfangsumschaltung
+und erzeugt Nachrichten und Audiosignale für die gewählte Betriebsart.
+
+*QMAP* ermöglicht ähnlich wie *MAP65* den breitbandigen Empfang eines gesamten
+EME-Teilbands. Zusammen mit *WSJT-X* unterstützt es **Q65** mit 30- und
+60-Sekunden-Sequenzen. Die Kombination bietet Transceiversteuerung und
+Dopplerkompensation für den Erde-Mond-Erde-Signalweg.
 
 
-### Mode Details
-**JT4**, **JT9**, and **JT65** use nearly identical message structure, efficient compression of messages for minimal QSOs, and 60-second T/R sequences. **JT4** and **JT65** were designed for EME on the VHF, UHF, and microwave bands, while **JT9** is optimized for the MF and HF bands. **JT9** is about 2 dB more sensitive than **JT65** while using less than 10% of the bandwidth.
+### Einzelheiten zu den Betriebsarten
 
-**FT4** and **FT8** use T/R cycles of only 7.5 and 15 s, respectively. They have become extremely popular for world-wide DXing on the HF bands. **MSK144** is designed for Meteor Scatter on the VHF bands. **Q65** offers submodes with T/R sequence lengths from 15 seconds to 5 minutes, and a wide range of tone spacings. Particular Q65 submodes are highly recommended for EME, ionospheric scatter, and other weak signal work on VHF, UHF, and microwave bands. These modes include message formats explicitly supporting nonstandard callsigns and some popular radio contests.
+**JT4**, **JT9** und **JT65** verwenden nahezu identische Nachrichtenstrukturen,
+effiziente Kompression für minimale QSOs und 60-Sekunden-Sende-/Empfangssequenzen.
+**JT4** und **JT65** wurden für EME auf VHF, UHF und den Mikrowellenbändern
+entwickelt, **JT9** ist für MF und HF optimiert. **JT9** ist etwa 2 dB
+empfindlicher als **JT65** und benötigt weniger als 10 % seiner Bandbreite.
 
-**FST4** and **FST4W** are designed particularly for the LF and MF bands. On these bands their fundamental sensitivities are better than other *WSJT-X* modes with the same sequence lengths, approaching the theoretical limits for their rates of information throughput. **FST4** is optimized for two-way QSOs, while **FST4W** is for quasi-beacon transmissions of **WSPR**-style messages. **FST4** and **FST4W** do not require the strict, independent time synchronization and phase locking of modes like EbNaut.
+**FT4** und **FT8** verwenden Zyklen von nur 7,5 beziehungsweise 15 Sekunden
+und sind für weltweite DX-Verbindungen auf HF weit verbreitet. **MSK144**
+ist für Meteorscatter auf VHF ausgelegt. **Q65** bietet Sequenzlängen von
+15 Sekunden bis 5 Minuten und verschiedene Tonabstände. Geeignete Q65-Varianten
+eignen sich besonders für EME, ionosphärische Streuung und andere
+Schwachsignal-Verbindungen auf VHF, UHF und den Mikrowellenbändern. Diese
+Betriebsarten unterstützen auch nicht standardmäßige Rufzeichen und
+Nachrichtenformate für einige verbreitete Amateurfunkwettbewerbe.
+
+**FST4** und **FST4W** wurden besonders für LF und MF entwickelt. Auf diesen
+Bändern erreichen sie bei gleicher Sequenzlänge eine höhere Empfindlichkeit
+als andere *WSJT-X*-Betriebsarten und nähern sich den theoretischen Grenzen
+ihrer Datenrate. **FST4** ist für Zweiweg-QSOs optimiert, **FST4W** für
+bakenähnliche Aussendungen von Nachrichten im **WSPR**-Stil. Beide benötigen
+nicht die strenge unabhängige Zeitsynchronisation und Phasenbindung von
+Betriebsarten wie EbNaut.
 
 
-### License
-Licensed under the GNU General Public License v3.0 — see [COPYING](COPYING).
+### Lizenz
 
-### Trademark
-"WSJT-X," "MAP65," and "QMAP" are trademarks of the WSJT Development Team — see [TRADEMARK.md](TRADEMARK.md) for our policy on use of these names.
+Lizenziert unter der GNU General Public License v3.0 — siehe [COPYING](COPYING).
+
+### Marken
+
+„WSJT-X“, „MAP65“ und „QMAP“ sind Marken des WSJT Development Team. Die
+Richtlinie zur Verwendung dieser Namen steht in [TRADEMARK.md](TRADEMARK.md).
