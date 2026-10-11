@@ -15,7 +15,8 @@ CAboutDlg::CAboutDlg(QWidget *parent) :
 
   ui->labelTxt->setText ("<h2>" + QString {"WSJT-X v"
                                              + QCoreApplication::applicationVersion ()
-                                             + " " + display_revision ()}.simplified () + "<br />"
+                                             + " " + display_revision ()}.simplified () + "</h2>"
+    "<p><b>" + custom_build_credit () + "</b></p>"
 
     "WSJT-X implements a number of digital modes designed for <br />"
     "weak-signal Amateur Radio communication.  <br /><br />"

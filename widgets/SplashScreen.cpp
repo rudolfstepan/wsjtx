@@ -30,7 +30,7 @@ SplashScreen::SplashScreen ()
   setLayout (&m_->main_layout_);
   showMessage ("<h2>" + QString {"WSJT-X v" +
         QCoreApplication::applicationVersion() + " " +
-        revision ()}.simplified () + "</h2>"
+        revision ()}.simplified () + "</h2><b>" + custom_build_credit () + "</b><br /><br />"
     "Send issue reports to https://wsjtx.groups.io, and be sure to save .wav<br />"
     "files where appropriate.<br /><br />"
     "<b>Open the Help menu and select Release Notes for more details.</b><br />"

@@ -22,7 +22,7 @@ int main (int argc, char * argv[])
   try
     {
       app.setApplicationName ("WSJT-X");
-      app.setApplicationVersion (version());
+      app.setApplicationVersion (display_version ());
 
       QCommandLineParser parser;
 //      parser.setApplicationDescription ("\n" PROJECT_DESCRIPTION);

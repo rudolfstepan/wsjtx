@@ -27,6 +27,16 @@ public:
     high_volume_ = high_volume;
   }
   void setContentFont (QFont const&);
+  struct StationHighlight
+  {
+    QColor background;
+    QColor foreground;
+    bool worked = false;
+    bool worked_on_band = false;
+    QString criterion;
+  };
+  StationHighlight station_highlight (QString const& call, QString const& grid, LogBook const&,
+                                      QString const& band, QString const& mode) const;
   void insertLineSpacer(QString const&);
   void displayDecodedText(DecodedText const& decodedText, QString const& myCall, QString const& mode,
                           bool displayDXCCEntity, LogBook const& logBook,

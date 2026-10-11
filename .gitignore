@@ -22,3 +22,7 @@ CMakeFiles
 fnd
 lib/77bit/tmp
 lib/tmp
+/build-custom/
+/.local/
+/.tools/
+/dist-custom/

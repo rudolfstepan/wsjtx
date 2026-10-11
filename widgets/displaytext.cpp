@@ -146,6 +146,40 @@ namespace
   }
 }
 
+DisplayText::StationHighlight DisplayText::station_highlight (QString const& call, QString const& grid,
+                                                             LogBook const& logBook, QString const& band,
+                                                             QString const& mode) const
+{
+  StationHighlight result;
+  if (!m_config) return result;
+  auto const& country = logBook.countries ()->lookup (call);
+  bool countryWorked, gridWorked, continentWorked, cqWorked, ituWorked;
+  bool countryOnBand, gridOnBand, continentOnBand, cqOnBand, ituOnBand;
+  logBook.match (call, mode, grid, country, result.worked, countryWorked, gridWorked,
+                 continentWorked, cqWorked, ituWorked);
+  logBook.match (call, mode, grid, country, result.worked_on_band, countryOnBand, gridOnBand,
+                 continentOnBand, cqOnBand, ituOnBand, band);
+  if (grid.isEmpty ()) gridWorked = gridOnBand = true;
+  highlight_types types {Highlight::CQ};
+  if (!countryWorked) types.push_back (Highlight::DXCC);
+  if (!countryOnBand) types.push_back (Highlight::DXCCBand);
+  if (!gridWorked) types.push_back (Highlight::Grid);
+  if (!gridOnBand) types.push_back (Highlight::GridBand);
+  if (!result.worked) types.push_back (Highlight::Call);
+  if (!result.worked_on_band) types.push_back (Highlight::CallBand);
+  if (!continentWorked) types.push_back (Highlight::Continent);
+  if (!continentOnBand) types.push_back (Highlight::ContinentBand);
+  if (!cqWorked) types.push_back (Highlight::CQZone);
+  if (!cqOnBand) types.push_back (Highlight::CQZoneBand);
+  if (!ituWorked) types.push_back (Highlight::ITUZone);
+  if (!ituOnBand) types.push_back (Highlight::ITUZoneBand);
+  if (m_config->lotw_users ().user (call)) types.push_back (Highlight::LotW);
+  // Use the exact priority order and enabled rules used for decoded CQ stations.
+  auto priority = set_colours (m_config, &result.background, &result.foreground, types);
+  result.criterion = DecodeHighlightingModel::highlight_name (priority);
+  return result;
+}
+
 void DisplayText::insertText(QString const& text, QColor bg, QColor fg
                              , QString const& call1, QString const& call2, QTextCursor::MoveOperation location)
 {

@@ -1,5 +1,7 @@
 //---------------------------------------------------------- MainWindow
 #include "mainwindow.h"
+#include "PskReporterDialog.hpp"
+#include "PskReporterHighlight.hpp"
 
 #include <QAudio>
 #include <QAudioOutput>
@@ -557,6 +559,55 @@ MainWindow::MainWindow(QDir const& temp_directory, bool multiple,
   m_useDarkStyle {false}
 {
   ui->setupUi(this);
+  auto pskHighlights = new PskReporterHighlight {ui->decodedTextBrowser,
+    [this] { return PskReporterDialog::Context {m_config.my_callsign (), m_mode, m_freqNominal}; }};
+  auto pskReporter = new PskReporterDialog {this,
+    [this] { return PskReporterDialog::Context {m_config.my_callsign (), m_mode, m_freqNominal}; },
+    [this] (QString const& call, QString const& grid, PskReporterDialog::Context const& ctx) {
+      if (ctx.call != m_config.my_callsign () || ctx.mode != m_mode || ctx.dial != m_freqNominal) {
+        return tr ("The callsign, mode or frequency has changed. Refresh the reports before calling a station.");
+      }
+      if (m_transmitting) return tr ("A transmission is still in progress. Call the station after this TX period finishes.");
+      if (m_diskData || ui->tuneButton->isChecked ()) return tr ("Stop file playback or Tune before calling a station.");
+      if (m_specOp != SpecOp::NONE || !ui->tx1->isEnabled ()
+          || (m_mode != "FT8" && m_mode != "FT4" && m_mode != "JT65" && m_mode != "JT9" && m_mode != "Q65")) {
+        return tr ("Calling from PSK Reporter requires a normal QSO mode with Tx1 enabled and no special operating activity.");
+      }
+      auto_tx_mode (false);
+      ui->dxCallEntry->setText (call);
+      on_dxCallEntry_editingFinished ();
+      static QRegularExpression const locator {"^[A-R]{2}[0-9]{2}([A-X]{2})?$"};
+      auto qsoGrid = grid.trimmed ().toUpper ().left (6);
+      ui->dxGridEntry->setText (locator.match (qsoGrid).hasMatch () ? qsoGrid : QString {});
+      m_bDoubleClicked = false;
+      on_genStdMsgsPushButton_clicked ();
+      on_txb1_clicked (); // Select Tx1 and reset the QSO progress before enabling TX.
+      if (!m_monitoring) {
+        monitor (true);
+        m_config.sync_transceiver (true, true);
+      }
+      auto_tx_mode (true);
+      return QString {};
+    }};
+  pskReporter->setReportsUpdatedHandler ([pskHighlights] (QMap<QString, qint64> const& heard, PskReporterDialog::Context const& context) {
+    pskHighlights->setReports (heard, context);
+  });
+  pskReporter->setStyleProvider ([this] (QString const& call, QString const& grid, PskReporterDialog::Context const& ctx) {
+    auto band = m_config.bands ()->find (ctx.dial);
+    auto style = ui->decodedTextBrowser->station_highlight (call, grid, m_logBook, band, ctx.mode);
+    auto worked = style.worked_on_band ? tr ("Worked on band") : style.worked ? tr ("Worked") : tr ("New callsign");
+    return PskReporterDialog::StationStyle {style.background, style.foreground, worked, style.criterion,
+                                           style.worked, style.worked_on_band};
+  });
+  pskReporter->setPreferences (*m_settings);
+  pskReporter->setHaltTxHandler ([this] { on_stopTxButton_clicked (); });
+  auto pskAction = ui->menuView->addAction (tr ("PSK Reporter — Who hears me?"));
+  connect (pskAction, &QAction::triggered, this, [pskReporter] {
+    pskReporter->show ();
+    pskReporter->raise ();
+    pskReporter->activateWindow ();
+    pskReporter->refresh ();
+  });
   setUnifiedTitleAndToolBarOnMac (true);
   createStatusBar();
   add_child_to_event_filter (this);

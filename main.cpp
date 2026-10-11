@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
             }
           else if (parser.isSet (version_option))
             {
-              MessageBox::information_message (nullptr, "Application version", a.applicationVersion ());
+              MessageBox::information_message (nullptr, "Application version", display_version ());
               return 0;
             }
         }
