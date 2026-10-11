@@ -2566,6 +2566,14 @@ void Configuration::impl::read_settings ()
         }
     }
 
+  // Migrate only the new mode; retain every existing working frequency.
+  // The flag also respects later user edits/deletions of the FT2 entries.
+  if (!settings_->value ("CustomFT2DefaultsAdded", false).toBool ())
+    {
+      frequencies_.add_mode_defaults (Modes::FT2);
+      settings_->setValue ("CustomFT2DefaultsAdded", true);
+    }
+
   stations_.station_list (settings_->value ("stations").value<StationList::Stations> ());
 
   auto highlight_items = settings_->value ("DecodeHighlighting", QVariant::fromValue (DecodeHighlightingModel::default_items ())).value<DecodeHighlightingModel::HighlightItems> ();

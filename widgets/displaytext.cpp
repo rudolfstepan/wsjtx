@@ -579,7 +579,7 @@ void DisplayText::displayDecodedText(DecodedText const& decodedText, QString con
       message = message.left (ap_pos).trimmed ();
     }
   m_CQPriority="";
-  if (CQcall || (is_73 && m_config->highlight_73()) || (mode == "FT4" && m_config->highlight_73() && m_config->NCCC_Sprint()
+  if (CQcall || (is_73 && m_config->highlight_73()) || ((mode == "FT4" or mode == "FT2") && m_config->highlight_73() && m_config->NCCC_Sprint()
       && (SpecOp::NA_VHF == m_config->special_op_id()) && decodedText.string().contains(" R ")))
     {
       if (displayDXCCEntity)
@@ -663,7 +663,7 @@ void DisplayText::displayDecodedText(DecodedText const& decodedText, QString con
       if ((decodedText.clean_string () + " ").contains (QRegularExpression {regexp}))
         {
         QStringList tw;
-        if (mode == "FT8" or mode == "FT4" or mode == "MSK144") {
+        if (mode == "FT8" or (mode == "FT4" or mode == "FT2") or mode == "MSK144") {
           tw=decodedText.string().mid(24).split(" ",SkipEmptyParts);
         } else {
           tw=decodedText.string().mid(22).split(" ",SkipEmptyParts);
@@ -734,6 +734,7 @@ void DisplayText::displayTransmittedText(QString text, QString modeTx, qint32 tx
                                          bool bFastMode, double TRperiod,bool bSuperfox)
 {
     QString t1=" @  ";
+    if(modeTx=="FT2") t1=" *  ";
     if(modeTx=="FT4") t1=" +  ";
     if(modeTx.contains("FT8")) t1=" ~  ";
     if(modeTx=="JT4") t1=" $  ";
@@ -744,7 +745,7 @@ void DisplayText::displayTransmittedText(QString text, QString modeTx, qint32 tx
     QString t2;
     t2 = t2.asprintf("%4d",txFreq);
     QString t;
-    if(bFastMode or modeTx=="FT8" or modeTx=="FT4" or (TRperiod<60) or
+    if(bFastMode or modeTx=="FT8" or modeTx=="FT4" or modeTx=="FT2" or (TRperiod<60) or
        (modeTx=="Q65" and TRperiod==60)) {
       t = QDateTime::currentDateTimeUtc().toString("hhmmss") + \
         "  Tx      " + t2 + t1 + text;

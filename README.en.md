@@ -10,7 +10,8 @@ receiver list and practical station calling tools to WSJT-X. See which
 stations have reported your signal, check their logbook status, and select
 or call them again directly within the app.
 
-The additions are by **OE3SRO**. The version display, window title,
+The custom additions are by **OE3SRO**; FT2 adapts the GPLv3 implementation
+by **DG2YCB / WSJT-X Improved**. The version display, window title,
 About dialog, and splash screen include **build by OE3SRO**.
 The custom build currently uses **WSJT-X 3.0.2-devel** as its base; the build
 scripts and package checks described here target Windows.
@@ -19,6 +20,7 @@ scripts and package checks described here target Windows.
 
 | Feature | Benefit |
 | --- | --- |
+| **FT2 (experimental)** | 3.75-second periods with transmit, decode, Auto Seq, waterfall, and PSK calling tools; adapted from WSJT-X Improved by DG2YCB. |
 | **PSK Reporter: Who hears me?** | Show receivers of your signal directly in WSJT-X, including callsign, grid locator, SNR, reception time, and mode. |
 | **Call a station directly** | Fill in the callsign and locator, select the first standard message, and turn on **Enable Tx**. |
 | **Receiver markers in Band Activity** | Callsigns from the receiver list appear in turquoise, bold, and underlined; a tooltip shows the reception time. |
@@ -33,6 +35,18 @@ scripts and package checks described here target Windows.
 ![Who hears me? with favorites, logbook colors, call history, and calling tools](docs/images/psk-reporter-who-hears-me.png)
 
 *Example view using test data. Actual row colors follow your WSJT-X settings.*
+
+## Using FT2
+
+Select **Mode → FT2**. The app uses 3.75-second TX/RX periods, the usual
+standard messages, and Auto Seq. FT2 decodes use the `*` marker. Existing
+settings are preserved; FT2 frequency defaults are added once if you have
+no custom FT2 entries.
+
+The integration adapts [WSJT-X Improved / WS Suite](https://wsjt-x-improved.sourceforge.io/)
+by **Uwe Risse, DG2YCB** (GPLv3). FT2 remains experimental. Transmit/receive
+WAV round trips and two official FT2 recordings passed; live RF operation
+has not been tested. See [FT2 documentation and sources](docs/FT2.md).
 
 ## Using the features
 
@@ -55,7 +69,7 @@ logbook entry or changes to your highlighting rules.
    **Enable Tx**. The call is transmitted in the next configured TX period,
    using your current TX frequency and TX sequence.
 
-Direct calling supports **FT8, FT4, JT65, JT9, and Q65** in normal QSO operation
+Direct calling supports **FT2, FT8, FT4, JT65, JT9, and Q65** in normal QSO operation
 with Tx1 enabled. If transmission is already in progress, Tune or file playback
 is active, or a special operating activity is selected, the view explains
 why the call cannot start. After changing your own callsign, mode, or dial
@@ -115,11 +129,12 @@ Run these commands from the repository directory:
 .\tools\Setup-CustomBuild.ps1
 .\tools\Build-Custom.ps1
 .\tools\Test-PskReporter.ps1
+.\tools\Test-Ft2.ps1
 .\tools\Package-Custom.ps1
 ```
 
 The release build is placed in `build-custom`; the package with runtime
-libraries, decoders, and station data is placed in `dist-custom\OE3SRO-calling`.
+libraries, decoders, and station data is placed in `dist-custom\OE3SRO-ft2`.
 The scripts build WSJT-X and its supporting utilities. MAP65 and the
 additional simulators are not built for this package.
 

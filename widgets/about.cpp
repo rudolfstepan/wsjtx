@@ -17,6 +17,8 @@ CAboutDlg::CAboutDlg(QWidget *parent) :
                                              + QCoreApplication::applicationVersion ()
                                              + " " + display_revision ()}.simplified () + "</h2>"
     "<p><b>" + custom_build_credit () + "</b></p>"
+    "<p>FT2 support adapted from WSJT-X Improved by Uwe Risse, DG2YCB.<br />"
+    "<a href=\"https://wsjt-x-improved.sourceforge.io/\">WS Suite / WSJT-X Improved</a> (GPLv3)</p>"
 
     "WSJT-X implements a number of digital modes designed for <br />"
     "weak-signal Amateur Radio communication.  <br /><br />"

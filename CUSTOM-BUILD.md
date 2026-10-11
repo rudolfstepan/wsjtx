@@ -6,7 +6,7 @@ Start im Projektordner:
 .\Start-Custom.ps1
 ```
 
-Das Startskript verwendet `dist-custom\OE3SRO-calling\bin\wsjtx.exe --rig-name Custom`.
+Das Startskript verwendet `dist-custom\OE3SRO-ft2\bin\wsjtx.exe --rig-name Custom`.
 Eine noch laufende frühere Custom-Version vor dem Neustart normal beenden.
 Die Versionsanzeige, der Fenstertitel und das About-Fenster enthalten
 **build by OE3SRO**.
@@ -16,6 +16,13 @@ geprüft. Alle gespeicherten Profile und Einstellungen sowie vorhandene
 Dateipfade bleiben erhalten. Eine private Sicherung liegt in
 `.local\installed-configuration\WSJT-X.ini`. Lokale Stationsdaten und
 das Logbuch wurden ebenfalls in das Custom-Profil kopiert.
+
+FT2 ist unter **Mode → FT2** mit 3,75-Sekunden-Perioden verfügbar.
+Sender, Decoder, Auto Seq, Wasserfall und PSK-Anrufhilfen unterstützen ihn.
+Die Integration adaptiert WSJT-X Improved von DG2YCB (GPLv3); Details und
+Prüfungen stehen in [docs/FT2.md](docs/FT2.md). FT2 bleibt experimentell.
+Bestehende Frequenzen bleiben erhalten; nur fehlende FT2-Vorgaben werden
+einmalig ergänzt.
 
 Im Menü **View → PSK Reporter — Who hears me?** öffnet sich die Stationsliste.
 Sie zeigt die Empfänger deines Signals aus den letzten 30 Minuten im
@@ -87,6 +94,7 @@ Erneut bauen und paketieren:
 .\tools\Setup-CustomBuild.ps1
 .\tools\Build-Custom.ps1
 .\tools\Test-PskReporter.ps1
+.\tools\Test-Ft2.ps1
 .\tools\Package-Custom.ps1
 .\tools\Verify-CustomPackage.ps1
 ```

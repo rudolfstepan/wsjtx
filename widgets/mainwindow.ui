@@ -4913,6 +4913,7 @@ QPushButton[state=&quot;ok&quot;] {
      <string>Mode</string>
     </property>
     <addaction name="actionFST4"/>
+    <addaction name="actionFT2"/>
     <addaction name="actionFT4"/>
     <addaction name="actionFT8"/>
     <addaction name="actionJT4"/>
@@ -5391,6 +5392,11 @@ QPushButton[state=&quot;ok&quot;] {
    <property name="text">
     <string>Erase WSPR hashtable</string>
    </property>
+  </action>
+  <action name="actionFT2">
+   <property name="checkable"><bool>true</bool></property>
+   <property name="text"><string>FT2</string></property>
+   <property name="toolTip"><string>Experimental FT2: 3.75-second periods</string></property>
   </action>
   <action name="actionFT4">
    <property name="checkable">

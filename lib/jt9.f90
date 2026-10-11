@@ -33,7 +33,7 @@ program jt9
        bLowSidelobes = .false., nexp_decode_set = .false.,                   &
        have_ntol = .false.,multift8 = .false.,hidedupes = .false.,           &
        lft8lowth = .true.,lft8subpass = .true.,lwidedxcsearch = .true.
-  type (option) :: long_options(41) = [                                      &
+  type (option) :: long_options(42) = [                                      &
     option ('help', .false., 'h', 'Display this help message', ''),          &
     option ('shmem',.true.,'s','Use shared memory for sample data','KEY'),   &
     option ('tr-period', .true., 'p', 'Tx/Rx period, default SECONDS=60',    &
@@ -83,6 +83,7 @@ program jt9
         'SKIP MTft8 Wideband DX Call Search', ''),                           &        
     option ('q65', .false., '3', 'Q65 mode', ''),                            &
     option ('jt4', .false., '4', 'JT4 mode', ''),                            &
+    option ('ft2', .false., '2', 'FT2 mode (3.75-second periods)', ''),      &
     option ('ft4', .false., '5', 'FT4 mode', ''),                            &
     option ('jt65', .false.,'6', 'JT65 mode', ''),                           &
     option ('fst4', .false., '7', 'FST4 mode', ''),                          &
@@ -119,7 +120,7 @@ program jt9
   TRperiod=60.d0
 
   do
-     call getopt('hs:e:a:b:r:m:p:d:f:F:w:t:9876543WYqkTMUSZL:S:H:c:G:x:g:X:Q:C:R:N:E:D:',     &
+     call getopt('hs:e:a:b:r:m:p:d:f:F:w:t:98765432WYqkTMUSZL:S:H:c:G:x:g:X:Q:C:R:N:E:D:',     &
           long_options,c,optarg,arglen,stat,offset,remain,.true.)
      if (stat .ne. 0) then
         exit
@@ -179,6 +180,9 @@ program jt9
            mode = 144
         case ('Q')
            read (optarg(:arglen), *) nQSOProg
+        case ('2')
+           mode = 52
+           TRperiod = 3.75d0
         case ('3')
            mode = 66
         case ('4')
@@ -294,6 +298,7 @@ program jt9
 1    nutc=0
 2    nsps=6912
      npts=TRperiod*12000.d0
+     if(mode.eq.52) nsps=3456
      kstep=nsps/2
      k=0
      nhsym=0
@@ -303,6 +308,7 @@ program jt9
         call timer('jt9     ',0)
      endif
      shared_data%id2=0          !??? Why is this necessary ???
+     if(mode.eq.52) npts=23*1728
      if(mode.eq.5) npts=21*3456
      if(mode.eq.66) npts=TRperiod*12000
      do iblk=1,npts/kstep

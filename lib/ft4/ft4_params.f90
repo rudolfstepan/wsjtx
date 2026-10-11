@@ -9,8 +9,8 @@ parameter (NN2=NS+ND+2)               !Total channel symbols (105)
 parameter (NSPS=576)                  !Samples per symbol at 12000 S/s
 parameter (NZ=NSPS*NN)                !Sync and Data samples (59328)
 parameter (NZ2=NSPS*NN2)              !Total samples in shaped waveform (60480)
-parameter (NMAX=21*3456)              !Samples in iwave (72576)
+parameter (NMAX=23*3456)              !Samples in iwave (79488), including stretched FT2
 parameter (NFFT1=2304, NH1=NFFT1/2)   !Length of FFTs for symbol spectra
 parameter (NSTEP=NSPS)                !Coarse time-sync step size
-parameter (NHSYM=(NMAX-NFFT1)/NSTEP)  !Number of symbol spectra (1/4-sym steps)
+parameter (NHSYM=(21*3456-NFFT1)/NSTEP)  !Number of symbol spectra (1/4-sym steps)
 parameter (NDOWN=18)                  !Downsample factor

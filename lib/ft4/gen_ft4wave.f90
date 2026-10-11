@@ -6,10 +6,14 @@ subroutine gen_ft4wave(itone,nsym,nsps,fsample,f0,cwave,wave,icmplx,nwave)
   real dphi(0:250000-1)
   integer itone(nsym)
   logical first
+  integer nsps0
+  real fsample0
   data first/.true./
-  save pulse,first,twopi,dt,hmod
+  data nsps0/0/,fsample0/0.0/
+  save pulse,first,twopi,dt,hmod,nsps0,fsample0
 
-  if(first) then
+  ! FT2/FT4 and the 12/48 kHz paths have different Gaussian pulses.
+  if(first.or.nsps.ne.nsps0.or.fsample.ne.fsample0) then
      twopi=8.0*atan(1.0)
      dt=1.0/fsample
      hmod=1.0
@@ -19,6 +23,8 @@ subroutine gen_ft4wave(itone,nsym,nsps,fsample,f0,cwave,wave,icmplx,nwave)
         pulse(i)=gfsk_pulse(1.0,tt)
      enddo
      first=.false.
+     nsps0=nsps
+     fsample0=fsample
   endif
 
 ! Compute the smoothed frequency waveform.

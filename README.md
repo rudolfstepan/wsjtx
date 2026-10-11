@@ -10,7 +10,8 @@ PSK-Reporter-Empfängerliste und praktische Anrufhilfen. Du siehst direkt in der
 App, welche Stationen dein Signal gemeldet haben, erkennst ihren Logbuchstatus
 und kannst sie auswählen oder erneut anrufen.
 
-Die Erweiterungen stammen von **OE3SRO**. Die Versionsanzeige, der Fenstertitel,
+Die Custom-Erweiterungen stammen von **OE3SRO**; FT2 wurde aus der
+GPLv3-Implementierung von **DG2YCB / WSJT-X Improved** adaptiert. Die Versionsanzeige, der Fenstertitel,
 das About-Fenster und der Splashscreen tragen den Zusatz **build by OE3SRO**.
 Der Custom-Build basiert derzeit auf **WSJT-X 3.0.2-devel**; die hier
 beschriebenen Build-Skripte und Paketprüfungen sind für Windows ausgelegt.
@@ -19,6 +20,7 @@ beschriebenen Build-Skripte und Paketprüfungen sind für Windows ausgelegt.
 
 | Funktion | Nutzen |
 | --- | --- |
+| **FT2 (experimentell)** | 3,75-Sekunden-Durchgänge mit Sender, Decoder, Auto Seq, Wasserfall und PSK-Anrufhilfen; übernommen und angepasst aus WSJT-X Improved von DG2YCB. |
 | **PSK Reporter: Who hears me?** | Empfänger des eigenen Signals direkt in WSJT-X anzeigen, mit Rufzeichen, Locator, SNR, Empfangszeit und Modus. |
 | **Station direkt anrufen** | Rufzeichen und Locator übernehmen, die erste Standardnachricht wählen und **Enable Tx** aktivieren. |
 | **Empfangsmarkierung in Band Activity** | Rufzeichen aus der Empfangsliste erscheinen türkis, fett und unterstrichen; ein Tooltip zeigt die Empfangszeit. |
@@ -34,6 +36,19 @@ beschriebenen Build-Skripte und Paketprüfungen sind für Windows ausgelegt.
 
 *Beispielansicht mit Testdaten. Die tatsächlichen Zeilenfarben richten sich
 nach deinen WSJT-X-Einstellungen.*
+
+## FT2 verwenden
+
+Wähle **Mode → FT2**. Die App verwendet 3,75-Sekunden-TX/RX-Perioden,
+die bekannten Standardnachrichten und Auto Seq. FT2-Decodes sind mit `*`
+markiert. Bestehende Einstellungen bleiben erhalten; nur FT2-Frequenzvorgaben
+werden einmalig ergänzt, sofern noch keine eigenen FT2-Einträge existieren.
+
+Die Integration basiert auf [WSJT-X Improved / WS Suite](https://wsjt-x-improved.sourceforge.io/)
+von **Uwe Risse, DG2YCB** (GPLv3). FT2 bleibt experimentell. Sender/Decoder
+wurden mit WAV-Roundtrips und zwei offiziellen FT2-Aufnahmen geprüft;
+der echte Funkbetrieb wurde nicht getestet. Details und Quellen:
+[FT2-Dokumentation](docs/FT2.md).
 
 ## Bedienung
 
@@ -57,7 +72,7 @@ einem neuen Logbucheintrag oder geänderten Hervorhebungsregeln.
    **Enable Tx**. Der Anruf wird im nächsten eingestellten TX-Zeitfenster
    gesendet, mit deiner eingestellten TX-Frequenz und TX-Sequenz.
 
-Das direkte Anrufen unterstützt **FT8, FT4, JT65, JT9 und Q65** im normalen
+Das direkte Anrufen unterstützt **FT2, FT8, FT4, JT65, JT9 und Q65** im normalen
 QSO-Betrieb mit aktivem Tx1. Während einer laufenden Aussendung, bei Tune,
 Dateiwiedergabe oder einer speziellen Betriebsaktivität zeigt die Ansicht
 den Hinderungsgrund. Nach einem Wechsel des eigenen Rufzeichens, des Modus
@@ -119,11 +134,12 @@ Führe im Repository-Verzeichnis aus:
 .\tools\Setup-CustomBuild.ps1
 .\tools\Build-Custom.ps1
 .\tools\Test-PskReporter.ps1
+.\tools\Test-Ft2.ps1
 .\tools\Package-Custom.ps1
 ```
 
 Der Release-Build liegt unter `build-custom`; das Paket mit Laufzeitbibliotheken,
-Decodern und Stationsdaten unter `dist-custom\OE3SRO-calling`.
+Decodern und Stationsdaten unter `dist-custom\OE3SRO-ft2`.
 Die Skripte bauen WSJT-X mit den zugehörigen Hilfsprogrammen; MAP65 und die
 zusätzlichen Simulatoren werden für dieses Paket nicht gebaut.
 

@@ -297,6 +297,7 @@ private slots:
   void on_actionJT9_triggered();
   void on_actionJT65_triggered();
   void on_actionJT4_triggered();
+  void on_actionFT2_triggered();
   void on_actionFT4_triggered();
   void on_actionFT8_triggered();
   void on_actionFST4_triggered();
@@ -500,6 +501,7 @@ private:
   void foxTest();
   void setColorHighlighting();
   void chkFT4();
+  bool isFT4Family() const {return m_mode=="FT4" || m_mode=="FT2";}
   bool elide_tx1_not_allowed () const;
   void readWidebandDecodes();
   void configActiveStations();

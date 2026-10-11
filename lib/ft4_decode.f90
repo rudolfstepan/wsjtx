@@ -24,7 +24,7 @@ module ft4_decode
 contains
 
    subroutine decode(this,callback,iwave,nQSOProgress,nfqso,    &
-      nfa,nfb,ndepth,lapcqonly,ncontest,mycall,hiscall)
+      nfa,nfb,ndepth,lapcqonly,ncontest,mycall,hiscall,ft2)
       use timer_module, only: timer
       use packjt77
       include 'ft4/ft4_params.f90'
@@ -69,6 +69,8 @@ contains
       logical dosubtract,doosd
       logical badsync
       logical, intent(in) :: lapcqonly
+      logical, optional, intent(in) :: ft2
+      logical isft2
 
       data first/.true./
       data     mcq/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0/
@@ -185,7 +187,10 @@ contains
       decodes=' '
       fa=nfa
       fb=nfb
+      isft2=.false.
+      if(present(ft2)) isft2=ft2
       dd=iwave
+      if(.not.isft2) dd(21*3456+1:)=0.0
 
 ! ndepth=3: 3 passes, bp+osd
 ! ndepth=2: 3 passes, bp only
@@ -193,6 +198,7 @@ contains
 
       max_iterations=40
       syncmin=1.18
+      if(isft2) syncmin=1.0
       dosubtract=.true.
       doosd=.true.
       nsp=3

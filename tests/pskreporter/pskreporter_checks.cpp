@@ -245,5 +245,17 @@ int main (int argc, char **argv)
       break;
     }
   }
-  std::cout << "PSK Reporter checks passed: query, filters, newest report, call action, throttle, malformed XML, Band Activity markers, expiry, station colors, QSO status, favorites, history persistence, recall guards, next station and Halt Tx.\n";
+  operating.mode = "FT2";
+  request.clear ();
+  body = ("<receptionReports>" + report ("DL2FT2", "JO63", now - 10, 14075500, "FT2") + "</receptionReports>").toUtf8 ();
+  PskReporterDialog ft2Dialog {nullptr, ctx, select, endpoint};
+  ft2Dialog.refresh ();
+  wait ();
+  auto ft2Table = ft2Dialog.findChild<QTableWidget *> ();
+  require (request.contains ("mode=FT2") && ft2Table->rowCount () == 1, "FT2 reception reports/query failed");
+  ft2Table->selectRow (0);
+  for (auto candidate : ft2Dialog.findChildren<QPushButton *> ())
+    if (candidate->text ().startsWith ("Call station")) candidate->click ();
+  require (selectedCall == "DL2FT2", "FT2 PSK station could not be selected for calling");
+  std::cout << "PSK Reporter checks passed: query, filters, newest report, call action, throttle, malformed XML, Band Activity markers, expiry, station colors, QSO status, favorites, history persistence, recall guards, next station, FT2 reports/calling and Halt Tx.\n";
 }

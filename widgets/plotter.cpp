@@ -260,6 +260,7 @@ void CPlotter::draw(float swide[], bool bScroll, bool bRed)
   if(m_bReplot and m_mode!="Q65") return;
 
   if(swide[0]>1.0e29) m_line=0;
+  if(m_mode=="FT2" and m_line==17) m_line=0;
   if(m_mode=="FT4" and m_line==34) m_line=0;
   if(m_line == painter1.fontMetrics ().height () && m_timestamp!=0) {
     painter1.setPen(Qt::white);
@@ -508,6 +509,7 @@ void CPlotter::DrawOverlay()                   //DrawOverlay()
   }
 
   float bw=9.0*12000.0/m_nsps;               //JT9
+  if(m_mode=="FT2") bw=3*12000.0/288.0;
   if(m_mode=="FT4") bw=3*12000.0/576.0;      //FT4  ### (3x, or 4x???) ###
   if(m_mode=="FT8") bw=7*12000.0/1920.0;     //FT8
   if(m_mode.startsWith("FST4")) {
@@ -600,7 +602,7 @@ void CPlotter::DrawOverlay()                   //DrawOverlay()
   int yTxTop=12;
   int yRxBottom=yTxTop + 2*yh + 4;
   if(m_mode=="JT9" or m_mode=="JT65" or m_mode=="Q65" or m_mode=="FT8"
-     or m_mode=="FT4" or m_mode.startsWith("FST4")) {
+     or m_mode=="FT4" or m_mode=="FT2" or m_mode.startsWith("FST4")) {
 
     if(m_mode=="FST4" and !m_bSingleDecode) {
       x1=XfromFreq(m_nfa);
@@ -686,7 +688,7 @@ void CPlotter::DrawOverlay()                   //DrawOverlay()
 
   // red goal post
   if(m_mode=="JT9" or m_mode=="JT65" or m_mode.mid(0,4)=="WSPR" or m_mode=="Q65"
-     or m_mode=="FT8" or m_mode=="FT4" or m_mode.startsWith("FST4")) {
+     or m_mode=="FT8" or m_mode=="FT4" or m_mode=="FT2" or m_mode.startsWith("FST4")) {
     painter0.setPen(penRed);
     x1=XfromFreq(m_txFreq);
     if(m_mode=="FT8" and m_bSuperFox) {

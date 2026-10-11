@@ -37,6 +37,19 @@ namespace
 {
   FrequencyList_v2_101::FrequencyItems const default_frequency_list =
     {
+      // Provisional FT2 frequencies from WSJT-X Improved 260522 (DG2YCB).
+      {1843000, Modes::FT2, IARURegions::ALL, "","", QDateTime(), QDateTime(), true}, // provisional
+      {3578000, Modes::FT2, IARURegions::R3, "","", QDateTime(), QDateTime(), false},   // provisional
+      {5357000, Modes::FT2, IARURegions::ALL, "","", QDateTime(), QDateTime(), true}, // provisional
+      {7052000, Modes::FT2, IARURegions::ALL, "","", QDateTime(), QDateTime(), true}, // provisional
+      {10144000, Modes::FT2, IARURegions::ALL, "","", QDateTime(), QDateTime(), true}, // provisional
+      {14084000, Modes::FT2, IARURegions::ALL, "","", QDateTime(), QDateTime(), true}, // provisional
+      {18108000, Modes::FT2, IARURegions::ALL, "","", QDateTime(), QDateTime(), true}, // provisional
+      {21144000, Modes::FT2, IARURegions::ALL, "","", QDateTime(), QDateTime(), true}, // provisional
+      {24923000, Modes::FT2, IARURegions::ALL, "","", QDateTime(), QDateTime(), true}, // provisional
+      {28184000, Modes::FT2, IARURegions::ALL, "","", QDateTime(), QDateTime(), true}, // provisional
+      {50320000, Modes::FT2, IARURegions::ALL, "","", QDateTime(), QDateTime(), true}, // provisional
+      {144177000, Modes::FT2, IARURegions::ALL, "","", QDateTime(), QDateTime(), true}, // provisional
       {198000, Modes::FreqCal, IARURegions::R1, "","", QDateTime(), QDateTime(), false}, // BBC Radio 4 Droitwich
       {4996000, Modes::FreqCal, IARURegions::R1, "","", QDateTime(), QDateTime(), false},  // RWM time signal
       {9996000, Modes::FreqCal, IARURegions::R1, "","", QDateTime(), QDateTime(), false},  // RWM time signal
@@ -583,6 +596,18 @@ int FrequencyList_v2_101::best_working_frequency (QString const& target_band) co
         }
     }
   return result;
+}
+
+void FrequencyList_v2_101::add_mode_defaults (Mode mode)
+{
+  auto const& items = frequency_list ();
+  if (std::any_of (items.begin (), items.end (), [mode] (Item const& item) {
+        return item.mode_ == mode;
+      })) return;
+  for (auto const& item : default_frequency_list)
+    {
+      if (item.mode_ == mode) add (item);
+    }
 }
 
 void FrequencyList_v2_101::reset_to_defaults ()

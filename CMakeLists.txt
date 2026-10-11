@@ -1640,6 +1640,17 @@ add_executable (record_time_signal Audio/tools/record_time_signal.cpp)
 target_link_libraries (record_time_signal wsjt_cxx wsjt_qtmm wsjt_qt)
 
 add_executable (jt9 ${jt9_FSRCS} ${jt9_VERSION_RESOURCES})
+# Explicit test targets: no hardware/audio/CAT is opened by either check.
+add_executable (ft2_wave_checks EXCLUDE_FROM_ALL tests/ft2/ft2_wave_checks.f90)
+if (OPENMP_FOUND)
+  target_include_directories (ft2_wave_checks PRIVATE ${CMAKE_BINARY_DIR}/fortran_modules_omp)
+  target_link_libraries (ft2_wave_checks wsjt_fort_omp wsjt_cxx)
+else ()
+  target_include_directories (ft2_wave_checks PRIVATE ${CMAKE_BINARY_DIR})
+  target_link_libraries (ft2_wave_checks wsjt_fort wsjt_cxx)
+endif ()
+add_executable (ft2_ui_checks EXCLUDE_FROM_ALL tests/ft2/ft2_ui_checks.cpp)
+target_link_libraries (ft2_ui_checks wsjt_qt)
 if (${OPENMP_FOUND} OR APPLE)
   if (APPLE)
     # On Mac we don't have working OpenMP support in the C/C++

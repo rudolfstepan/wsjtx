@@ -136,6 +136,8 @@ public:
 
   // Reset
   Q_SLOT void reset_to_defaults ();
+  // Add a new mode's defaults only when it has no user-defined entries.
+  void add_mode_defaults (Mode);
 
   // Model API
   QModelIndex add (Item);
