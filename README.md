@@ -6,7 +6,13 @@
 
 [![Windows-Build](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml/badge.svg)](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml)
 
-**[Windows-EXE herunterladen](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml):**
+**[Windows-Release herunterladen](https://github.com/rudolfstepan/wsjtx/releases/latest)** —
+das **windows-x64.zip** enthält die Anwendung und die deutsche/englische
+Anleitung. Vollständig entpacken und **Start-WSJT-X.bat** öffnen.
+Die [Anleitung](docs/WINDOWS-QUICKSTART.html) liegt im Paket unter **docs/index.html**;
+sie ist auch separat als **documentation.zip** verfügbar.
+
+**[Neueste CI-Builds](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml):**
 Den neuesten erfolgreichen Lauf öffnen und unter **Artifacts** das versionierte
 `wsjtx-OE3SRO-…-windows-x64`-Paket herunterladen. GitHub-Anmeldung erforderlich.
 Das Artefakt und das darin enthaltene ZIP entpacken, dann **Start-WSJT-X.bat**
@@ -32,6 +38,8 @@ GitHub Actions baut dieses Paket automatisch bei jedem Push, einschließlich
 Tags, sowie für Pull Requests und manuelle Starts. Der Dateiname enthält die
 Projektversion, den Quellcommit, die Buildnummer und den Wiederholungsversuch;
 `build-info.json` und eine SHA256-Datei dokumentieren den Download.
+Release-Tags `oe3sro-vX.Y.Z-N` veröffentlichen nach erfolgreichen Prüfungen
+zusätzlich ein dauerhaftes GitHub-Release mit beiden ZIPs und Prüfsummen.
 
 Die [Änderungshistorie des Forks](docs/CHANGES.md) dokumentiert die Custom-
 Erweiterungen und ihre Implementierungscommits. Die [FT2-Dokumentation](docs/FT2.md)

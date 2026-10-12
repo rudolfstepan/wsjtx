@@ -11,6 +11,12 @@ sie sind keine Veröffentlichung einer neuen offiziellen WSJT-X-Version.
 
 ### 2026-10-12 — Automatische Windows-Binaries
 
+- Erstes öffentliches Custom-Release **3.0.2-oe3sro.1**, Tag `oe3sro-v3.0.2-1`:
+  Windows-ZIP mit EXE und deutscher/englischer HTML-Anleitung sowie separates
+  Dokumentations-ZIP und SHA256-Dateien. Release-Links stehen in beiden READMEs.
+- Custom-Tags `oe3sro-vX.Y.Z-N` bauen und testen den getaggten Stand und
+  veröffentlichen nach erfolgreicher Paketprüfung automatisch ein GitHub-Release.
+
 - Neuer Workflow **OE3SRO Windows EXE** bei allen Pushes, Tags, Pull Requests
   und manuellem Start; nutzt den lokal bewährten MinGW64-/Qt5-Buildweg.
 - Versioniertes Windows-x64-ZIP mit EXE, Decodern, DLLs, Daten, Start-Launcher,
@@ -110,6 +116,12 @@ describe the implemented state on October 12, 2026; they do not announce a
 new official WSJT-X release.
 
 ### 2026-10-12 — Automatic Windows binaries
+
+- First public custom release **3.0.2-oe3sro.1**, tag `oe3sro-v3.0.2-1`:
+  Windows ZIP with EXE and German/English HTML guide, plus a separate
+  documentation ZIP and SHA256 files. Release links appear in both READMEs.
+- Custom tags `oe3sro-vX.Y.Z-N` build and test the tagged source and
+  automatically publish a GitHub release after successful package verification.
 
 - New **OE3SRO Windows EXE** workflow for all pushes, tags, pull requests,
   and manual runs, using the established local MinGW64/Qt5 build scripts.

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WSJT-X OE3SRO Custom — Windows-Anleitung / Windows guide</title>
+  <style>
+    body { max-width: 880px; margin: 36px auto; padding: 0 24px; color: #17202a; background: #fff; font: 17px/1.65 system-ui, sans-serif; }
+    h1,h2,h3 { line-height: 1.25; color: #123c59; } h2 { margin-top: 2em; border-bottom: 1px solid #ccd9e2; padding-bottom: .3em; }
+    a { color: #075aa4; } code { background: #edf2f6; padding: .1em .3em; border-radius: 3px; }
+    .intro { background: #edf5fa; padding: 18px 24px; border-left: 4px solid #2375a8; }
+    table { width: 100%; border-collapse: collapse; } th,td { padding: 10px; text-align: left; border-bottom: 1px solid #ccd9e2; }
+    footer { margin-top: 3em; font-size: .9em; color: #52616b; } @media print { body { font-size: 11pt; margin: 0; max-width: none; } a { color: inherit; } }
+  </style>
+</head>
+<body>
+  <h1>WSJT-X OE3SRO Custom</h1>
+  <p><strong>build by OE3SRO</strong> · Windows x64 · <a href="#deutsch">Deutsch</a> / <a href="#english">English</a></p>
+  <div class="intro">Windows-Paket mit integrierter PSK-Reporter-Liste, Anrufhilfen und experimentellem FT2.
+    Die Paketversion und der Quellstand stehen in <code>build-info.json</code> im Hauptordner.</div>
+
+  <section id="deutsch">
+    <h2>Deutsch — Installation und erster Start</h2>
+    <ol>
+      <li>Das ZIP mit <strong>windows-x64</strong> im Namen von der <a href="https://github.com/rudolfstepan/wsjtx/releases">GitHub-Releases-Seite</a> herunterladen.</li>
+      <li>Das gesamte ZIP in einen eigenen Ordner entpacken. <code>bin</code>, <code>share</code> und <code>docs</code> zusammen behalten.</li>
+      <li><strong>Start-WSJT-X.bat</strong> per Doppelklick öffnen. Eine separate Installation der mitgelieferten DLLs ist nicht erforderlich.</li>
+      <li>Beim ersten Start unter <strong>Settings</strong> eigenes Rufzeichen, Locator, Funkgerät/CAT und Audioeingang/-ausgang einrichten.</li>
+      <li>Gewünschten Modus und eine passende Arbeitsfrequenz auswählen, dann Empfang mit <strong>Monitor</strong> starten.</li>
+    </ol>
+    <p>Der Launcher verwendet das Profil <strong>Custom</strong>. Ein vorhandenes Custom-Profil einschließlich Einstellungen und Logbuch wird weiterverwendet.
+      Das Paket importiert keine Einstellungen aus einer anderen WSJT-X-Installation. Eine vorherige Custom-Version vor dem Start normal beenden.</p>
+
+    <h3>PSK Reporter — Wer hört mich?</h3>
+    <p><strong>View → PSK Reporter — Who hears me?</strong> öffnet die Empfängerliste. Abfragen verwenden Rufzeichen,
+      Modus und Band aus dem laufenden Hauptfenster. Angezeigt werden Empfänger, die dein Signal in den letzten 30 Minuten gemeldet haben.</p>
+    <ul>
+      <li><strong>Current band and mode:</strong> gesamtes aktuelles Band im aktuell eingestellten Modus (Vorgabe).</li>
+      <li><strong>Current frequency and mode:</strong> Anzeige auf Dialfrequenz bis +5 kHz beschränken.</li>
+      <li><strong>Refresh:</strong> neue Abfrage frühestens alle fünf Minuten. Der Countdown zeigt die Wartezeit; die Automatik arbeitet bei geöffneter Liste.</li>
+      <li>Suche nach Rufzeichen/Locator, Favoriten, Logbuchfilter und Empfangsalter 5/15/30 Minuten helfen bei der Auswahl.</li>
+    </ul>
+    <p>Meldungen treffen verzögert ein. Ohne gemeldeten Empfang des eigenen Signals bleibt die Liste leer.
+      Bei Modus- oder Frequenzwechsel werden alte Einträge entfernt; der nächste erlaubte Abruf verwendet den neuen Betriebskontext.
+      Abfragefehler stehen unter der Tabelle und erhalten vorhandene Meldungen bis zum Ablauf.</p>
+
+    <h3>Station anrufen und TX stoppen</h3>
+    <p><strong>Call station</strong> oder Doppelklick auf eine Station übernimmt Rufzeichen und Locator, wählt Tx1 und aktiviert
+      <strong>Enable Tx</strong>: Die erste Standardnachricht wird im nächsten eingestellten TX-Zeitfenster gesendet.
+      Eigene TX-Frequenz und TX-Sequenz bleiben maßgeblich. Direkte Anrufe und türkis unterstrichene Band-Activity-Markierungen
+      verwenden nur Meldungen im aktuellen Arbeitsbereich (Dialfrequenz bis +5 kHz).</p>
+    <p><strong>Repeat last</strong> und <strong>Call recent</strong> wiederholen einen früheren Anruf bei passendem Rufzeichen/Modus/Frequenzkontext.
+      <strong>Call next</strong> startet pro Klick einen Anruf zur nächsten passenden sichtbaren Station.
+      <strong>Halt Tx</strong> stoppt TX wie im Hauptfenster. Favoriten und die letzten 20 Anrufe bleiben im Custom-Profil gespeichert.</p>
+
+    <h3>FT2 auswählen</h3>
+    <p><strong>Mode → FT2</strong> aktiviert den experimentellen Modus mit 3,75-Sekunden-Perioden.
+      Fehlende FT2-Frequenzvorgaben werden einmalig ergänzt. Eigene Frequenzen lassen sich unter <strong>Settings → Frequencies</strong> eintragen.
+      FT2 beruht auf der GPLv3-Implementierung von DG2YCB / WSJT-X Improved (heute WS Suite).</p>
+
+    <h3>Tastenkürzel im PSK-Fenster</h3>
+    <table><tr><th>Kürzel</th><th>Aktion</th></tr>
+      <tr><td>Ctrl+Enter</td><td>Ausgewählte Station anrufen</td></tr>
+      <tr><td>Ctrl+R</td><td>Letzten Anruf wiederholen</td></tr>
+      <tr><td>Ctrl+N</td><td>Nächste passende Station anrufen</td></tr>
+      <tr><td>Ctrl+Shift+S</td><td>TX stoppen</td></tr>
+      <tr><td>Ctrl+F</td><td>Stationssuche</td></tr>
+    </table>
+  </section>
+
+  <section id="english" lang="en">
+    <h2>English — Installation and first launch</h2>
+    <ol>
+      <li>Download the ZIP named <strong>windows-x64</strong> from <a href="https://github.com/rudolfstepan/wsjtx/releases">GitHub Releases</a>.</li>
+      <li>Extract the entire ZIP into its own folder. Keep <code>bin</code>, <code>share</code>, and <code>docs</code> together.</li>
+      <li>Double-click <strong>Start-WSJT-X.bat</strong>. The required DLLs are bundled.</li>
+      <li>On first launch, configure your callsign, locator, radio/CAT, and audio input/output in <strong>Settings</strong>.</li>
+      <li>Select the desired mode and an appropriate working frequency, then enable <strong>Monitor</strong> to receive.</li>
+    </ol>
+    <p>The launcher uses the <strong>Custom</strong> profile. Existing Custom settings and logs are reused.
+      No settings are imported from another WSJT-X installation. Close an earlier Custom instance normally before launching.</p>
+
+    <h3>PSK Reporter — Who hears me?</h3>
+    <p>Open <strong>View → PSK Reporter — Who hears me?</strong>. Queries read callsign, mode, and band directly from the running main window.
+      The list shows receivers reporting your signal during the past 30 minutes.</p>
+    <ul>
+      <li><strong>Current band and mode:</strong> the current mode across the current band (default).</li>
+      <li><strong>Current frequency and mode:</strong> limit the display to dial frequency through +5 kHz.</li>
+      <li><strong>Refresh:</strong> at least five minutes between requests. The countdown shows the remaining wait; automatic refresh runs while the list is open.</li>
+      <li>Use callsign/grid search, favorites, logbook filters, and 5/15/30-minute report age to select stations.</li>
+    </ul>
+    <p>Reports are delayed. Without reports of your own signal, the list remains empty.
+      Mode/frequency changes clear old entries; the next allowed request uses the new context.
+      Request errors appear below the table and preserve existing reports until they expire.</p>
+
+    <h3>Calling a station and stopping TX</h3>
+    <p><strong>Call station</strong> or double-click fills callsign and locator, selects Tx1, and turns on <strong>Enable Tx</strong>.
+      The first standard message is sent in the next configured TX period, using your TX frequency and sequence.
+      Direct calls and turquoise underlined Band Activity markers require reports in the current working range (dial frequency through +5 kHz).</p>
+    <p><strong>Repeat last</strong> and <strong>Call recent</strong> repeat a previous call when operator/mode/frequency context matches.
+      <strong>Call next</strong> starts one call per click to the next suitable visible station.
+      <strong>Halt Tx</strong> stops TX like the main window. Favorites and the last 20 calls are saved in the Custom profile.</p>
+
+    <h3>Selecting FT2</h3>
+    <p><strong>Mode → FT2</strong> enables the experimental mode with 3.75-second periods.
+      Missing FT2 frequency defaults are added once; enter your own frequencies under <strong>Settings → Frequencies</strong>.
+      FT2 adapts the GPLv3 implementation by DG2YCB / WSJT-X Improved, now WS Suite.</p>
+
+    <h3>PSK window shortcuts</h3>
+    <table><tr><th>Shortcut</th><th>Action</th></tr>
+      <tr><td>Ctrl+Enter</td><td>Call selected station</td></tr><tr><td>Ctrl+R</td><td>Repeat last call</td></tr>
+      <tr><td>Ctrl+N</td><td>Call next suitable station</td></tr><tr><td>Ctrl+Shift+S</td><td>Stop TX</td></tr><tr><td>Ctrl+F</td><td>Station search</td></tr>
+    </table>
+  </section>
+
+  <footer>
+    <p>Technische Dokumentation / Technical documentation: <a href="FT2.md">FT2.md</a> · <a href="CHANGES.md">CHANGES.md</a> (Markdown).</p>
+    <p>GPLv3 · <a href="../COPYING">COPYING</a> · <a href="https://github.com/rudolfstepan/wsjtx">Source repository</a> ·
+      <a href="https://wsjt-x-improved.sourceforge.io/">DG2YCB / WS Suite</a></p>
+  </footer>
+</body>
+</html>

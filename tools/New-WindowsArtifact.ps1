@@ -28,6 +28,8 @@ Existing WSJT-X - Custom profiles are reused without importing other profiles.
 
 Source commit: $commit
 Source and GPLv3 license: https://github.com/rudolfstepan/wsjtx
+
+Deutsche und englische Anleitung / German and English guide: docs/index.html
 "@
 [IO.File]::WriteAllText((Join-Path $package 'README-Windows.txt'), $instructions, $utf8)
 $manifest = [ordered]@{
@@ -40,9 +42,27 @@ $manifest = [ordered]@{
     exeSha256 = (Get-FileHash -LiteralPath $exe).Hash.ToLowerInvariant()
 }
 [IO.File]::WriteAllText((Join-Path $package 'build-info.json'), ($manifest | ConvertTo-Json), $utf8)
+$docs = Join-Path $package 'docs'
+New-Item -ItemType Directory -Force -Path $docs | Out-Null
+Copy-Item -LiteralPath "$root\docs\WINDOWS-QUICKSTART.html" -Destination "$docs\index.html" -Force
+foreach ($document in @('FT2.md', 'CHANGES.md')) {
+    $content = [IO.File]::ReadAllText("$root\docs\$document")
+    # Repository source links should also work from an extracted binary package.
+    $content = [regex]::Replace($content, '\]\(\.\./([^)]+)\)', [Text.RegularExpressions.MatchEvaluator]{ param($match)
+        $target = $match.Groups[1].Value
+        $kind = if (Test-Path -LiteralPath (Join-Path $root $target.Split('#')[0]) -PathType Container) { 'tree' } else { 'blob' }
+        return "](https://github.com/rudolfstepan/wsjtx/$kind/$commit/$target)"
+    })
+    [IO.File]::WriteAllText((Join-Path $docs $document), $content, $utf8)
+}
 $name = "wsjtx-OE3SRO-$Version-windows-x64"
 $zip = Join-Path $output "$name.zip"
 Compress-Archive -Path (Join-Path $package '*') -DestinationPath $zip -CompressionLevel Optimal -Force
 $hash = (Get-FileHash -LiteralPath $zip).Hash.ToLowerInvariant()
 [IO.File]::WriteAllText((Join-Path $output "$name.sha256"), "$hash  $name.zip`n", $utf8)
+$docsName = "wsjtx-OE3SRO-$Version-documentation"
+$docsZip = Join-Path $output "$docsName.zip"
+Compress-Archive -Path $docs, (Join-Path $package 'COPYING'), (Join-Path $package 'README-Windows.txt'), (Join-Path $package 'build-info.json') -DestinationPath $docsZip -CompressionLevel Optimal -Force
+$docsHash = (Get-FileHash -LiteralPath $docsZip).Hash.ToLowerInvariant()
+[IO.File]::WriteAllText((Join-Path $output "$docsName.sha256"), "$docsHash  $docsName.zip`n", $utf8)
 Write-Output "Windows artifact ready: $zip"

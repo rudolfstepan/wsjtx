@@ -2,6 +2,13 @@
 
 ## Automatischer Windows-Download
 
+Das [aktuelle GitHub-Release](https://github.com/rudolfstepan/wsjtx/releases/latest)
+enthält einen direkten Download des Windows-ZIPs und der separaten Dokumentation.
+Das Windows-ZIP einmal vollständig entpacken, **Start-WSJT-X.bat** starten und
+die beiliegende deutsche/englische Anleitung unter **docs/index.html** öffnen.
+Release-Downloads sind öffentlich verfügbar und unterliegen nicht dem
+90-Tage-Ablauf der Actions-Artefakte.
+
 [OE3SRO Windows EXE in GitHub Actions](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml)
 baut bei jedem Push (alle Branches und Tags), Pull Request und manuellen Start
 die Windows-x64-Anwendung. Im neuesten erfolgreichen Lauf führt **Artifacts**
@@ -26,6 +33,23 @@ Funkgerät eingerichtet. Ein vorhandenes Custom-Profil wird weiterverwendet.
 Umgebungsvariable bleibt lokal `C:\msys64\mingw64` maßgeblich.
 `tools/New-WindowsArtifact.ps1 -Version VERSION` erzeugt das versionierte ZIP
 aus dem geprüften Paket unter `.local\windows-artifacts`.
+Es legt außerdem ein separates Dokumentations-ZIP samt SHA256 an. Die HTML-
+Anleitung, technische FT2-Dokumentation und Änderungshistorie liegen in beiden
+ZIPs; Links auf Quelltext verweisen auf den genauen Quellcommit.
+
+Für ein Release zuerst `docs/releases/X.Y.Z-oe3sro.N.md` mit Release Notes
+anlegen und committen. Anschließend den zugehörigen Tag auf diesen Commit setzen
+und nach origin pushen, zum Beispiel:
+
+```powershell
+git tag oe3sro-v3.0.2-1
+git push origin oe3sro-v3.0.2-1
+```
+
+Der Workflow prüft die CMake-Version, baut und testet den getaggten Quellstand
+und veröffentlicht erst danach das Release mit Windows-ZIP, Dokumentations-ZIP
+und beiden SHA256-Dateien. Die erste Paketversion lautet `3.0.2-oe3sro.1`;
+die zugrunde liegende Anwendung bleibt WSJT-X 3.0.2-devel mit Custom-Branding.
 
 ## Lokaler Start und Bedienung
 

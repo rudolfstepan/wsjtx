@@ -12,6 +12,8 @@ permissions:
 
 jobs:
   windows:
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     runs-on: windows-2022
     timeout-minutes: 60
     defaults:
@@ -34,6 +36,11 @@ jobs:
           $commit = (git rev-parse --short=9 HEAD).Trim()
           if ($LASTEXITCODE) { throw 'Cannot read source revision.' }
           $version = "$($match.Groups[1].Value)-devel-$commit-build$env:GITHUB_RUN_NUMBER.$env:GITHUB_RUN_ATTEMPT"
+          if ($env:GITHUB_REF_TYPE -eq 'tag' -and $env:GITHUB_REF_NAME.StartsWith('oe3sro-v')) {
+            $tag = [regex]::Match($env:GITHUB_REF_NAME, '^oe3sro-v(\d+\.\d+\.\d+)-([1-9]\d*)$')
+            if (!$tag.Success -or $tag.Groups[1].Value -ne $match.Groups[1].Value) { throw 'Release tag must match oe3sro-vX.Y.Z-N and the CMake version.' }
+            $version = "$($tag.Groups[1].Value)-oe3sro.$($tag.Groups[2].Value)"
+          }
           "version=$version" >> $env:GITHUB_OUTPUT
 
       - name: Install MinGW64 and Qt dependencies
@@ -116,7 +123,37 @@ jobs:
 
           [Download Windows EXE package]($env:ARTIFACT_URL)
 
-          Contains the portable ZIP, SHA256 checksum, wsjtx.exe, decoders, Qt/OpenSSL DLLs, and station data.
+          Contains the portable ZIP, documentation ZIP, SHA256 checksums, wsjtx.exe, decoders, Qt/OpenSSL DLLs, and station data.
           Extract both the artifact and the portable ZIP, then start **Start-WSJT-X.bat**.
           A GitHub login is required. Artifacts are retained for 90 days.
           "@ >> $env:GITHUB_STEP_SUMMARY
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/oe3sro-v')
+    needs: windows
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: wsjtx-OE3SRO-${{ needs.windows.outputs.version }}-windows-x64
+          path: release-assets
+      - name: Publish versioned Windows release with documentation
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_VERSION: ${{ needs.windows.outputs.version }}
+        run: |
+          set -euo pipefail
+          notes="docs/releases/${RELEASE_VERSION}.md"
+          test -f "$notes"
+          test -f "release-assets/wsjtx-OE3SRO-${RELEASE_VERSION}-windows-x64.zip"
+          test -f "release-assets/wsjtx-OE3SRO-${RELEASE_VERSION}-documentation.zip"
+          (cd release-assets && sha256sum --check ./*.sha256)
+          gh release create "$RELEASE_TAG" release-assets/*.zip release-assets/*.sha256 \
+            --verify-tag --latest --title "WSJT-X OE3SRO Custom ${RELEASE_VERSION}" \
+            --notes-file "$notes"
