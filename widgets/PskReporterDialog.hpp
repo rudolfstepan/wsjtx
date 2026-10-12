@@ -33,6 +33,7 @@ class PskReporterDialog final : public QDialog
 public:
   struct Context { QString call; QString mode; quint64 dial; };
   using ContextProvider = std::function<Context ()>;
+  using BandRange = std::function<QPair<quint64, quint64> (quint64)>;
   // Empty result means the call was started; otherwise display the reason here.
   using SelectStation = std::function<QString (QString const&, QString const&, Context const&)>;
   using ReportsUpdated = std::function<void (QMap<QString, qint64> const&, Context const&)>;
@@ -50,12 +51,17 @@ public:
     setWindowTitle (tr ("PSK Reporter — Who hears me?"));
     resize (1120, 560);
     auto layout = new QVBoxLayout {this};
-    auto info = new QLabel {tr ("Receivers reporting your signal on the current frequency and mode, over the last 30 minutes.\n"
+    auto info = new QLabel {tr ("Receivers reporting your signal in the current mode on the current band over the last 30 minutes.\n"
                                "Reports are delayed. Call station enables TX using your current TX frequency and sequence.\n"
                                "Turquoise underlined callsigns in Band Activity are receivers from this list.")};
     info->setWordWrap (true);
     layout->addWidget (info);
     auto filters = new QHBoxLayout;
+    scope_ = new QComboBox {this};
+    scope_->setObjectName ("pskScope");
+    scope_->addItems ({tr ("Current frequency and mode"), tr ("Current band and mode")});
+    scope_->setCurrentIndex (1);
+    filters->addWidget (scope_);
     search_ = new QLineEdit {this};
     search_->setObjectName ("pskSearch");
     search_->setPlaceholderText (tr ("Search callsign or grid (Ctrl+F)"));
@@ -130,6 +136,7 @@ public:
       if (column == 7) toggleFavorite (); else callSelected ();
     });
     connect (search_, &QLineEdit::textChanged, this, [this] { applyFilters (); });
+    connect (scope_, QOverload<int>::of (&QComboBox::currentIndexChanged), this, [this] { applyFilters (); });
     connect (filter_, QOverload<int>::of (&QComboBox::currentIndexChanged), this, [this] { applyFilters (); });
     connect (age_, QOverload<int>::of (&QComboBox::currentIndexChanged), this, [this] { applyFilters (); });
     connect (repeat, &QPushButton::clicked, this, [this] { repeatLast (); });
@@ -168,6 +175,14 @@ public:
     connect (timer, &QTimer::timeout, this, [this, automatic] {
       bool ready = !busy_ && (!lastRequest_.isValid () || lastRequest_.elapsed () >= 300000);
       refresh_->setEnabled (ready);
+      refresh_->setText (ready ? tr ("Refresh") : busy_ ? tr ("Retrieving…")
+        : tr ("Refresh in %1 s").arg ((300000 - lastRequest_.elapsed () + 999) / 1000));
+      if (isVisible () && table_->rowCount () && !sameContext (loaded_, context_ ())) {
+        table_->setRowCount (0);
+        auto current = context_ ();
+        status_->setText (tr ("Operating context changed to %1 / %2 at %3 MHz. Waiting for the next allowed refresh.")
+                          .arg (current.call, current.mode).arg (current.dial / 1.e6, 0, 'f', 6));
+      }
       if (isVisible ()) { refreshStyles (); applyFilters (); }
       if (ready && automatic->isChecked () && isVisible ()) refresh ();
     });
@@ -187,7 +202,8 @@ public:
     query.addQueryItem ("senderCallsign", ctx.call);
     query.addQueryItem ("mode", ctx.mode);
     query.addQueryItem ("flowStartSeconds", "-1800");
-    query.addQueryItem ("frange", QString::number (ctx.dial) + "-" + QString::number (ctx.dial + 5000));
+    auto range = bandRange_ ? bandRange_ (ctx.dial) : qMakePair (ctx.dial, ctx.dial + 5000);
+    query.addQueryItem ("frange", QString::number (range.first) + "-" + QString::number (range.second));
     query.addQueryItem ("rptlimit", "1000");
     query.addQueryItem ("rronly", "1");
     query.addQueryItem ("noactive", "1");
@@ -195,8 +211,7 @@ public:
     busy_ = true;
     lastRequest_.start ();
     refresh_->setEnabled (false);
-    table_->setRowCount (0);
-    status_->setText (tr ("Retrieving reception reports for %1 / %2…").arg (ctx.call, ctx.mode));
+    status_->setText (tr ("Retrieving reception reports for %1 on the current band…").arg (ctx.call));
     QNetworkRequest request {url};
     request.setAttribute (QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
     auto reply = network_.get (request);
@@ -207,11 +222,15 @@ public:
     connect (reply, &QNetworkReply::readyRead, this, [reply] {
       if (reply->bytesAvailable () > 5 * 1024 * 1024) reply->abort ();
     });
-    connect (reply, &QNetworkReply::finished, this, [this, reply, ctx] {
+    connect (reply, &QNetworkReply::finished, this, [this, reply, ctx, range] {
       busy_ = false;
       reply->deleteLater ();
       if (reply->error () != QNetworkReply::NoError) {
         status_->setText (tr ("PSK Reporter request failed: %1. Retry after five minutes.").arg (reply->errorString ()));
+        return;
+      }
+      if (!sameContext (ctx, context_ ())) {
+        status_->setText (tr ("Operating context changed during retrieval. Next request after the five-minute interval."));
         return;
       }
       struct Report { QString call, grid, snr, mode; quint64 frequency; qint64 time; };
@@ -233,7 +252,7 @@ public:
             || !r.call.contains (QRegularExpression {"[A-Z]"}) || r.call.size () > 20
             || a.value ("senderCallsign").toString ().compare (ctx.call, Qt::CaseInsensitive)
             || (!r.mode.isEmpty () && r.mode != ctx.mode)
-            || r.frequency < ctx.dial || r.frequency > ctx.dial + 5000
+            || r.frequency < range.first || r.frequency > range.second
             || r.time < QDateTime::currentSecsSinceEpoch () - 1800
             || r.time > QDateTime::currentSecsSinceEpoch () + 300) continue;
         if (r.mode.isEmpty ()) r.mode = ctx.mode;
@@ -245,6 +264,7 @@ public:
       }
       loaded_ = ctx;
       table_->setSortingEnabled (false);
+      table_->setRowCount (0);
       for (auto const& r : reports) {
         int row = table_->rowCount ();
         table_->insertRow (row);
@@ -265,16 +285,20 @@ public:
       refreshCallDetails ();
       if (reportsUpdated_) {
         QMap<QString, qint64> heard;
-        for (auto const& report : reports) heard.insert (report.call, report.time);
+        for (auto const& report : reports)
+          if (report.mode == ctx.mode && report.frequency >= ctx.dial && report.frequency <= ctx.dial + 5000)
+            heard.insert (report.call, report.time);
         reportsUpdated_ (heard, ctx);
       }
-      status_->setText (tr ("%1 receivers for %2 / %3 at %4 MHz. Updated %5 UTC. Next request in five minutes.")
+      applyFilters ();
+      status_->setText (tr ("%1 receivers for %2 on the band at %4 MHz (current mode: %3). Updated %5 UTC. Next request in five minutes.")
                         .arg (reports.size ()).arg (ctx.call, ctx.mode).arg (ctx.dial / 1.e6, 0, 'f', 6)
                         .arg (QDateTime::currentDateTimeUtc ().toString ("HH:mm:ss")));
     });
   }
 
   void setReportsUpdatedHandler (ReportsUpdated handler) { reportsUpdated_ = handler; }
+  void setBandRangeProvider (BandRange provider) { bandRange_ = provider; }
   void setStyleProvider (StyleProvider provider) { style_ = provider; refreshStyles (); }
   void setHaltTxHandler (std::function<void ()> handler) { haltTx_ = handler; halt_->setEnabled (bool (haltTx_)); }
   void setPreferences (QSettings const& settings)
@@ -305,7 +329,9 @@ public:
     auto sorting = table_->isSortingEnabled ();
     table_->setSortingEnabled (false);
     for (int row = 0; row < table_->rowCount (); ++row) {
-      auto style = style_ (table_->item (row, 0)->text (), table_->item (row, 1)->text (), loaded_);
+      auto reportContext = loaded_;
+      reportContext.mode = table_->item (row, 5)->text ();
+      auto style = style_ (table_->item (row, 0)->text (), table_->item (row, 1)->text (), reportContext);
       auto status = table_->item (row, 6);
       table_->item (row, 0)->setData (Qt::UserRole + 1, style.workedBefore);
       table_->item (row, 0)->setData (Qt::UserRole + 2, style.workedOnBand);
@@ -360,7 +386,19 @@ private:
   {
     int row = table_->currentRow ();
     if (row < 0 || table_->isRowHidden (row)) { status_->setText (tr ("Select a visible station first.")); return; }
+    if (!canCallRow (row)) return;
     startCall (table_->item (row, 0)->text (), table_->item (row, 1)->text (), loaded_);
+  }
+
+  bool canCallRow (int row)
+  {
+    auto frequency = table_->item (row, 3)->data (Qt::UserRole).toULongLong ();
+    if (table_->item (row, 5)->text () != loaded_.mode
+        || frequency < loaded_.dial || frequency > loaded_.dial + 5000) {
+      status_->setText (tr ("This report belongs to another mode or working frequency. Select that mode/frequency and refresh before calling."));
+      return false;
+    }
+    return true;
   }
 
   void repeatLast ()
@@ -378,6 +416,8 @@ private:
     for (int offset = 1; offset <= rows; ++offset) {
       int row = (start + offset + rows) % rows;
       if (table_->isRowHidden (row)) continue;
+      auto frequency = table_->item (row, 3)->data (Qt::UserRole).toULongLong ();
+      if (table_->item (row, 5)->text () != loaded_.mode || frequency < loaded_.dial || frequency > loaded_.dial + 5000) continue;
       if (fallback < 0) fallback = row;
       if (recordFor (table_->item (row, 0)->text (), loaded_) < 0) { fallback = row; break; }
     }
@@ -457,7 +497,10 @@ private:
       bool worked = table_->item (row, 0)->data (Qt::UserRole + 1).toBool ();
       bool onBand = table_->item (row, 0)->data (Qt::UserRole + 2).toBool ();
       int filter = filter_->currentIndex ();
+      auto frequency = table_->item (row, 3)->data (Qt::UserRole).toULongLong ();
       bool show = (search.isEmpty () || call.contains (search) || grid.contains (search))
+                  && (scope_->currentIndex () == 1 || (table_->item (row, 5)->text () == loaded_.mode
+                      && frequency >= loaded_.dial && frequency <= loaded_.dial + 5000))
                   && table_->item (row, 4)->data (Qt::UserRole).toLongLong () >= oldest
                   && (filter != 1 || !worked) && (filter != 2 || !onBand)
                   && (filter != 3 || favorites_.contains (call))
@@ -485,6 +528,7 @@ private:
     }
   };
   ContextProvider context_;
+  BandRange bandRange_;
   SelectStation select_;
   ReportsUpdated reportsUpdated_;
   StyleProvider style_;
@@ -503,7 +547,7 @@ private:
   QPushButton *refresh_;
   QPushButton *use_, *halt_;
   QLineEdit *search_;
-  QComboBox *filter_, *age_, *recent_;
+  QComboBox *filter_, *age_, *recent_, *scope_;
   QLabel *visibleCount_;
 };
 #endif

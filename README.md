@@ -61,10 +61,15 @@ der echte Funkbetrieb wurde nicht getestet. Details und Quellen:
 
 Öffne **View → PSK Reporter — Who hears me?**. Die Ansicht fragt
 Empfangsmeldungen für dein konfiguriertes Rufzeichen im aktuellen Modus ab.
-Sie berücksichtigt die letzten 30 Minuten und den Bereich von der
-Dialfrequenz bis 5 kHz darüber. Pro Empfänger erscheint die neueste Meldung.
+Modus und Band stammen direkt aus der laufenden Anwendung. Sie berücksichtigt
+die letzten 30 Minuten im aktuellen Band; **Current frequency and mode**
+beschränkt die Anzeige optional auf Dialfrequenz bis 5 kHz darüber.
+Pro Empfänger erscheint die neueste Meldung.
 Eine neue Abfrage ist frühestens nach fünf Minuten möglich; die automatische
 Aktualisierung arbeitet bei geöffneter Ansicht.
+Die Refresh-Schaltfläche zeigt die Wartezeit; Abfragefehler löschen vorhandene
+Meldungen nicht. Direkte Anrufe und Band-Activity-Markierungen bleiben auf den
+aktuellen Arbeitsbereich beschränkt.
 
 Die Spalte **QSO status** zeigt **New callsign**, **Worked** oder
 **Worked on band**. Farben und Logbuchfilter aktualisieren sich auch nach
@@ -146,7 +151,7 @@ Führe im Repository-Verzeichnis aus:
 ```
 
 Der Release-Build liegt unter `build-custom`; das Paket mit Laufzeitbibliotheken,
-Decodern und Stationsdaten unter `dist-custom\OE3SRO-ft2`.
+Decodern und Stationsdaten unter `dist-custom\OE3SRO-psk-fix`.
 Die Skripte bauen WSJT-X mit den zugehörigen Hilfsprogrammen; MAP65 und die
 zusätzlichen Simulatoren werden für dieses Paket nicht gebaut.
 

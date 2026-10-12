@@ -6,8 +6,30 @@
 
 Dieser Fork von [WSJTX/wsjtx](https://github.com/WSJTX/wsjtx) basiert für die
 hier dokumentierten Erweiterungen auf WSJT-X 3.0.2-devel, Commit `967c85a61`.
-Die Einträge beschreiben den implementierten Stand vom 11. Oktober 2026;
+Die Einträge beschreiben den implementierten Stand vom 12. Oktober 2026;
 sie sind keine Veröffentlichung einer neuen offiziellen WSJT-X-Version.
+
+### 2026-10-12 — PSK-Reporter-Liste und Aktualisierung
+
+- Die Abfrage verwendet den Modus, das Rufzeichen und die Dialfrequenz direkt
+  aus dem laufenden Hauptfenster. Der aktuell gewählte Modus bleibt maßgeblich.
+- **Current band and mode** zeigt standardmäßig Meldungen im gesamten aktuellen
+  Band. Der bisherige Bereich Dialfrequenz bis +5 kHz konnte Meldungen ausblenden,
+  die auf der Website sichtbar waren. **Current frequency and mode** schränkt
+  die Anzeige optional wieder auf diesen Bereich ein, ohne zusätzliche Abfrage.
+- Die Refresh-Schaltfläche zeigt die verbleibende Wartezeit bis zur nächsten
+  erlaubten Abfrage. Mindestintervall weiterhin fünf Minuten.
+- Netzwerk- oder XML-Fehler erhalten vorhandene Meldungen bis zu deren Ablauf.
+  Kontextwechsel entfernt alte sichtbare Zeilen; Antworten aus einem inzwischen
+  geänderten Modus, Rufzeichen oder Dialfrequenz werden verworfen.
+- Direkte Anrufe, **Call next** und Band-Activity-Markierungen berücksichtigen
+  weiterhin nur Meldungen im aktuellen Arbeitsbereich Dialfrequenz bis +5 kHz.
+- Neuer Paketordner `dist-custom\OE3SRO-psk-fix`; Launcher, Paketierung,
+  Paketprüfung und deutsche/englische Bedienungsanleitung angepasst.
+- PSK-Funktionstests einschließlich Bandfilter und Moduswechsel, vollständiger
+  Build sowie Paket- und Laufzeitprüfungen bestanden. Echte HTTPS-Abfrage mit
+  der paketierten Qt-Laufzeit erfolgreich. Der Benutzer bestätigte anschließend,
+  dass die Liste im laufenden Programm funktioniert.
 
 ### 2026-10-11 — FT2
 
@@ -70,8 +92,29 @@ speichert den FT2-Fortsetzungspunkt; dieser Commit ändert keine Programmfunktio
 
 This fork of [WSJTX/wsjtx](https://github.com/WSJTX/wsjtx) uses WSJT-X
 3.0.2-devel, commit `967c85a61`, as the base for these additions. The entries
-describe the implemented state on October 11, 2026; they do not announce a
+describe the implemented state on October 12, 2026; they do not announce a
 new official WSJT-X release.
+
+### 2026-10-12 — PSK Reporter list and refresh
+
+- Queries read mode, callsign, and dial frequency directly from the running
+  main window. The currently selected mode remains the query mode.
+- **Current band and mode** now shows reports across the current band by
+  default. The previous dial-frequency-to-+5-kHz range could hide reports shown
+  on the website. **Current frequency and mode** optionally restores that
+  narrower display without another API request.
+- The Refresh button shows the remaining wait until the next allowed request.
+  The minimum request interval remains five minutes.
+- Network or XML errors preserve existing reports until they expire. Context
+  changes clear old visible rows; replies from an outdated mode, callsign,
+  or dial-frequency context are discarded.
+- Direct calls, **Call next**, and Band Activity markers still use only reports
+  within the current working range from dial frequency to +5 kHz.
+- New package directory `dist-custom\OE3SRO-psk-fix`; launcher, packaging,
+  package checks, and German/English usage documentation updated.
+- PSK tests including band filtering and mode changes, the full build, and
+  package/runtime checks passed. A real HTTPS query using the packaged Qt runtime
+  succeeded. The user subsequently confirmed the list works in the running app.
 
 ### 2026-10-11 — FT2
 

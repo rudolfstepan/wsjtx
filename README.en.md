@@ -58,10 +58,15 @@ has not been tested. See [FT2 documentation and sources](docs/FT2.md).
 ## Using the features
 
 Open **View → PSK Reporter — Who hears me?**. The view requests reception
-reports for your configured callsign in the current mode. It covers the
-last 30 minutes and the range from the dial frequency to 5 kHz above it.
+reports for your configured callsign in the current mode. Mode and band are
+read directly from the running application. It covers the last 30 minutes
+on the current band; **Current frequency and mode** optionally limits the
+display to the dial frequency through 5 kHz above it.
 Only the latest report for each receiver is shown. Requests are limited to
 one every five minutes; automatic refresh runs while the view is open.
+The Refresh button shows the remaining wait. Request failures preserve existing
+reports. Direct calls and Band Activity markers still require reports within
+the current working frequency range.
 
 The **QSO status** column shows **New callsign**, **Worked**, or
 **Worked on band**. Colors and logbook filters also update after a new
@@ -141,7 +146,7 @@ Run these commands from the repository directory:
 ```
 
 The release build is placed in `build-custom`; the package with runtime
-libraries, decoders, and station data is placed in `dist-custom\OE3SRO-ft2`.
+libraries, decoders, and station data is placed in `dist-custom\OE3SRO-psk-fix`.
 The scripts build WSJT-X and its supporting utilities. MAP65 and the
 additional simulators are not built for this package.
 

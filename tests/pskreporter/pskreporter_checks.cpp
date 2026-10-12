@@ -25,6 +25,32 @@ int main (int argc, char **argv)
     return 0;
   }
   QApplication app {argc, argv};
+  if (argc == 7 && QString::fromLocal8Bit (argv[1]) == "--live-query") {
+    PskReporterDialog::Context liveContext {QString::fromLocal8Bit (argv[2]), QString::fromLocal8Bit (argv[3]),
+                                           QString::fromLocal8Bit (argv[4]).toULongLong ()};
+    PskReporterDialog liveDialog {nullptr, [liveContext] { return liveContext; },
+      [] (QString const&, QString const&, PskReporterDialog::Context const&) { return QString {"Diagnostic only"}; }};
+    liveDialog.setBandRangeProvider ([&] (quint64) {
+      return qMakePair (QString::fromLocal8Bit (argv[5]).toULongLong (), QString::fromLocal8Bit (argv[6]).toULongLong ());
+    });
+    QEventLoop loop;
+    QTimer poll;
+    QObject::connect (&poll, &QTimer::timeout, [&] {
+      for (auto label : liveDialog.findChildren<QLabel *> ()) {
+        auto status = label->text ();
+        if (status.contains ("Updated") || status.contains ("request failed") || status.contains ("invalid response")) {
+          std::cout << status.toStdString () << '\n';
+          require (status.contains ("Updated"), "Live Qt HTTPS request failed");
+          loop.quit ();
+        }
+      }
+    });
+    poll.start (100);
+    QTimer::singleShot (35000, [&] { require (false, "Live query did not finish"); });
+    liveDialog.refresh ();
+    loop.exec ();
+    return 0;
+  }
   QFontDatabase::addApplicationFont ("C:/Windows/Fonts/segoeui.ttf");
   app.setFont (QFont {"Segoe UI", 10});
   QTcpServer server;
@@ -66,6 +92,7 @@ int main (int argc, char **argv)
           + report ("F1OLD", "JN18", now - 3600) + report ("K1BAD", "FN42", now - 10, 7074500)
           + report ("I1BAD", "JN45", now - 10, 14075500, "FT4") + "</receptionReports>").toUtf8 ();
   PskReporterDialog dialog {nullptr, ctx, select, endpoint};
+  dialog.findChild<QComboBox *> ("pskScope")->setCurrentIndex (0);
   QTemporaryDir preferences;
   require (preferences.isValid (), "Cannot create settings fixture");
   QSettings settings {preferences.filePath ("custom.ini"), QSettings::IniFormat};
@@ -224,6 +251,35 @@ int main (int argc, char **argv)
   bool error = false;
   for (auto label : malformed.findChildren<QLabel *> ()) error |= label->text ().contains ("invalid response");
   require (error, "Malformed XML did not display an error");
+  request.clear ();
+  body = ("<receptionReports>" + report ("DL3BAND", "JO62", now - 10, 14074952)
+          + report ("DL4MODE", "JO63", now - 10, 14085000, "FT2")
+          + report ("DL5FREQ", "JO64", now - 10, 14085000) + "</receptionReports>").toUtf8 ();
+  PskReporterDialog bandDialog {nullptr, ctx, select, endpoint};
+  bandDialog.setBandRangeProvider ([] (quint64) { return qMakePair (quint64 {14000000}, quint64 {14350000}); });
+  bandDialog.refresh ();
+  wait ();
+  auto bandTable = bandDialog.findChild<QTableWidget *> ();
+  require (request.contains ("mode=FT8") && request.contains ("frange=14000000-14350000")
+           && bandTable->rowCount () == 2, "Band query lost reports or included the wrong mode");
+  for (int row = 0; row < bandTable->rowCount (); ++row) require (!bandTable->isRowHidden (row), "Band report hidden by default");
+  int previousCalls = calls;
+  bandTable->selectRow (0);
+  for (auto candidate : bandDialog.findChildren<QPushButton *> ())
+    if (candidate->text () == "Call station") candidate->click ();
+  require (calls == previousCalls, "Called a station from another working frequency");
+  bandDialog.findChild<QComboBox *> ("pskScope")->setCurrentIndex (0);
+  int visibleBandRows = 0;
+  for (int row = 0; row < bandTable->rowCount (); ++row) if (!bandTable->isRowHidden (row)) ++visibleBandRows;
+  require (visibleBandRows == 1, "Narrow scope did not filter band reports");
+  request.clear ();
+  PskReporterDialog changedMode {nullptr, ctx, select, endpoint};
+  changedMode.refresh ();
+  operating.mode = "FT2";
+  wait ();
+  require (request.contains ("mode=FT8") && changedMode.findChild<QTableWidget *> ()->rowCount () == 0,
+           "A response from the previous live mode was displayed");
+  operating.mode = "FT8";
   QFile live {".local/psk-reporter-live.xml"};
   if (live.open (QIODevice::ReadOnly)) {
     body = live.readAll ();

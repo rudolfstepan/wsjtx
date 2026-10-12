@@ -589,6 +589,13 @@ MainWindow::MainWindow(QDir const& temp_directory, bool multiple,
       auto_tx_mode (true);
       return QString {};
     }};
+  pskReporter->setBandRangeProvider ([this] (quint64 frequency) {
+    auto bands = m_config.bands ();
+    int row = bands->find (bands->find (frequency));
+    if (row < 0) return qMakePair (frequency, frequency + 5000);
+    return qMakePair (bands->data (bands->index (row, 1), Bands::SortRole).toULongLong (),
+                      bands->data (bands->index (row, 2), Bands::SortRole).toULongLong ());
+  });
   pskReporter->setReportsUpdatedHandler ([pskHighlights] (QMap<QString, qint64> const& heard, PskReporterDialog::Context const& context) {
     pskHighlights->setReports (heard, context);
   });

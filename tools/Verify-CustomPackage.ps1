@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
-$bin = Join-Path $root 'dist-custom\OE3SRO-ft2\bin'
+$bin = Join-Path $root 'dist-custom\OE3SRO-psk-fix\bin'
 $checker = Join-Path $bin 'pskreporter-runtime-check.exe'
 $previousPath = $env:PATH
 Copy-Item -LiteralPath "$root\build-custom\pskreporter-checks\pskreporter_checks.exe" -Destination $checker -Force

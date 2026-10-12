@@ -13,7 +13,7 @@ denselben Launcher und dasselbe Custom-Profil wie der PowerShell-Aufruf:
 .\Start-Custom.ps1
 ```
 
-Das Startskript verwendet `dist-custom\OE3SRO-ft2\bin\wsjtx.exe --rig-name Custom`.
+Das Startskript verwendet `dist-custom\OE3SRO-psk-fix\bin\wsjtx.exe --rig-name Custom`.
 Eine noch laufende frühere Custom-Version vor dem Neustart normal beenden.
 Die Versionsanzeige, der Fenstertitel und das About-Fenster enthalten
 **build by OE3SRO**.
@@ -33,9 +33,15 @@ einmalig ergänzt.
 
 Im Menü **View → PSK Reporter — Who hears me?** öffnet sich die Stationsliste.
 Sie zeigt die Empfänger deines Signals aus den letzten 30 Minuten im
-aktuellen Modus zwischen Dialfrequenz und Dialfrequenz + 5 kHz. Pro Station
+aktuellen Modus im aktuellen Band. Modus, Rufzeichen und Dialfrequenz werden
+bei jeder Abfrage direkt aus der laufenden Anwendung gelesen. Mit **Current
+frequency and mode** lässt sich die Anzeige auf Dialfrequenz bis +5 kHz
+einschränken; **Current band and mode** ist die Vorgabe. Pro Station
 wird die neueste Meldung angezeigt. Die Abfragen erfolgen frühestens alle
 fünf Minuten, automatisch nur bei geöffneter Ansicht.
+Die Refresh-Schaltfläche zeigt die verbleibende Wartezeit. Bei Abfragefehlern
+bleiben vorhandene Meldungen erhalten und laufen anhand ihres Alters ab.
+Antworten aus einem inzwischen geänderten Betriebskontext werden verworfen.
 Die Zeilenfarben entsprechen deinen WSJT-X-Hervorhebungsregeln einschließlich
 ihrer Reihenfolge, aktivierten Kategorien und der Einstellung zur Trennung
 nach Modus. Sie berücksichtigen das Logbuch, Rufzeichen, DXCC, Locator,
@@ -58,6 +64,9 @@ normalen QSO-Betrieb mit Tx1 voraus. Während einer laufenden Aussendung, im
 Tune-Betrieb oder bei Dateiwiedergabe zeigt die Ansicht den Hinderungsgrund an.
 Nach einem Wechsel von Rufzeichen, Modus oder Frequenz muss die Liste vor
 der Auswahl aktualisiert werden.
+Empfänger aus anderen Arbeitsfrequenzen im Band werden angezeigt; direktes
+Anrufen und Band-Activity-Markierung erfordern weiterhin den aktuellen
+Arbeitsbereich (Dialfrequenz bis +5 kHz).
 
 Zusätzliche Anrufhilfen in **Who hears me?**:
 
