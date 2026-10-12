@@ -1,3 +1,4 @@
+param([switch]$PortableOnly)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $bin = Join-Path $root 'dist-custom\OE3SRO-psk-fix\bin'
@@ -11,6 +12,10 @@ try {
     if ($LASTEXITCODE) { throw 'Packaged runtime / HTTPS check failed.' }
     & "$bin\wsjtx_app_version.exe"
     if ($LASTEXITCODE) { throw 'Packaged version tool failed.' }
+    if ($PortableOnly) {
+        Write-Output 'Portable runtime verified without an installed WSJT-X or personal configuration.'
+        return
+    }
     $snapshot = "$root\.local\installed-configuration\WSJT-X.ini"
     $profile = "$env:LOCALAPPDATA\WSJT-X - Custom\WSJT-X - Custom.ini"
     if ((Get-FileHash -LiteralPath $snapshot).Hash -eq (Get-FileHash -LiteralPath $profile).Hash) {

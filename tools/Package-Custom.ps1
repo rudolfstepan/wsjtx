@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
-$mingw = 'C:\msys64\mingw64'
+$mingw = if ($env:WSJTX_MINGW_PREFIX) { $env:WSJTX_MINGW_PREFIX } else { 'C:\msys64\mingw64' }
 $env:PATH = "$mingw\bin;$env:PATH"
 $build = Join-Path $root 'build-custom'
 $package = Join-Path $root 'dist-custom\OE3SRO-psk-fix'

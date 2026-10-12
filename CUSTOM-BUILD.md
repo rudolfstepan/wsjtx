@@ -1,5 +1,34 @@
 # Eigene WSJT-X-Version mit PSK Reporter
 
+## Automatischer Windows-Download
+
+[OE3SRO Windows EXE in GitHub Actions](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml)
+baut bei jedem Push (alle Branches und Tags), Pull Request und manuellen Start
+die Windows-x64-Anwendung. Im neuesten erfolgreichen Lauf führt **Artifacts**
+zum versionierten Download; derselbe direkte Link steht in der Build-Zusammenfassung.
+Eine GitHub-Anmeldung ist erforderlich. Die Aufbewahrungszeit beträgt 90 Tage.
+
+Beispielname: `wsjtx-OE3SRO-3.0.2-devel-abcdef123-build12.1-windows-x64.zip`.
+Die Version kommt aus `CMakeLists.txt`, ergänzt um Commit, Laufnummer und Versuch.
+Das Paket enthält `bin/wsjtx.exe`, Decoder, Hamlib-Tools, Qt/OpenSSL-DLLs,
+Stationsdaten, GPL-Lizenz, `build-info.json` und einen eigenen Start-Launcher.
+Eine SHA256-Datei liegt neben dem ZIP. Nach dem Entpacken des Artefakts auch das
+innere ZIP vollständig entpacken und **Start-WSJT-X.bat** öffnen.
+
+Der CI-Runner lädt geprüfte Hamlib-/OmniRig-Abhängigkeiten, baut mit denselben
+Skripten wie lokal, prüft PSK Reporter und FT2/FT4 und paketiert erst nach
+erfolgreichen Tests. `Verify-CustomPackage.ps1 -PortableOnly` prüft die Laufzeit
+ohne installierte Originalversion und ohne persönliche Konfiguration. Das Paket
+enthält keine INI oder Logbuchdaten; beim ersten Start werden Stationsdaten und
+Funkgerät eingerichtet. Ein vorhandenes Custom-Profil wird weiterverwendet.
+
+`WSJTX_MINGW_PREFIX` erlaubt den abweichenden MSYS2-Pfad des Runners. Ohne diese
+Umgebungsvariable bleibt lokal `C:\msys64\mingw64` maßgeblich.
+`tools/New-WindowsArtifact.ps1 -Version VERSION` erzeugt das versionierte ZIP
+aus dem geprüften Paket unter `.local\windows-artifacts`.
+
+## Lokaler Start und Bedienung
+
 Die Änderungen gegenüber dem Original und ihre Quelltextbereiche stehen in
 [docs/CHANGES.md](docs/CHANGES.md). Die technische FT2-Implementierung und ihre
 Prüfungen sind in [docs/FT2.md](docs/FT2.md) auf Deutsch und Englisch dokumentiert.

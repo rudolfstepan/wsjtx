@@ -1,7 +1,7 @@
 param([switch]$ConfigureOnly)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
-$mingw = 'C:\msys64\mingw64'
+$mingw = if ($env:WSJTX_MINGW_PREFIX) { $env:WSJTX_MINGW_PREFIX } else { 'C:\msys64\mingw64' }
 $env:PATH = "$mingw\bin;$env:PATH"
 $env:MSYSTEM_PREFIX = $mingw.Replace('\', '/')
 $hamlib = Join-Path $root '.tools\hamlib\hamlib-w64-4.7.2'

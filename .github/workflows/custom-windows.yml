@@ -1,0 +1,122 @@
+name: OE3SRO Windows EXE
+
+on:
+  push:
+    branches: ['**']
+    tags: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-2022
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Preserve source line endings
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Derive artifact version
+        id: version
+        run: |
+          $source = Get-Content -Raw CMakeLists.txt
+          $match = [regex]::Match($source, '(?s)project\s*\(\s*wsjtx\s+VERSION\s+(\d+\.\d+\.\d+)(?:\.\d+)?\s')
+          if (!$match.Success) { throw 'Cannot derive WSJT-X version from CMakeLists.txt.' }
+          $commit = (git rev-parse --short=9 HEAD).Trim()
+          if ($LASTEXITCODE) { throw 'Cannot read source revision.' }
+          $version = "$($match.Groups[1].Value)-devel-$commit-build$env:GITHUB_RUN_NUMBER.$env:GITHUB_RUN_ATTEMPT"
+          "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Install MinGW64 and Qt dependencies
+        id: msys2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          cache: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-gcc-fortran
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-ninja
+            mingw-w64-x86_64-qt5-base
+            mingw-w64-x86_64-qt5-multimedia
+            mingw-w64-x86_64-qt5-serialport
+            mingw-w64-x86_64-qt5-svg
+            mingw-w64-x86_64-qt5-tools
+            mingw-w64-x86_64-qt5-websockets
+            mingw-w64-x86_64-qt5-activeqt
+            mingw-w64-x86_64-fftw
+            mingw-w64-x86_64-boost
+            mingw-w64-x86_64-libusb
+            mingw-w64-x86_64-openssl
+            mingw-w64-x86_64-pkgconf
+
+      - name: Set toolchain path
+        env:
+          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
+        run: |
+          $prefix = Join-Path $env:MSYS2_LOCATION 'mingw64'
+          "WSJTX_MINGW_PREFIX=$prefix" >> $env:GITHUB_ENV
+
+      - name: Prepare pinned Hamlib and OmniRig dependencies
+        run: ./tools/Setup-CustomBuild.ps1
+
+      - name: Build Windows executables
+        run: ./tools/Build-Custom.ps1
+
+      - name: Verify PSK Reporter integration
+        run: ./tools/Test-PskReporter.ps1
+
+      - name: Verify FT2 and FT4 codecs
+        run: ./tools/Test-Ft2.ps1
+
+      - name: Package EXE, DLLs, and station data
+        run: ./tools/Package-Custom.ps1
+
+      - name: Verify standalone package runtime
+        run: ./tools/Verify-CustomPackage.ps1 -PortableOnly
+
+      - name: Create versioned Windows ZIP and checksum
+        env:
+          ARTIFACT_VERSION: ${{ steps.version.outputs.version }}
+        run: ./tools/New-WindowsArtifact.ps1 -Version $env:ARTIFACT_VERSION
+
+      - name: Upload Windows download
+        id: download
+        uses: actions/upload-artifact@v7
+        with:
+          name: wsjtx-OE3SRO-${{ steps.version.outputs.version }}-windows-x64
+          path: |
+            .local/windows-artifacts/*.zip
+            .local/windows-artifacts/*.sha256
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
+
+      - name: Link download in build summary
+        env:
+          ARTIFACT_URL: ${{ steps.download.outputs.artifact-url }}
+          ARTIFACT_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          @"
+          ## Windows x64 — build by OE3SRO
+
+          **Version:** $env:ARTIFACT_VERSION
+
+          [Download Windows EXE package]($env:ARTIFACT_URL)
+
+          Contains the portable ZIP, SHA256 checksum, wsjtx.exe, decoders, Qt/OpenSSL DLLs, and station data.
+          Extract both the artifact and the portable ZIP, then start **Start-WSJT-X.bat**.
+          A GitHub login is required. Artifacts are retained for 90 days.
+          "@ >> $env:GITHUB_STEP_SUMMARY

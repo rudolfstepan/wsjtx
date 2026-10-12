@@ -9,6 +9,17 @@ hier dokumentierten Erweiterungen auf WSJT-X 3.0.2-devel, Commit `967c85a61`.
 Die Einträge beschreiben den implementierten Stand vom 12. Oktober 2026;
 sie sind keine Veröffentlichung einer neuen offiziellen WSJT-X-Version.
 
+### 2026-10-12 — Automatische Windows-Binaries
+
+- Neuer Workflow **OE3SRO Windows EXE** bei allen Pushes, Tags, Pull Requests
+  und manuellem Start; nutzt den lokal bewährten MinGW64-/Qt5-Buildweg.
+- Versioniertes Windows-x64-ZIP mit EXE, Decodern, DLLs, Daten, Start-Launcher,
+  Buildmanifest und SHA256. Downloadlinks in beiden READMEs und im Actions-Lauf;
+  Aufbewahrung 90 Tage, GitHub-Anmeldung für Artefaktdownloads erforderlich.
+- CI prüft PSK Reporter, FT2/FT4 und die eigenständige Paketlaufzeit.
+  Runnerpfade sind konfigurierbar; Paketprüfung benötigt im CI keine installierte
+  Originalversion oder private Konfiguration. OmniRig-Quelle und Hash festgelegt.
+
 ### 2026-10-12 — PSK-Reporter-Liste und Aktualisierung
 
 - Die Abfrage verwendet den Modus, das Rufzeichen und die Dialfrequenz direkt
@@ -94,6 +105,17 @@ This fork of [WSJTX/wsjtx](https://github.com/WSJTX/wsjtx) uses WSJT-X
 3.0.2-devel, commit `967c85a61`, as the base for these additions. The entries
 describe the implemented state on October 12, 2026; they do not announce a
 new official WSJT-X release.
+
+### 2026-10-12 — Automatic Windows binaries
+
+- New **OE3SRO Windows EXE** workflow for all pushes, tags, pull requests,
+  and manual runs, using the established local MinGW64/Qt5 build scripts.
+- Versioned Windows x64 ZIP with EXE, decoders, DLLs, data, launcher, build
+  manifest, and SHA256. Download links in both READMEs and the Actions summary;
+  90-day retention and GitHub login required for artifact downloads.
+- CI verifies PSK Reporter, FT2/FT4, and the standalone package runtime.
+  Runner paths are configurable; CI package checks need no installed original
+  version or private settings. OmniRig source revision and checksum are pinned.
 
 ### 2026-10-12 — PSK Reporter list and refresh
 

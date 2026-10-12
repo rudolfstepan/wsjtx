@@ -4,6 +4,16 @@
 
 **build by OE3SRO**
 
+[![Windows-Build](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml/badge.svg)](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml)
+
+**[Windows-EXE herunterladen](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml):**
+Den neuesten erfolgreichen Lauf öffnen und unter **Artifacts** das versionierte
+`wsjtx-OE3SRO-…-windows-x64`-Paket herunterladen. GitHub-Anmeldung erforderlich.
+Das Artefakt und das darin enthaltene ZIP entpacken, dann **Start-WSJT-X.bat**
+starten. EXE, Decoder, DLLs und Stationsdaten sind enthalten. Beim ersten Start
+die Station und das Funkgerät einrichten; vorhandene Custom-Einstellungen bleiben
+erhalten. Die Downloads werden 90 Tage aufbewahrt.
+
 **Start per Doppelklick:** [start.bat](start.bat) im Projektordner öffnen.
 Sie startet das vorhandene Custom-Paket mit dem Profil `Custom`.
 
@@ -18,6 +28,10 @@ GPLv3-Implementierung von **DG2YCB / WSJT-X Improved** adaptiert. Die Versionsan
 das About-Fenster und der Splashscreen tragen den Zusatz **build by OE3SRO**.
 Der Custom-Build basiert derzeit auf **WSJT-X 3.0.2-devel**; die hier
 beschriebenen Build-Skripte und Paketprüfungen sind für Windows ausgelegt.
+GitHub Actions baut dieses Paket automatisch bei jedem Push, einschließlich
+Tags, sowie für Pull Requests und manuelle Starts. Der Dateiname enthält die
+Projektversion, den Quellcommit, die Buildnummer und den Wiederholungsversuch;
+`build-info.json` und eine SHA256-Datei dokumentieren den Download.
 
 Die [Änderungshistorie des Forks](docs/CHANGES.md) dokumentiert die Custom-
 Erweiterungen und ihre Implementierungscommits. Die [FT2-Dokumentation](docs/FT2.md)

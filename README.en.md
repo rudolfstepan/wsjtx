@@ -4,6 +4,16 @@
 
 **build by OE3SRO**
 
+[![Windows build](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml/badge.svg)](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml)
+
+**[Download Windows EXE](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml):**
+Open the latest successful run and download the versioned
+`wsjtx-OE3SRO-…-windows-x64` package under **Artifacts**. GitHub login is required.
+Extract the artifact and its enclosed ZIP, then launch **Start-WSJT-X.bat**.
+The EXE, decoders, DLLs, and station data are included. Configure your station
+and radio on first launch; existing Custom settings are preserved.
+Downloads are retained for 90 days.
+
 **Start with a double-click:** open [start.bat](start.bat) in the repository
 directory. It launches the existing custom package with the `Custom` profile.
 
@@ -18,6 +28,10 @@ by **DG2YCB / WSJT-X Improved**. The version display, window title,
 About dialog, and splash screen include **build by OE3SRO**.
 The custom build currently uses **WSJT-X 3.0.2-devel** as its base; the build
 scripts and package checks described here target Windows.
+GitHub Actions builds the package automatically on every push, including tags,
+as well as pull requests and manual runs. Filenames include the project version,
+source commit, build number, and attempt; `build-info.json` and a SHA256 file
+identify and verify the download.
 
 The [fork change history](docs/CHANGES.md) records the custom additions and
 their implementation commits. The [FT2 documentation](docs/FT2.md) covers
