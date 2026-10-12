@@ -159,7 +159,9 @@ Komponenten Widgets, Network, Multimedia, PrintSupport, SerialPort, Sql,
 WebSockets, ActiveQt, SVG und die Qt-Werkzeuge bereitstellen.
 
 `Setup-CustomBuild.ps1` lädt das **Hamlib-4.7.2-SDK** mit SHA256-Prüfung sowie
-die OmniRig-Typbibliothek in das lokale Verzeichnis `.tools`. MSYS2 und seine
+die auf Commit und SHA256 festgelegte OmniRig-Typbibliothek in das lokale
+Verzeichnis `.tools`. `WSJTX_MINGW_PREFIX` kann den Standardpfad überschreiben.
+MSYS2 und seine
 Pakete müssen bereits installiert sein.
 
 Führe im Repository-Verzeichnis aus:
@@ -210,6 +212,17 @@ je Station, Abfrageintervall, fehlerhafte XML-Antworten, Farben und Logbuchstatu
 Band-Activity-Markierungen, Favoriten und gespeicherte Anrufe, Wiederanruf im
 passenden Kontext, nächste Station und der Halt-Tx-Callback. Dabei wird keine
 Funkübertragung ausgelöst.
+
+Ohne Originalinstallation oder importierte Konfiguration prüfst du die
+Paketlaufzeit mit:
+
+```powershell
+.\tools\Verify-CustomPackage.ps1 -PortableOnly
+```
+
+Das erste [Release 3.0.2-oe3sro.1](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-1)
+bestand den vollständigen CI-Build einschließlich PSK-, FT2-/FT4- und
+Paketprüfungen. Die öffentlichen ZIP-Downloads und Prüfsummen wurden geprüft.
 
 Nach dem Konfigurationsimport lässt sich das Paket zusätzlich prüfen:
 

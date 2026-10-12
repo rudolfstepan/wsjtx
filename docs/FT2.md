@@ -3,6 +3,29 @@
 [README Deutsch](../README.md) | [README English](../README.en.md) |
 [Änderungshistorie / Change history](CHANGES.md)
 
+## Aktuelles Windows-Release / Current Windows release
+
+[3.0.2-oe3sro.1](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-1)
+enthält FT2, die PSK-Reporter-Korrektur und die DE/EN-Anleitung. Windows-ZIP
+vollständig entpacken und **Start-WSJT-X.bat** öffnen; Anleitung **docs/index.html**.
+Im lokalen Repository startet **Start-Custom.ps1** das Paket unter
+`dist-custom\OE3SRO-psk-fix`. Der historische Prüfstand vom 11. Oktober bleibt
+weiter unten dokumentiert. FT2 bleibt experimentell.
+
+The release includes FT2, the PSK Reporter fix, and the German/English guide.
+Extract the complete Windows ZIP and launch **Start-WSJT-X.bat**; open
+**docs/index.html** for instructions. The local repository launcher is
+**Start-Custom.ps1**, using `dist-custom\OE3SRO-psk-fix`. The October 11 baseline
+below remains a historical verification record. FT2 remains experimental.
+
+Der [Release-CI-Lauf](https://github.com/rudolfstepan/wsjtx/actions/runs/38218198831)
+bestand PSK-, FT2-/FT4- und eigenständige Paketprüfungen. Release-EXE-SHA256:
+The release CI passed PSK, FT2/FT4, and standalone runtime checks. EXE SHA256:
+
+```text
+F61F611C41E059FBF4BB91CA9BB28502BF179ED88B591F76A47F4739B2EF9DB3
+```
+
 **Deutsch**
 
 FT2 ist über **Mode → FT2** verfügbar. Der experimentelle Modus verwendet
@@ -223,9 +246,10 @@ Calling sets Tx1 and Enable Tx, using the configured TX frequency and sequence.
 ## Prüfstand / Verification baseline — 2026-10-11
 
 Die Ergebnisse stammen aus der Implementierung und anschließenden Paketierung
-von `4c7c48d53`. Ein späterer reiner Dokumentationscommit bedeutet keinen
-neuen Binärbuild. These results belong to implementation commit `4c7c48d53`
-and its subsequent packaging; a later documentation commit is not a new build.
+von `4c7c48d53`. Spätere automatische CI-Builds haben eigene Quellcommit- und
+EXE-Hashes. These results belong to implementation commit `4c7c48d53`
+and its subsequent packaging; later automatic CI builds have their own
+source commit and executable hashes.
 
 | Prüfung / Check | Ergebnis / Result |
 | --- | --- |
@@ -261,7 +285,7 @@ laufen die generierten Roundtrips und Modellprüfungen. The optional parameter
 does not download recordings; without it, generated round trips and model
 checks still run. Local artifacts remain under `.local\ft2-checks`.
 
-Paketstart / Start package: `Start-Custom.ps1` →
+Paketstart im damaligen Prüfstand / Package launch at that baseline: `Start-Custom.ps1` →
 `dist-custom\OE3SRO-ft2\bin\wsjtx.exe --rig-name Custom`.
 SHA256 der damals identischen Build- und Paket-EXE / SHA256 of the matching
 build and packaged executable at this baseline:

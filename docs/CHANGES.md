@@ -14,6 +14,10 @@ sie sind keine Veröffentlichung einer neuen offiziellen WSJT-X-Version.
 - Erstes öffentliches Custom-Release **3.0.2-oe3sro.1**, Tag `oe3sro-v3.0.2-1`:
   Windows-ZIP mit EXE und deutscher/englischer HTML-Anleitung sowie separates
   Dokumentations-ZIP und SHA256-Dateien. Release-Links stehen in beiden READMEs.
+- Der [Release-Tag-Build](https://github.com/rudolfstepan/wsjtx/actions/runs/38218198831)
+  bestand Build, PSK-/FT2-/FT4-Tests, Paketprüfung und Veröffentlichung. Die vier
+  veröffentlichten Dateien wurden ohne Anmeldung heruntergeladen; ZIP-/EXE-
+  Prüfsummen, Quellcommit und Paketinhalt stimmen.
 - Custom-Tags `oe3sro-vX.Y.Z-N` bauen und testen den getaggten Stand und
   veröffentlichen nach erfolgreicher Paketprüfung automatisch ein GitHub-Release.
 
@@ -120,6 +124,10 @@ new official WSJT-X release.
 - First public custom release **3.0.2-oe3sro.1**, tag `oe3sro-v3.0.2-1`:
   Windows ZIP with EXE and German/English HTML guide, plus a separate
   documentation ZIP and SHA256 files. Release links appear in both READMEs.
+- The [release tag build](https://github.com/rudolfstepan/wsjtx/actions/runs/38218198831)
+  passed the build, PSK/FT2/FT4 tests, runtime checks, and publication. All four
+  public assets were downloaded without authentication; ZIP/EXE checksums,
+  source commit, and package contents matched.
 - Custom tags `oe3sro-vX.Y.Z-N` build and test the tagged source and
   automatically publish a GitHub release after successful package verification.
 

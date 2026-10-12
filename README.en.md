@@ -154,7 +154,8 @@ Widgets, Network, Multimedia, PrintSupport, SerialPort, Sql, WebSockets,
 ActiveQt, SVG, and the Qt tools.
 
 `Setup-CustomBuild.ps1` downloads the **Hamlib 4.7.2 SDK** with SHA256
-verification and the OmniRig type library into the local `.tools` directory.
+verification and the commit- and SHA256-pinned OmniRig type library into `.tools`.
+`WSJTX_MINGW_PREFIX` can override the default toolchain path.
 MSYS2 and its packages must already be installed.
 
 Run these commands from the repository directory:
@@ -204,6 +205,17 @@ It checks reception filters, the latest report per station, request throttling,
 malformed XML responses, colors and logbook status, Band Activity markers,
 favorites and saved calls, recall in the correct context, next-station
 selection, and the Halt Tx callback. These checks do not transmit over the air.
+
+To verify the package runtime without an original installation or imported
+configuration, run:
+
+```powershell
+.\tools\Verify-CustomPackage.ps1 -PortableOnly
+```
+
+The first [release 3.0.2-oe3sro.1](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-1)
+passed the complete CI build, including PSK, FT2/FT4, and package checks.
+The public ZIP downloads and checksums were verified.
 
 After importing the configuration, you can also check the package:
 

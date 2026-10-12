@@ -170,11 +170,21 @@ Erneut bauen und paketieren:
 
 Der Windows-Build verwendet MSYS2/MinGW64 mit Qt5, Boost, FFTW, Fortran,
 ActiveQt und libusb sowie das lokale Hamlib-4.7.2-SDK. Die OmniRig-Typbibliothek
-wird vom offiziellen Quellprojekt geladen. MAP65 und die zusätzlichen
+wird mit festem Quellcommit und SHA256-Prüfung geladen. MAP65 und die zusätzlichen
 Simulatoren werden für dieses WSJT-X-Paket nicht gebaut.
 
+Auf einem Rechner ohne Originalinstallation und importiertes Profil genügt
+für die Laufzeitprüfung `Verify-CustomPackage.ps1 -PortableOnly`. Das erste
+[Release 3.0.2-oe3sro.1](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-1)
+wurde vom [Tag-CI-Lauf](https://github.com/rudolfstepan/wsjtx/actions/runs/38218198831)
+erfolgreich gebaut, getestet und veröffentlicht. Beide öffentlichen ZIPs wurden
+anschließend heruntergeladen und auf Prüfsummen, Quellcommit und Inhalt geprüft.
+
 Eine einzelne Live-Abfrage zum Prüfen der API ist über
-`tools\Test-PskReporterLive.ps1` möglich. Auch zwischen manuellen Live-Abfragen
+`tools\Test-PskReporterLive.ps1` möglich.
+Das Skript ist ein FT8-Diagnosetest mit dem Rufzeichen aus der lokalen Importkopie;
+der Produktionsdialog liest seinen Modus hingegen aus dem laufenden Hauptfenster.
+Auch zwischen manuellen Live-Abfragen
 mindestens fünf Minuten warten. Die Antwort wird ausschließlich lokal unter
 `.local` gespeichert. Tests verwenden einen lokalen Server und prüfen die
 Abfrageparameter, die Filter, doppelte Meldungen, Stationsauswahl, das
