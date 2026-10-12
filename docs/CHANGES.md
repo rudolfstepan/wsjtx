@@ -19,6 +19,9 @@ sie sind keine Veröffentlichung einer neuen offiziellen WSJT-X-Version.
 - CI prüft PSK Reporter, FT2/FT4 und die eigenständige Paketlaufzeit.
   Runnerpfade sind konfigurierbar; Paketprüfung benötigt im CI keine installierte
   Originalversion oder private Konfiguration. OmniRig-Quelle und Hash festgelegt.
+- Der [erste GitHub-Build](https://github.com/rudolfstepan/wsjtx/actions/runs/38216578996)
+  bestand alle Schritte. Das heruntergeladene Artefakt wurde zusätzlich auf
+  ZIP-/EXE-Prüfsummen, Quellcommit und vollständigen Paketinhalt geprüft.
 
 ### 2026-10-12 — PSK-Reporter-Liste und Aktualisierung
 
@@ -116,6 +119,9 @@ new official WSJT-X release.
 - CI verifies PSK Reporter, FT2/FT4, and the standalone package runtime.
   Runner paths are configurable; CI package checks need no installed original
   version or private settings. OmniRig source revision and checksum are pinned.
+- The [first GitHub build](https://github.com/rudolfstepan/wsjtx/actions/runs/38216578996)
+  passed every step. The downloaded artifact was also checked for ZIP/EXE
+  checksums, source commit, and complete package contents.
 
 ### 2026-10-12 — PSK Reporter list and refresh
 
