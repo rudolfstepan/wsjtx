@@ -3,7 +3,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
-$package = Join-Path $root 'dist-custom\OE3SRO-bugfix'
+$package = Join-Path $root 'dist-custom\OE3SRO-ftx-native'
 $output = Join-Path $root '.local\windows-artifacts'
 $exe = Join-Path $package 'bin\wsjtx.exe'
 if (!(Test-Path -LiteralPath $exe)) { throw 'Run Package-Custom.ps1 first.' }
@@ -45,7 +45,7 @@ $manifest = [ordered]@{
 $docs = Join-Path $package 'docs'
 New-Item -ItemType Directory -Force -Path $docs | Out-Null
 Copy-Item -LiteralPath "$root\docs\WINDOWS-QUICKSTART.html" -Destination "$docs\index.html" -Force
-foreach ($document in @('FT2.md', 'CHANGES.md')) {
+foreach ($document in @('FT2.md', 'FT8.md', 'CHANGES.md')) {
     $content = [IO.File]::ReadAllText("$root\docs\$document")
     # Repository source links should also work from an extracted binary package.
     $content = [regex]::Replace($content, '\]\(\.\./([^)]+)\)', [Text.RegularExpressions.MatchEvaluator]{ param($match)

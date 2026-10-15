@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 #include "PskReporterDialog.hpp"
 #include "PskReporterHighlight.hpp"
+#include "TxQualityDialog.hpp"
 
 #include <QAudio>
 #include <QAudioOutput>
@@ -670,6 +671,38 @@ MainWindow::MainWindow(QDir const& temp_directory, bool multiple,
   connect (this, &MainWindow::endTransmitMessage, m_modulator, &Modulator::stop);
   connect (this, &MainWindow::tune, m_modulator, &Modulator::tune);
   connect (this, &MainWindow::sendMessage, m_modulator, &Modulator::start);
+  qRegisterMetaType<QVector<float>> ("QVector<float>");
+  connect (this, &MainWindow::transmitWaveform, m_modulator, &Modulator::setWaveform);
+  auto soundOutput = m_soundOutput;
+  connect (m_modulator, &Modulator::stateChanged, m_soundOutput,
+    [soundOutput] (Modulator::ModulatorState state) {
+      soundOutput->setSourceFinished (state == Modulator::Idle);
+    });
+  auto txQuality = new TxQualityDialog {this, [this] {
+    return TxQualityDialog::Context {m_mode, m_config.audio_output_device ().deviceName (),
+      ui->TxFreqSpinBox->value () - m_XIT, QThread::idealThreadCount (), m_ft8threads,
+      m_config.split_mode (), m_multithreadFT8, m_rigState.ptt (), m_rigState.alc (),
+      ui->outAttenuation->value () / 10.0};
+  }, [this] (bool checked) {
+    ui->actionUse_multithreaded_FT8_decoder->setChecked (checked);
+    on_actionUse_multithreaded_FT8_decoder_triggered (checked);
+  }, [this] (int n) {
+    m_ft8threads = n;
+    QList<QAction *> choices {ui->actionMTAuto, ui->actionMT1, ui->actionMT2, ui->actionMT3,
+      ui->actionMT4, ui->actionMT5, ui->actionMT6, ui->actionMT7, ui->actionMT8, ui->actionMT9,
+      ui->actionMT10, ui->actionMT11, ui->actionMT12};
+    choices[n]->setChecked (true);
+  }};
+  connect (m_modulator, &Modulator::startTiming, txQuality, &TxQualityDialog::startTiming);
+  connect (m_soundOutput, &SoundOutput::streamStarted, txQuality, &TxQualityDialog::audioStarted);
+  connect (m_soundOutput, &SoundOutput::error, txQuality, &TxQualityDialog::audioError);
+  auto txQualityAction = ui->menuView->addAction (tr ("TX quality — FT8 / FT4 / FT2"));
+  connect (txQualityAction, &QAction::triggered, this, [txQuality] {
+    txQuality->refresh ();
+    txQuality->show ();
+    txQuality->raise ();
+    txQuality->activateWindow ();
+  });
   connect (&m_audioThread, &QThread::finished, m_modulator, &QObject::deleteLater);
 
   // hook up the audio input stream signals, slots and disposal
@@ -1193,6 +1226,9 @@ MainWindow::MainWindow(QDir const& temp_directory, bool multiple,
       };
   QProcessEnvironment new_env {m_env};
   new_env.insert ("OMP_STACKSIZE", "10M");
+  // Let waiting decoder workers sleep instead of competing with audio/CAT.
+  // Respect explicit tuning supplied by the user.
+  if (!new_env.contains ("OMP_WAIT_POLICY")) new_env.insert ("OMP_WAIT_POLICY", "PASSIVE");
   proc_jt9.setProcessEnvironment (new_env);
   proc_jt9.start(QDir::toNativeSeparators (m_appDir) + QDir::separator () +
           "jt9", jt9_args, QIODevice::ReadWrite | QIODevice::Unbuffered);
@@ -1978,7 +2014,7 @@ void MainWindow::readSettings()
   else if(m_nFT8RXfSens==3) ui->actionRXfHigh->setChecked(true);
 
   m_ft8threads=m_settings->value("FT8threads",0).toInt();
-  if(!(m_ft8threads>=0 && m_ft8threads<25)) m_ft8threads=0;
+  if(!(m_ft8threads>=0 && m_ft8threads<=12)) m_ft8threads=0;
   if(m_ft8threads==0) ui->actionMTAuto->setChecked(true);
   else if(m_ft8threads==1) ui->actionMT1->setChecked(true);
   else if(m_ft8threads==2) ui->actionMT2->setChecked(true);
@@ -3539,6 +3575,9 @@ void MainWindow::showSoundInError(const QString& errorMsg)
 
 void MainWindow::showSoundOutError(const QString& errorMsg)
 {
+  // Release PTT before displaying a modal error: do not leave a silent
+  // transmitter keyed while the user is reading the dialog.
+  if (m_auto || m_transmitting || m_tune || g_iptt) on_stopTxButton_clicked ();
   if (m_splash && m_splash->isVisible ()) m_splash->hide ();
   MessageBox::critical_message (this, tr ("Error in Sound Output"), errorMsg);
 }
@@ -8020,6 +8059,8 @@ void MainWindow::guiUpdate()
             int nwave=nsym*nsps;
             gen_ft8wave_(const_cast<int *>(itone),&nsym,&nsps,&bt,&fsample,&f0,foxcom_.wave,
                          foxcom_.wave,&icmplx,&nwave);
+            if (SpecOp::FOX != m_specOp)
+              Q_EMIT transmitWaveform (QVector<float> (foxcom_.wave, foxcom_.wave + nwave));
             if(SpecOp::FOX == m_specOp) {
               //Fox must generate the full Tx waveform, not just an itone[] array.
               QString fm = QString::fromStdString(message).trimmed();
@@ -8055,6 +8096,7 @@ void MainWindow::guiUpdate()
           int icmplx=0;
           gen_ft4wave_(const_cast<int *>(itone),&nsym,&nsps,&fsample,&f0,foxcom_.wave,
                        foxcom_.wave,&icmplx,&nwave);
+          Q_EMIT transmitWaveform (QVector<float> (foxcom_.wave, foxcom_.wave + nwave));
         }
         if(m_mode=="FST4" or m_mode=="FST4W") {
           int ichk=0;

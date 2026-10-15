@@ -49,6 +49,7 @@ operation, implementation, sources, and the verified build baseline.
 
 | Feature | Benefit |
 | --- | --- |
+| **FT8 / FT4 / FT2 native kernels and TX diagnostics** | C++ waveforms, shared LDPC encoder, FT8 BP kernels and parallel FT4/FT2 synchronization; audio/start/ALC readings under View → TX quality — FT8 / FT4 / FT2. [FT8](docs/FT8.md), [FT4/FT2](docs/FT2.md). |
 | **FT2 (experimental)** | 3.75-second periods with transmit, decode, Auto Seq, waterfall, and PSK calling tools; adapted from WSJT-X Improved by DG2YCB. |
 | **PSK Reporter: Who hears me?** | Show receivers of your signal directly in WSJT-X, including callsign, grid locator, SNR, reception time, and mode. |
 | **Call a station directly** | Fill in the callsign and locator, select the first standard message, and turn on **Enable Tx**. |
@@ -164,13 +165,14 @@ Run these commands from the repository directory:
 .\tools\Setup-CustomBuild.ps1
 .\tools\Build-Custom.ps1
 .\tools\Test-Core.ps1
+.\tools\Test-TxQuality.ps1
 .\tools\Test-PskReporter.ps1
 .\tools\Test-Ft2.ps1
 .\tools\Package-Custom.ps1
 ```
 
 The release build is placed in `build-custom`; the package with runtime
-libraries, decoders, and station data is placed in `dist-custom\OE3SRO-bugfix`.
+libraries, decoders, and station data is placed in `dist-custom\OE3SRO-ftx-native`.
 The scripts build WSJT-X and its supporting utilities. MAP65 and the
 additional simulators are not built for this package.
 

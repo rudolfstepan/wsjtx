@@ -49,6 +49,7 @@ enthält Bedienung, technische Umsetzung, Quellen und den geprüften Buildstand.
 
 | Funktion | Nutzen |
 | --- | --- |
+| **FT8 / FT4 / FT2: native Kerne und TX-Diagnose** | C++-Wellenformen, gemeinsamer LDPC-Encoder, FT8-BP-Kerne und parallele FT4-/FT2-Synchronisationssuche; Audio-/Start-/ALC-Anzeige unter View → TX quality — FT8 / FT4 / FT2. [FT8](docs/FT8.md), [FT4/FT2](docs/FT2.md). |
 | **FT2 (experimentell)** | 3,75-Sekunden-Durchgänge mit Sender, Decoder, Auto Seq, Wasserfall und PSK-Anrufhilfen; übernommen und angepasst aus WSJT-X Improved von DG2YCB. |
 | **PSK Reporter: Who hears me?** | Empfänger des eigenen Signals direkt in WSJT-X anzeigen, mit Rufzeichen, Locator, SNR, Empfangszeit und Modus. |
 | **Station direkt anrufen** | Rufzeichen und Locator übernehmen, die erste Standardnachricht wählen und **Enable Tx** aktivieren. |
@@ -170,13 +171,14 @@ Führe im Repository-Verzeichnis aus:
 .\tools\Setup-CustomBuild.ps1
 .\tools\Build-Custom.ps1
 .\tools\Test-Core.ps1
+.\tools\Test-TxQuality.ps1
 .\tools\Test-PskReporter.ps1
 .\tools\Test-Ft2.ps1
 .\tools\Package-Custom.ps1
 ```
 
 Der Release-Build liegt unter `build-custom`; das Paket mit Laufzeitbibliotheken,
-Decodern und Stationsdaten unter `dist-custom\OE3SRO-bugfix`.
+Decodern und Stationsdaten unter `dist-custom\OE3SRO-ftx-native`.
 Die Skripte bauen WSJT-X mit den zugehörigen Hilfsprogrammen; MAP65 und die
 zusätzlichen Simulatoren werden für dieses Paket nicht gebaut.
 

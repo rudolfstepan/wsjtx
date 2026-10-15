@@ -489,6 +489,7 @@ private:
       bool synchronize = true, bool fastMode = false, double dBSNR = 99.,
                              int TRperiod=60) const;
   Q_SIGNAL void outAttenuationChanged (qreal) const;
+  Q_SIGNAL void transmitWaveform (QVector<float> const&) const;
   Q_SIGNAL void toggleShorthand () const;
   Q_SIGNAL void reset_audio_input_stream (bool report_dropped_frames) const;
 

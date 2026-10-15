@@ -138,6 +138,7 @@ protected:
   void update_level (int = 0);
   void update_power (unsigned int = 0);
   void update_swr (unsigned int = 0);
+  void update_alc (float = -1.f);
 
   // Calling this eventually triggers the Transceiver::update(State) signal.
   void update_complete (bool force_signal = false);

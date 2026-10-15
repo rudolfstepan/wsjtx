@@ -362,6 +362,9 @@ set (wsjt_CXXSRCS
   lib/crc10.cpp
   lib/crc13.cpp
   lib/crc14.cpp
+  lib/ft8/native/ft8_wave.cpp
+  lib/ft8/native/ft8_ldpc.cpp
+  lib/ft4/native/ft4_sync.cpp
   ${wsjt_fox_CXXSRCS}
   )
 # deal with a GCC v6 UB error message
@@ -439,7 +442,6 @@ set (wsjt_FSRCS
   lib/blanker.f90
   lib/bpdecode40.f90
   lib/bpdecode128_90.f90
-  lib/ft8/bpdecode174_91.f90
   lib/baddata.f90
   lib/cablog.f90
   lib/calibrate.f90
@@ -475,7 +477,6 @@ set (wsjt_FSRCS
   lib/encode4.f90
   lib/encode_msk40.f90
   lib/encode_128_90.f90
-  lib/ft8/encode174_91.f90
   lib/ft8/encode174_91_nocrc.f90
   lib/entail.f90
   lib/ephem.f90
@@ -526,8 +527,7 @@ set (wsjt_FSRCS
   lib/genmsk40.f90
   lib/ft4/ft4code.f90
   lib/ft4/genft4.f90
-  lib/ft4/gen_ft4wave.f90
-  lib/ft8/gen_ft8wave.f90
+  lib/ft8/ft8_thread_budget.f90
   lib/ft8/genft8refsig.f90
   lib/genwspr.f90
   lib/geodist.f90
@@ -630,7 +630,6 @@ set (wsjt_FSRCS
   lib/ft4/get_ft4_bitmetrics.f90
   lib/ft8/sync8.f90
   lib/ft8/sync8d.f90
-  lib/ft4/sync4d.f90
   lib/sync9.f90
   lib/sync9f.f90
   lib/sync9w.f90
@@ -670,7 +669,6 @@ set (wsjt_FSRCS
   lib/77bit/hash22calc.f90
   lib/ft8var/agccft8.f90
   lib/ft8var/baddatavar.f90
-  lib/ft8var/bpdecode174_91var.f90
   lib/ft8var/chkfalse8var.f90
   lib/ft8var/chkflscallvar.f90
   lib/ft8var/chkgridvar.f90
@@ -678,7 +676,6 @@ set (wsjt_FSRCS
   lib/ft8var/chkspecial8var.f90
   lib/ft8var/cwfilter.f90
   lib/ft8var/datacor.f90
-  lib/ft8var/encode174_91var.f90
   lib/ft8var/extract_callvar.f90
   lib/ft8var/filbigvar.f90
   lib/ft8var/fillhashvar.f90
@@ -695,7 +692,6 @@ set (wsjt_FSRCS
   lib/ft8var/ft8sdvar.f90
   lib/ft8var/ft8sd1var.f90
   lib/ft8var/genft8var.f90
-  lib/ft8var/gen_ft8wavevar.f90
   lib/ft8var/genft8sdvar.f90
   lib/ft8var/jt65_mod2var.f90
   lib/ft8var/jt65_mod5.f90
@@ -1651,6 +1647,31 @@ else ()
 endif ()
 add_executable (ft2_ui_checks EXCLUDE_FROM_ALL tests/ft2/ft2_ui_checks.cpp)
 target_link_libraries (ft2_ui_checks wsjt_qt)
+add_executable (ft8_wave_checks EXCLUDE_FROM_ALL tests/ft8/ft8_wave_checks.f90)
+add_executable (ft8_native_checks EXCLUDE_FROM_ALL tests/ft8/native_wave_checks.cpp
+  tests/ft8/native_ldpc_checks.cpp tests/ft2/native_ft4_checks.cpp lib/ft8/gen_ft8wave.f90
+  lib/ft8/encode174_91.f90 lib/ft8/bpdecode174_91.f90 lib/ft8var/bpdecode174_91var.f90
+  lib/ft8var/gen_ft8wavevar.f90 lib/ft8var/encode174_91var.f90
+  lib/ft4/gen_ft4wave.f90 lib/ft4/sync4d.f90 tests/ft2/reference_sync_search.f90)
+target_compile_definitions (ft8_native_checks PRIVATE gen_ft8wave=gen_ft8wave_reference
+  encode174_91=encode174_91_reference bpdecode174_91=bpdecode174_91_reference
+  bpdecode174_91var=bpdecode174_91var_reference gen_ft8wavevar=gen_ft8wavevar_reference
+  encode174_91var=encode174_91var_reference gen_ft4wave=gen_ft4wave_reference
+  sync4d=sync4d_reference sync4d_search=sync4d_search_reference)
+target_include_directories (ft8_native_checks PRIVATE ${CMAKE_SOURCE_DIR})
+if (OPENMP_FOUND)
+  target_include_directories (ft8_native_checks PRIVATE ${CMAKE_BINARY_DIR}/fortran_modules_omp)
+  target_link_libraries (ft8_native_checks wsjt_fort_omp wsjt_cxx)
+else ()
+  target_link_libraries (ft8_native_checks wsjt_fort wsjt_cxx)
+endif ()
+if (OPENMP_FOUND)
+  target_include_directories (ft8_wave_checks PRIVATE ${CMAKE_BINARY_DIR}/fortran_modules_omp)
+  target_link_libraries (ft8_wave_checks wsjt_fort_omp wsjt_cxx)
+else ()
+  target_include_directories (ft8_wave_checks PRIVATE ${CMAKE_BINARY_DIR})
+  target_link_libraries (ft8_wave_checks wsjt_fort wsjt_cxx)
+endif ()
 if (${OPENMP_FOUND} OR APPLE)
   if (APPLE)
     # On Mac we don't have working OpenMP support in the C/C++
@@ -1690,6 +1711,25 @@ if (${OPENMP_FOUND} OR APPLE)
 else (${OPENMP_FOUND} OR APPLE)
   target_link_libraries (jt9 wsjt_fort wsjt_cxx fort_qt)
 endif (${OPENMP_FOUND} OR APPLE)
+
+# Same decoder with the original kernels, for end-to-end differential tests.
+# Only the explicit test script builds this target; it never opens a radio.
+add_executable (ft8_reference_decoder EXCLUDE_FROM_ALL ${jt9_FSRCS}
+  lib/ft8/gen_ft8wave.f90 lib/ft8var/gen_ft8wavevar.f90
+  lib/ft8/encode174_91.f90 lib/ft8var/encode174_91var.f90
+  lib/ft8/bpdecode174_91.f90 lib/ft8var/bpdecode174_91var.f90
+  lib/ft4/gen_ft4wave.f90 lib/ft4/sync4d.f90 tests/ft2/reference_sync_search.f90)
+get_target_property (ft8_reference_libraries jt9 LINK_LIBRARIES)
+target_link_libraries (ft8_reference_decoder ${ft8_reference_libraries})
+if (OPENMP_FOUND OR APPLE)
+  target_include_directories (ft8_reference_decoder PRIVATE ${CMAKE_BINARY_DIR}/fortran_modules_omp)
+  target_compile_options (ft8_reference_decoder PRIVATE $<$<COMPILE_LANGUAGE:Fortran>:-fopenmp>)
+else ()
+  target_include_directories (ft8_reference_decoder PRIVATE ${CMAKE_BINARY_DIR})
+endif ()
+if (WIN32)
+  set_target_properties (ft8_reference_decoder PROPERTIES LINK_FLAGS -Wl,--stack,16777216)
+endif ()
 
 if (NOT WSJT_SKIP_MAP65)
   find_package (Portaudio REQUIRED)

@@ -269,16 +269,8 @@ contains
                   idfbest=0
                   smax=-99.
                   call timer('sync4d  ',0)
-                  do idf=idfmin,idfmax,idfstp
-                     do istart=ibmin,ibmax,ibstp
-                        call sync4d(cd2,istart,ctwk2(:,idf),1,sync)  !Find sync power
-                        if(sync.gt.smax) then
-                           smax=sync
-                           ibest=istart
-                           idfbest=idf
-                        endif
-                     enddo
-                  enddo
+                  call sync4d_search(cd2,ctwk2,idfmin,idfmax,idfstp, &
+                       ibmin,ibmax,ibstp,ibest,idfbest,smax)
                   call timer('sync4d  ',1)
                enddo
                if(iseg.eq.1) smax1=smax

@@ -3,6 +3,8 @@
 
 #include <QAudio>
 #include <QPointer>
+#include <QVector>
+#include <atomic>
 
 #include "Audio/AudioDevice.hpp"
 
@@ -42,9 +44,13 @@ public:
   Q_SLOT void stop (bool quick = false);
   Q_SLOT void tune (bool newState = true);
   Q_SLOT void setFrequency (double newFrequency) {m_frequency = newFrequency;}
+  // Delivered through the audio thread's event queue, never shared with GUI writers.
+  Q_SLOT void setWaveform (QVector<float> const& waveform) {m_waveform = waveform;}
+  Q_SIGNAL void startTiming (QString mode, int skippedMilliseconds) const;
   Q_SIGNAL void stateChanged (ModulatorState) const;
 
 protected:
+  virtual qint64 millisecondsSinceEpoch () const;
   qint64 readData (char * data, qint64 maxSize) override;
   qint64 writeData (char const * /* data */, qint64 /* maxSize */) override
   {
@@ -55,9 +61,10 @@ private:
   qint16 postProcessSample (qint16 sample) const;
 
   QPointer<SoundOutput> m_stream;
+  QVector<float> m_waveform;
   bool m_quickClose;
 
-  unsigned m_symbolsLength;
+  std::atomic<unsigned> m_symbolsLength;
 
   static double constexpr m_twoPi = 2.0 * 3.141592653589793238462;
   unsigned m_nspd = 2048 + 512; // CW ID WPM factor = 22.5 WPM
@@ -66,24 +73,24 @@ private:
   double m_dphi;
   double m_amp;
   double m_nsps;
-  double m_frequency;
+  std::atomic<double> m_frequency;
   double m_frequency0;
   double m_snr;
   double m_fac;
   double m_toneSpacing;
-  double m_fSpread;
+  std::atomic<double> m_fSpread;
   double m_TRperiod;
-  double m_period;
+  std::atomic<double> m_period;
 
   qint64 m_silentFrames;
-  qint64 m_ms0;
+  std::atomic<qint64> m_ms0;
   qint16 m_ramp;
 
 
   unsigned m_frameRate;
-  ModulatorState m_state;
+  std::atomic<ModulatorState> m_state;
 
-  bool m_tuning;
+  std::atomic<bool> m_tuning;
   bool m_addNoise;
   bool m_bFastMode;
 

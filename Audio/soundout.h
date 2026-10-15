@@ -20,7 +20,8 @@ class SoundOutput
   
 public:
   SoundOutput ()
-    : m_framesBuffered {0}
+    : m_channels {0}
+    , m_framesBuffered {0}
     , m_volume {1.0}
     , error_ {false}
   {
@@ -30,17 +31,19 @@ public:
 
 public Q_SLOTS:
   void setFormat (QAudioDeviceInfo const& device, unsigned channels, int frames_buffered = 0);
-  void restart (QIODevice *);
+  virtual void restart (QIODevice *);
   void suspend ();
   void resume ();
-  void reset ();
-  void stop ();
+  virtual void reset ();
+  virtual void stop ();
   void setAttenuation (qreal);	/* unsigned */
   void resetAttenuation ();	/* to zero */
+  void setSourceFinished (bool finished) {m_sourceFinished = finished;}
   
 Q_SIGNALS:
   void error (QString message) const;
   void status (QString message) const;
+  void streamStarted (QString device, int sampleRate, int bufferMilliseconds) const;
 
 private:
   bool checkStream () const;
@@ -55,6 +58,7 @@ private:
   int m_framesBuffered;
   qreal m_volume;
   bool error_;
+  bool m_sourceFinished = true;
 };
 
 #endif

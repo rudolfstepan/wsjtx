@@ -9,6 +9,43 @@ hier dokumentierten Erweiterungen auf WSJT-X 3.0.2-devel, Commit `967c85a61`.
 Die Einträge beschreiben den implementierten Stand vom 15. Oktober 2026;
 sie sind keine Veröffentlichung einer neuen offiziellen WSJT-X-Version.
 
+### 2026-10-15 — Erweiterung auf FT4 und FT2
+
+- Native C++-GFSK-Wellenformen einschließlich modusspezifischer Rampen,
+  doppelter zentrierter Phase und interpolierter Sinustabelle. Der bereits
+  native LDPC-Encoder wird von FT8/FT4/FT2 gemeinsam verwendet.
+- Native Synchronisationsberechnung und parallele Frequenz-/Zeitsuche mit bis
+  zu acht Workern. CPU-/OpenMP-Limits beachtet, kleine Feinsuchen seriell,
+  ursprüngliche Reihenfolge bei gleichen Maxima erhalten.
+- Private Audio-Snapshots und gemeinsamer Dialog
+  **View → TX quality — FT8 / FT4 / FT2**; FT8-Threadregler nur in FT8 aktiv.
+- Wellenform-, Grob-/Feinsuch- und Parallelvergleiche gegen Originale bestanden.
+  Aufnahmevergleiche: jeweils 19 FT4-, 6/2 FT2-Nachrichten auch unter Teamlimits.
+  Kernelmessungen: FT4-Welle ca. 8,6 → 1,0 ms; FT2 ca. 4,2 → 0,4 ms. Keine generellen
+  Gesamtdecoder-Speedups oder RF-Empfangsverbesserungen daraus ableiten.
+- Neues Paket `dist-custom\OE3SRO-ftx-native`; vorhandenes Custom-Profil erhalten.
+  Hybrid-BP/OSD und weitere Decoderteile enthalten weiterhin Fortran.
+
+### 2026-10-15 — FT8: C++-Kerne, SMP und TX-Diagnose
+
+- Normale FT8-Wellenform sowie LDPC-Encoder und Standard-/SMP-BP-Kerne auf C++
+  portiert. Zentrierte Phase nach dem Zustandsprinzip des REIST-Papers,
+  doppelte Phasengenauigkeit, interpolierte Sinustabelle, gepackte Parität und
+  getrennte Decoder-Arbeitsdaten. Vollständige FT8-Kette noch nicht C++:
+  Nachrichtenpackung, Synchronisation und Hybrid-BP/OSD enthalten weiter Fortran.
+- Fehler bei OpenMP-Limits behoben: Die tatsächliche Teamgrenze begrenzt die
+  angeforderte Zahl der maximal zwölf Worker; deaktivierte Teams werden beachtet.
+- Normales FT8 nutzt einen eigenen Audiopuffer. Nachrichtenende ohne zusätzliches
+  Sample, kein Weiterverwenden ungültiger Audioformate und TX-Stopp vor Audiofehlerdialog.
+- **View → TX quality — FT8** ergänzt Audio-/Start-/optionale CAT-ALC-Anzeige sowie
+  die vorhandenen SMP-Bedienelemente. ALC hat eine backendabhängige relative Skala.
+- Differenztests gegen Originalkerne und WAV-Aufnahme ohne Decode-Verlust im
+  geprüften Material. Lokale Kernelmessungen: Wellenform etwa 21 → 2–3 ms,
+  Encoder etwa 8,3 → 0,25 µs, BP etwa Faktor 1,2. Keine Aussage über allgemeine
+  Empfindlichkeit oder bessere RF-Empfangbarkeit; kein Geräte-/Funk-Sendetest.
+- Paketpfad `dist-custom\OE3SRO-ft8-native`, Start über `start.bat` mit bestehendem
+  Custom-Profil. [Umfang, Paper-Einordnung und Tests](FT8.md).
+
 ### 2026-10-15 — Fehlerprüfung: Logbuch und UDP
 
 - Beim Einlesen des ADIF-Logbuchs werden vollständige, noch gepufferte QSOs
@@ -137,6 +174,38 @@ This fork of [WSJTX/wsjtx](https://github.com/WSJTX/wsjtx) uses WSJT-X
 3.0.2-devel, commit `967c85a61`, as the base for these additions. The entries
 describe the implemented state on October 15, 2026; they do not announce a
 new official WSJT-X release.
+
+### 2026-10-15 — Extension to FT4 and FT2
+
+- Native C++ GFSK waveforms with mode-specific ramps, double centered phase
+  and interpolated sine lookup. FT8/FT4/FT2 share the native LDPC encoder.
+- Native synchronization and parallel frequency/time search, up to eight workers
+  within CPU/OpenMP limits. Small fine grids run serially; peak ties retain the
+  original search order.
+- Private audio snapshots and shared **View → TX quality — FT8 / FT4 / FT2**.
+  Recorded comparisons preserve 19 FT4 and 6/2 FT2 messages under all tested team
+  limits. Waveform kernel timings: FT4 about 8.6 → 1.0 ms, FT2 about 4.2 → 0.4 ms;
+  these are not general full-decoder or on-air improvements.
+- New local package `dist-custom\OE3SRO-ftx-native`, preserving the Custom profile.
+  Hybrid BP/OSD and other decoder stages still contain Fortran.
+
+### 2026-10-15 — FT8: C++ kernels, SMP and TX diagnostics
+
+- Ported normal FT8 waveform generation, LDPC encoding and standard/reordered BP
+  kernels to C++. Centered phase applies the REIST paper's bounded-state idea;
+  double precision, interpolated lookup, packed parity and private decoder scratch.
+  Message packing, synchronization and hybrid BP/OSD still contain Fortran.
+- Corrected SMP worker selection under restricted or disabled OpenMP teams;
+  the existing architecture still supports at most twelve workers.
+- Private normal-FT8 audio snapshot, exact message end, invalid-format handling
+  and TX stop before audio error dialogs. Added **View → TX quality — FT8** with
+  audio/start/optional CAT ALC readings and existing parallel-decoder controls.
+- Differential kernel tests and the recorded FT8 sample show no lost messages in
+  tested material. Local kernel timings: waveform about 21 → 2–3 ms, encoding
+  about 8.3 → 0.25 µs, BP about 1.2× faster. These are not full-decoder speedups
+  or evidence of improved on-air reception. No radio test was performed.
+- Local package: `dist-custom\OE3SRO-ft8-native`, using the existing Custom profile.
+  [Scope, paper interpretation and validation](FT8.md).
 
 ### 2026-10-15 — Bug review: logbook and UDP
 

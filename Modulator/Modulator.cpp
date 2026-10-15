@@ -54,7 +54,7 @@ void Modulator::start (QString mode, unsigned symbolsLength, double framesPerSym
   // qDebug () << "mode:" << mode << "symbolsLength:" << symbolsLength << "framesPerSymbol:" << framesPerSymbol << "frequency:" << frequency << "toneSpacing:" << toneSpacing << "channel:" << channel << "synchronize:" << synchronize << "fastMode:" << fastMode << "dBSNR:" << dBSNR << "TRperiod:" << TRperiod;
   Q_ASSERT (stream);
 // Time according to this computer which becomes our base time
-  qint64 ms0 = QDateTime::currentMSecsSinceEpoch() % 86400000;
+  qint64 ms0 = millisecondsSinceEpoch () % 86400000;
   unsigned mstr = ms0 % int(1000.0*m_period); // ms into the nominal Tx start time
 
   if(m_state != Idle) stop();
@@ -88,6 +88,9 @@ void Modulator::start (QString mode, unsigned symbolsLength, double framesPerSym
 
   m_silentFrames = 0;
   m_ic=0;
+  bool const privateWave = (mode == "FT8" && toneSpacing == -3.0)
+    || ((mode == "FT4" || mode == "FT2") && toneSpacing == -2.0);
+  if (!privateWave) m_waveform.clear ();
   if (!m_tuning && !m_bFastMode)
     {
       // calculate number of silent frames to send, so that audio will
@@ -104,6 +107,7 @@ void Modulator::start (QString mode, unsigned symbolsLength, double framesPerSym
         }
     }
   if(mode=="Echo") m_ic=0;
+  if (!m_tuning) Q_EMIT startTiming (mode, int (1000 * qint64 (m_ic) / m_frameRate));
 
   initialize (QIODevice::ReadOnly, channel);
   Q_EMIT stateChanged ((m_state = (synchronize && m_silentFrames) ?
@@ -121,6 +125,11 @@ void Modulator::start (QString mode, unsigned symbolsLength, double framesPerSym
     {
       qDebug () << "Modulator::start: no audio output stream assigned";
     }
+}
+
+qint64 Modulator::millisecondsSinceEpoch () const
+{
+  return QDateTime::currentMSecsSinceEpoch ();
 }
 
 void Modulator::tune (bool newState)
@@ -172,6 +181,8 @@ qint64 Modulator::readData (char * data, qint64 maxSize)
   qint16 * samples (reinterpret_cast<qint16 *> (data));
   qint16 * end (samples + numFrames * (bytesPerFrame () / sizeof (qint16)));
   qint64 framesGenerated (0);
+  bool const waveformSnapshot = !m_tuning && !m_waveform.isEmpty ();
+  int const cwSymbols = waveformSnapshot ? 0 : icw[0];
 
 //  if(m_ic==0) qDebug() << "aa" << 0.001*(QDateTime::currentMSecsSinceEpoch() % qint64(1000*m_TRperiod))
 //                       << m_state << m_TRperiod << m_silentFrames << m_ic << foxcom_.wave[m_ic];
@@ -202,13 +213,13 @@ qint64 Modulator::readData (char * data, qint64 maxSize)
         unsigned int isym=0;
 
         if(!m_tuning) isym=m_ic/(4.0*m_nsps);            // Actual fsample=48000
-        bool slowCwId=((isym >= m_symbolsLength) && (icw[0] > 0)) && (!m_bFastMode);
+        bool slowCwId=((isym >= m_symbolsLength) && (cwSymbols > 0)) && (!m_bFastMode);
         if(m_TRperiod==3.0) slowCwId=false;
         bool fastCwId=false;
         static bool bCwId=false;
         qint64 ms = QDateTime::currentMSecsSinceEpoch();
         float tsec=0.001*(ms % int(1000*m_TRperiod));
-        if(m_bFastMode and (icw[0]>0) and (tsec > (m_TRperiod-5.0))) fastCwId=true;
+        if(m_bFastMode and (cwSymbols>0) and (tsec > (m_TRperiod-5.0))) fastCwId=true;
         if(!m_bFastMode) m_nspd=2560;                 // 22.5 WPM
 
 
@@ -229,6 +240,10 @@ qint64 Modulator::readData (char * data, qint64 maxSize)
 
           while (samples != end) {
             j = (m_ic - ic0)/m_nspd + 1; // symbol of this sample
+            if (int (j) > icw[0] || j >= NUM_CW_SYMBOLS) {
+              Q_EMIT stateChanged ((m_state = Idle));
+              return framesGenerated * bytesPerFrame ();
+            }
             bool level {bool (icw[j])};
             m_phi += m_dphi;
             if (m_phi > m_twoPi) m_phi -= m_twoPi;
@@ -284,11 +299,11 @@ qint64 Modulator::readData (char * data, qint64 maxSize)
 
         qint16 sample;
 
-        while (samples != end && m_ic <= i1) {
+        while (samples != end && m_ic < i1) {
           isym=0;
           if(!m_tuning and m_TRperiod!=3.0) isym=m_ic/(4.0*m_nsps);   //Actual fsample=48000
           if(m_bFastMode) isym=isym%m_symbolsLength;
-          if (isym != m_isym0 || m_frequency != m_frequency0) {
+          if (!waveformSnapshot && (isym != m_isym0 || m_frequency != m_frequency0)) {
             if(itone[0]>=100) {
               m_toneFrequency0=itone[0];
             } else {
@@ -304,7 +319,7 @@ qint64 Modulator::readData (char * data, qint64 maxSize)
           }
 
           int j=m_ic/480;
-          if(m_fSpread>0.0 and j!=m_j0) {
+          if(!waveformSnapshot && m_fSpread>0.0 and j!=m_j0) {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
             float x1=QRandomGenerator::global ()->generateDouble ();
             float x2=QRandomGenerator::global ()->generateDouble ();
@@ -317,17 +332,23 @@ qint64 Modulator::readData (char * data, qint64 maxSize)
             m_j0=j;
           }
 
-          m_phi += m_dphi;
-          if (m_phi > m_twoPi) m_phi -= m_twoPi;
-          if (m_ic > i0) m_amp = 0.98 * m_amp;
-          if (m_ic > i1) m_amp = 0.0;
-
-          sample=qRound(m_amp*qSin(m_phi));
+          sample = 0;
+          if (!waveformSnapshot) {
+            m_phi += m_dphi;
+            if (m_phi > m_twoPi) m_phi -= m_twoPi;
+            if (m_ic > i0) m_amp = 0.98 * m_amp;
+            if (m_ic > i1) m_amp = 0.0;
+            sample=qRound(m_amp*qSin(m_phi));
+          }
 
 //Here's where we transmit from a precomputed wave[] array:
-          if(!m_tuning and (m_toneSpacing < 0) and (itone[0]<100)) {
+          if(!m_tuning and (m_toneSpacing < 0) and (waveformSnapshot || itone[0]<100)) {
             m_amp=32767.0;
-            sample=qRound(m_amp*foxcom_.wave[m_ic]);
+            // FT8/FT4/FT2 use a private snapshot; other modes retain their
+            // existing waveform source. Never read the sample beyond i1.
+            float waveSample = m_waveform.isEmpty () ? foxcom_.wave[m_ic]
+              : m_ic < unsigned (m_waveform.size ()) ? m_waveform[int (m_ic)] : 0.f;
+            sample=qRound(m_amp*waveSample);
             m_icmin=qMin(m_ic,m_icmin);
             m_icmax=qMax(m_ic,m_icmax);
           }
@@ -341,7 +362,8 @@ qint64 Modulator::readData (char * data, qint64 maxSize)
           ++m_ic;
         }
 
-        if(m_TRperiod==3 and m_ic >i1) {
+        if (!m_tuning && m_ic >= i1) m_amp = 0.;
+        if(m_TRperiod==3 and m_ic >=i1) {
           Q_EMIT stateChanged ((m_state = Idle));
           return framesGenerated * bytesPerFrame ();
         }
@@ -350,7 +372,7 @@ qint64 Modulator::readData (char * data, qint64 maxSize)
 //                 << tsec << m_ic << i1;
 
         if (m_amp == 0.0) { // TODO G4WJS: compare double with zero might not be wise
-          if (icw[0] == 0) {
+          if (cwSymbols == 0) {
             // no CW ID to send
             Q_EMIT stateChanged ((m_state = Idle));
             return framesGenerated * bytesPerFrame ();

@@ -53,6 +53,13 @@
       <strong>Call next</strong> startet pro Klick einen Anruf zur nächsten passenden sichtbaren Station.
       <strong>Halt Tx</strong> stoppt TX wie im Hauptfenster. Favoriten und die letzten 20 Anrufe bleiben im Custom-Profil gespeichert.</p>
 
+    <h3>FT8-/FT4-/FT2-Sendediagnose und Mehrkernbetrieb</h3>
+    <p><strong>View → TX quality — FT8 / FT4 / FT2</strong> zeigt Audiofrequenz nach Split,
+      Ausgangsdämpfung, Audiopuffer, übersprungene Samples bei verspätetem Start
+      und während TX optional ALC über CAT. ALC ist keine Verzerrungsmessung.
+      Der Dialog bietet auch den vorhandenen parallelen Decoder mit Auto oder
+      1–12 Workern für FT8. FT4/FT2 nutzen automatisch bis zu acht Worker für
+      größere Synchronisationsraster. Die Anzeigen messen weder USB-Latenz noch das abgestrahlte Signal.</p>
     <h3>FT2 auswählen</h3>
     <p><strong>Mode → FT2</strong> aktiviert den experimentellen Modus mit 3,75-Sekunden-Perioden.
       Fehlende FT2-Frequenzvorgaben werden einmalig ergänzt. Eigene Frequenzen lassen sich unter <strong>Settings → Frequencies</strong> eintragen.
@@ -101,6 +108,13 @@
       <strong>Call next</strong> starts one call per click to the next suitable visible station.
       <strong>Halt Tx</strong> stops TX like the main window. Favorites and the last 20 calls are saved in the Custom profile.</p>
 
+    <h3>FT8 / FT4 / FT2 transmit diagnostics and multiple cores</h3>
+    <p><strong>View → TX quality — FT8 / FT4 / FT2</strong> shows split-adjusted audio frequency,
+      attenuation, buffer information, samples skipped at late starts and optional
+      CAT ALC during TX. ALC is not a distortion measurement. The dialog also
+      controls the existing FT8 parallel decoder with Auto or 1–12 workers.
+      FT4/FT2 automatically use up to eight workers for larger synchronization grids.
+      These readings do not measure USB latency or the radiated signal.</p>
     <h3>Selecting FT2</h3>
     <p><strong>Mode → FT2</strong> enables the experimental mode with 3.75-second periods.
       Missing FT2 frequency defaults are added once; enter your own frequencies under <strong>Settings → Frequencies</strong>.
@@ -114,7 +128,7 @@
   </section>
 
   <footer>
-    <p>Technische Dokumentation / Technical documentation: <a href="FT2.md">FT2.md</a> · <a href="CHANGES.md">CHANGES.md</a> (Markdown).</p>
+    <p>Technische Dokumentation / Technical documentation: <a href="FT2.md">FT2.md</a> · <a href="FT8.md">FT8.md</a> · <a href="CHANGES.md">CHANGES.md</a> (Markdown).</p>
     <p>GPLv3 · <a href="../COPYING">COPYING</a> · <a href="https://github.com/rudolfstepan/wsjtx">Source repository</a> ·
       <a href="https://wsjt-x-improved.sourceforge.io/">DG2YCB / WS Suite</a></p>
   </footer>

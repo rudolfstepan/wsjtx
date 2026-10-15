@@ -655,6 +655,7 @@ int HamlibTransceiver::do_start ()
   do_pwr_ &= (!m_->is_dummy_ && rig_get_function_ptr (m_->model_, RIG_FUNCTION_GET_LEVEL) && (rig_get_caps_int (m_->model_, RIG_CAPS_HAS_GET_LEVEL) & RIG_LEVEL_RFPOWER_METER_WATTS) == RIG_LEVEL_RFPOWER_METER_WATTS);
   do_pwr2_ &= (!m_->is_dummy_ && rig_get_function_ptr (m_->model_, RIG_FUNCTION_GET_LEVEL) && (rig_get_caps_int (m_->model_, RIG_CAPS_HAS_GET_LEVEL) & RIG_LEVEL_RFPOWER) == RIG_LEVEL_RFPOWER);
   do_swr_ &= (!m_->is_dummy_ && rig_get_function_ptr (m_->model_, RIG_FUNCTION_GET_LEVEL) && (rig_get_caps_int (m_->model_, RIG_CAPS_HAS_GET_LEVEL) & RIG_LEVEL_SWR) == RIG_LEVEL_SWR);
+  do_alc_ = !m_->is_dummy_ && rig_has_get_level (m_->rig_.data (), RIG_LEVEL_ALC);
 
   // the Net rigctl back end promises all functions work but we must
   // test get_vfo as it determines our strategy for Icom rigs
@@ -1232,6 +1233,12 @@ void HamlibTransceiver::do_poll ()
     // update PWR and SWR
     value_t strength;
     int rc;
+    update_alc ();
+    if (do_alc_) {
+      rc = rig_get_level (m_->rig_.data (), RIG_VFO_CURR, RIG_LEVEL_ALC, &strength);
+      if (RIG_OK == rc) update_alc (strength.f);
+      else if (rc == -RIG_ENAVAIL || rc == -RIG_ENIMPL) do_alc_ = false;
+    }
     if (do_swr_) {
         rc = rig_get_level (m_->rig_.data (), RIG_VFO_CURR, RIG_LEVEL_SWR, &strength);
         if (RIG_OK == rc && ptt_on_) {
@@ -1276,6 +1283,7 @@ void HamlibTransceiver::do_poll ()
   } else {
     update_power (0);
     update_swr (0);
+    update_alc ();
   }
 }
 

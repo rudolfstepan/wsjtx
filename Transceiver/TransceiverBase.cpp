@@ -347,6 +347,11 @@ void TransceiverBase::update_swr (unsigned int p)
   actual_.swr (p);
 }
 
+void TransceiverBase::update_alc (float value)
+{
+  actual_.alc (value);
+}
+
 void TransceiverBase::update_complete (bool force_signal)
 {
   CAT_TRACE ("force signal: " << force_signal) << '\n';

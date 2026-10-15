@@ -66,7 +66,7 @@ denselben Launcher und dasselbe Custom-Profil wie der PowerShell-Aufruf:
 .\Start-Custom.ps1
 ```
 
-Das Startskript verwendet `dist-custom\OE3SRO-bugfix\bin\wsjtx.exe --rig-name Custom`.
+Das Startskript verwendet `dist-custom\OE3SRO-ftx-native\bin\wsjtx.exe --rig-name Custom`.
 Eine noch laufende frühere Custom-Version vor dem Neustart normal beenden.
 Die Versionsanzeige, der Fenstertitel und das About-Fenster enthalten
 **build by OE3SRO**.
@@ -163,6 +163,7 @@ Erneut bauen und paketieren:
 .\tools\Setup-CustomBuild.ps1
 .\tools\Build-Custom.ps1
 .\tools\Test-Core.ps1
+.\tools\Test-TxQuality.ps1
 .\tools\Test-PskReporter.ps1
 .\tools\Test-Ft2.ps1
 .\tools\Package-Custom.ps1

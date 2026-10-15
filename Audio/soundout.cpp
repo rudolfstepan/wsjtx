@@ -29,6 +29,9 @@ bool SoundOutput::checkStream () const
         break;
 
       case QAudio::UnderrunError:
+        // Qt also enters Idle/Underrun after a finite source has ended.
+        // A completed message is not a dropped-audio fault.
+        if (m_sourceFinished) { result = true; break; }
         Q_EMIT error (tr ("Audio data not being fed to the audio output device fast enough."));
         break;
 
@@ -47,6 +50,7 @@ bool SoundOutput::checkStream () const
 void SoundOutput::setFormat (QAudioDeviceInfo const& device, unsigned channels, int frames_buffered)
 {
   Q_ASSERT (0 < channels && channels < 3);
+  if (device != m_device || channels != m_channels) m_stream.reset ();
   m_device = device;
   m_channels = channels;
   m_framesBuffered = frames_buffered;
@@ -66,27 +70,32 @@ void SoundOutput::restart (QIODevice * source)
       format.setByteOrder (QAudioFormat::Endian (QSysInfo::ByteOrder));
       if (!format.isValid ())
         {
+          m_stream.reset ();
           Q_EMIT error (tr ("Requested output audio format is not valid."));
+          return;
         }
       else if (!m_device.isFormatSupported (format))
         {
+          m_stream.reset ();
           Q_EMIT error (tr ("Requested output audio format is not supported on device."));
+          return;
         }
       else
         {
           // qDebug () << "Selected audio output format:" << format;
-          m_stream.reset (new QAudioOutput (m_device, format));
-          checkStream ();
+          if (!m_stream) {
+            m_stream.reset (new QAudioOutput (m_device, format));
+            m_stream->setNotifyInterval (1000);
+            connect (m_stream.data(), &QAudioOutput::stateChanged, this, &SoundOutput::handleStateChanged);
+            connect (m_stream.data(), &QAudioOutput::notify, this, [this] () {checkStream ();});
+          }
           m_stream->setVolume (m_volume);
-          m_stream->setNotifyInterval(1000);
           error_ = false;
-
-          connect (m_stream.data(), &QAudioOutput::stateChanged, this, &SoundOutput::handleStateChanged);
-          connect (m_stream.data(), &QAudioOutput::notify, [this] () {checkStream ();});
 
           //      qDebug() << "A" << m_volume << m_stream->notifyInterval();
         }
     }
+  else m_stream.reset ();
   if (!m_stream)
     {
       if (!error_)
@@ -110,7 +119,10 @@ void SoundOutput::restart (QIODevice * source)
       m_stream->setBufferSize (m_stream->format().bytesForFrames (m_framesBuffered));
     }
   m_stream->setCategory ("production");
+  m_sourceFinished = false;
   m_stream->start (source);
+  if (checkStream ()) Q_EMIT streamStarted (m_device.deviceName (), 48000,
+    m_stream->format ().durationForBytes (m_stream->bufferSize ()) / 1000);
 //  LOG_DEBUG ("Selected buffer size (bytes): " << m_stream->bufferSize () << " period size: " << m_stream->periodSize ());
 }
 
@@ -134,6 +146,7 @@ void SoundOutput::resume ()
 
 void SoundOutput::reset ()
 {
+  m_sourceFinished = true;
   if (m_stream)
     {
       m_stream->reset ();
@@ -143,6 +156,7 @@ void SoundOutput::reset ()
 
 void SoundOutput::stop ()
 {
+  m_sourceFinished = true;
   if (m_stream)
     {
       m_stream->reset ();
@@ -185,6 +199,7 @@ void SoundOutput::handleStateChanged (QAudio::State newState)
   switch (newState)
     {
     case QAudio::IdleState:
+      if (m_stream && m_stream->error () == QAudio::UnderrunError) checkStream ();
       Q_EMIT status (tr ("Idle"));
       break;
 

@@ -7,12 +7,20 @@ $env:MSYSTEM_PREFIX = $mingw.Replace('\', '/')
 $build = Join-Path $root 'build-custom'
 $work = Join-Path $root '.local\ft2-checks'
 if (!(Test-Path -LiteralPath "$build\CMakeCache.txt")) { throw 'Run Build-Custom.ps1 first.' }
-& "$mingw\bin\cmake.exe" --build $build --target ft2_wave_checks ft2_ui_checks jt9 --parallel 6
+& "$mingw\bin\cmake.exe" --build $build --target ft2_wave_checks ft2_ui_checks ft8_native_checks ft8_reference_decoder jt9 --parallel 6
 if ($LASTEXITCODE) { throw 'FT2 test build failed.' }
 New-Item -ItemType Directory -Path $work -Force | Out-Null
 if ($SamplesDirectory) { $SamplesDirectory = (Resolve-Path -LiteralPath $SamplesDirectory).Path }
+$previousLimit = $env:OMP_THREAD_LIMIT
+$previousThreads = $env:OMP_NUM_THREADS
+$previousLevels = $env:OMP_MAX_ACTIVE_LEVELS
+$previousWait = $env:OMP_WAIT_POLICY
 Push-Location $work
 try {
+    $env:OMP_WAIT_POLICY = 'PASSIVE'
+    $env:OMP_NUM_THREADS = '8'
+    $env:OMP_THREAD_LIMIT = '16'
+    $env:OMP_MAX_ACTIVE_LEVELS = '1'
     & "$build\ft2_ui_checks.exe"
     if ($LASTEXITCODE) { throw 'FT2 mode/timing/frequency tests failed.' }
     & "$build\ft2_wave_checks.exe"
@@ -50,7 +58,65 @@ try {
             Write-Output "Reference WAV passed: $($sample.File) ($($sample.Messages.Count) stations)"
         }
     }
-    Write-Output 'FT2 checks passed. No radio, CAT, or audio device was opened.'
+    function Invoke-Decoder([string]$Executable, [string]$Mode, [string]$File, [string]$Tag) {
+        $stdout = Join-Path $work "$Tag.txt"
+        $stderr = Join-Path $work "$Tag-stderr.txt"
+        $watch = [Diagnostics.Stopwatch]::StartNew()
+        $arguments = @($Mode, '-d', '3', ('"' + $File + '"'))
+        $process = Start-Process -FilePath "$build\$Executable.exe" -ArgumentList $arguments -WorkingDirectory $work -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+        if (!$process.WaitForExit(45000)) {
+            $process.Kill()
+            $process.WaitForExit()
+            throw "Decoder timeout: $Tag"
+        }
+        $process.WaitForExit()
+        if ($process.ExitCode) { throw "Decoder failure: $Tag ($($process.ExitCode))" }
+        Write-Host "FT2/FT4 decoder $Tag : $([Math]::Round($watch.Elapsed.TotalMilliseconds, 1)) ms"
+        return Get-Content -Raw -LiteralPath $stdout
+    }
+    function Get-Messages([string]$Output) {
+        @($Output -split '\r?\n' | ForEach-Object {
+            if ($_ -match '^\d{6}\s+[-\d]+\s+[-\d.]+\s+\d+\s+[+*]\s+(.{1,37})') { $Matches[1].Trim() }
+        } | Sort-Object -Unique)
+    }
+    $recordings = @(
+        @{ Name='ft4'; Mode='-5'; File=(Join-Path $root 'samples\FT4\000000_000002.wav') }
+    )
+    if ($SamplesDirectory) {
+        $recordings += @{ Name='ft2-a'; Mode='-2'; File=(Join-Path $SamplesDirectory '260301_170123.wav') }
+        $recordings += @{ Name='ft2-b'; Mode='-2'; File=(Join-Path $SamplesDirectory '260301_085945.wav') }
+    }
+    $referenceMessages = @{}
+    foreach ($recording in $recordings) {
+        $output = Invoke-Decoder 'ft8_reference_decoder' $recording.Mode $recording.File "$($recording.Name)-original"
+        $decoded = @(Get-Messages $output)
+        if (!$decoded.Count) { throw "No reference messages: $($recording.Name)" }
+        $referenceMessages[$recording.Name] = $decoded
+    }
+    foreach ($team in @(
+        @{ Name='one'; Threads='1'; Limit='1'; Levels='1' },
+        @{ Name='two'; Threads='8'; Limit='2'; Levels='1' },
+        @{ Name='eight'; Threads='8'; Limit='16'; Levels='1' },
+        @{ Name='disabled'; Threads='8'; Limit='16'; Levels='0' }
+    )) {
+        $env:OMP_NUM_THREADS = $team.Threads
+        $env:OMP_THREAD_LIMIT = $team.Limit
+        $env:OMP_MAX_ACTIVE_LEVELS = $team.Levels
+        & "$build\ft8_native_checks.exe" --ft4-only
+        if ($LASTEXITCODE) { throw "Native FT4/FT2 kernel regression: $($team.Name) ($LASTEXITCODE)" }
+        foreach ($recording in $recordings) {
+            $output = Invoke-Decoder 'jt9' $recording.Mode $recording.File "$($recording.Name)-$($team.Name)"
+            $decoded = @(Get-Messages $output)
+            $missing = @($referenceMessages[$recording.Name] | Where-Object { $_ -notin $decoded })
+            if ($missing.Count) { throw "Lost FT2/FT4 decodes ($($recording.Name), $($team.Name)): $($missing -join ', ')" }
+            Write-Output "Recorded FT2/FT4 passed: $($recording.Name) / $($team.Name), $($decoded.Count) messages"
+        }
+    }
+    Write-Output 'FT2/FT4 checks passed. No radio, CAT, or audio device was opened.'
 } finally {
     Pop-Location
+    $env:OMP_THREAD_LIMIT = $previousLimit
+    $env:OMP_NUM_THREADS = $previousThreads
+    $env:OMP_MAX_ACTIVE_LEVELS = $previousLevels
+    $env:OMP_WAIT_POLICY = $previousWait
 }

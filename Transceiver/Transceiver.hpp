@@ -106,6 +106,7 @@ public:
       , level_ {0}
       , power_ {0}
       , swr_ {0}
+      , alc_ {-1.f}
       , jtmode_ {"FT8"}  //w3sz tci
       , fastmode_ {false}  //w3sz tci
     {
@@ -137,6 +138,7 @@ public:
     int level () const {return level_;}
     unsigned int power () const {return power_;}
     unsigned int swr () const {return swr_;}
+    float alc () const {return alc_;} // negative: unavailable; backend-relative scale
     QString jtmode () const {return jtmode_;}  //w3sz tci
     bool fastmode () const {return fastmode_;}  //w3sz tci
 
@@ -166,6 +168,7 @@ public:
     void level (int strength) {level_ = strength;}
     void power (unsigned int mwpower) {power_ = mwpower;}
     void swr (unsigned int mswr) {swr_ = mswr;}
+    void alc (float value) {alc_ = qIsFinite (value) && value >= 0.f ? value : -1.f;}
     void jtmode(QString jtmode) {jtmode_ = jtmode;}  //w3sz tci
     void fastmode(bool fastmode) {fastmode_ = fastmode;}  //w3sz tci
 
@@ -196,6 +199,7 @@ public:
     int level_;
     unsigned int power_;
     unsigned int swr_;
+    float alc_;
     QString jtmode_;  //w3sz tci
     bool fastmode_;  //w3sz tci
 

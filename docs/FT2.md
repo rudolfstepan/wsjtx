@@ -9,13 +9,13 @@
 enthält FT2, die PSK-Reporter-Korrektur und die DE/EN-Anleitung. Windows-ZIP
 vollständig entpacken und **Start-WSJT-X.bat** öffnen; Anleitung **docs/index.html**.
 Im lokalen Repository startet **Start-Custom.ps1** das Paket unter
-`dist-custom\OE3SRO-bugfix`. Der historische Prüfstand vom 11. Oktober bleibt
+`dist-custom\OE3SRO-ftx-native`. Der historische Prüfstand vom 11. Oktober bleibt
 weiter unten dokumentiert. FT2 bleibt experimentell.
 
 The release includes FT2, the PSK Reporter fix, and the German/English guide.
 Extract the complete Windows ZIP and launch **Start-WSJT-X.bat**; open
 **docs/index.html** for instructions. The local repository launcher is
-**Start-Custom.ps1**, using `dist-custom\OE3SRO-bugfix`. The October 11 baseline
+**Start-Custom.ps1**, using `dist-custom\OE3SRO-ftx-native`. The October 11 baseline
 below remains a historical verification record. FT2 remains experimental.
 
 Der [Release-CI-Lauf](https://github.com/rudolfstepan/wsjtx/actions/runs/38218198831)
@@ -25,6 +25,58 @@ The release CI passed PSK, FT2/FT4, and standalone runtime checks. EXE SHA256:
 ```text
 F61F611C41E059FBF4BB91CA9BB28502BF179ED88B591F76A47F4739B2EF9DB3
 ```
+
+## C++- und SMP-Erweiterung für FT4/FT2 — 2026-10-15
+
+Der aktuelle lokale Stand erweitert die FT8-Optimierungen auf FT4 und FT2:
+
+- Gemeinsame GFSK-Wellenformerzeugung in
+  [ft8_wave.cpp](../lib/ft8/native/ft8_wave.cpp), jetzt mit separater
+  FT4-/FT2-Rampenform (je ein ganzes Rampensymbol, keine FT8-Randverlängerung).
+  Zentrierte doppelte Phase, interpolierte Sinustabelle, unveränderlicher
+  Pulscache und private Arbeitsarrays. Zu große FT4-Puffer werden nach einer
+  kürzeren FT2-Wellenform mit Nullen gefüllt.
+- Der native LDPC(174,91)-Encoder wird von allen drei Modi gemeinsam verwendet.
+- [ft4_sync.cpp](../lib/ft4/native/ft4_sync.cpp) ersetzt die Leistungsberechnung
+  und das Frequenz-/Zeitsuchraster durch C++. Frequenzkorrekturen werden einmal
+  je Hypothese berechnet. Größere Raster verteilen sich automatisch auf höchstens
+  acht Worker, begrenzt durch CPUs, OpenMP-Threadlimit und aktive Ebenen.
+  Kleine Feinsuchen bleiben seriell. Die Ergebnisreduktion hält die bisherige
+  Suchreihenfolge einschließlich Gleichständen ein.
+- Die lokale Qt-Audioausgabe von FT4 und FT2 erhält eigene Wellenform-Snapshots über die Audio-Queue,
+  vollständige Endbegrenzung und die TX-Diagnose unter
+  **View → TX quality — FT8 / FT4 / FT2**. Die dortigen FT8-Threadregler
+  sind in FT4/FT2 deaktiviert; deren Synchronisationssuche arbeitet automatisch.
+
+Die Subtraktionsdurchläufe, FFT-Verarbeitung, Nachrichtenpackung und
+Hybrid-BP/OSD bleiben in ihrer bisherigen Reihenfolge beziehungsweise enthalten
+weiter Fortran. Dies ist keine vollständige C++-Portierung des Decoders.
+
+Lokale Kernelmessung auf i9-14900K, GCC15.2 Release, 30 Wiederholungen:
+FT4-Wellenform bei 48 kHz etwa 8,6 → 1,0 ms, FT2 etwa 4,2 → 0,4 ms.
+Ein geprüftes Synchronisationsraster sank mit acht Workern etwa 0,63 → 0,18–0,21 ms.
+Dies sind keine allgemeinen Gesamtdecoder-Speedups; insbesondere bei kleinen
+Rastern und wenig belegtem Band kann der Parallelisierungsaufwand überwiegen.
+
+`Test-Ft2.ps1` vergleicht reelle/komplexe Wellenformen bei 12/48 kHz mit den
+Originalen und einem analytischen Träger, prüft Cachewechsel, Parallelaufrufe,
+Synchronisation an Puffergrenzen, Grob-/Feinsuche und Gleichstände. Eine
+FT4-Aufnahme liefert mit alten und neuen Kernen jeweils 19 Nachrichten; die beiden
+optionalen FT2-Aufnahmen jeweils sechs und zwei. Alle bestehen mit 1/8 Workern, einem auf zwei
+begrenzten Team und deaktivierten Parallelteams. Keine Funkgeräteprüfung.
+
+**English:** The current local build extends the FT8 optimizations to FT4 and
+FT2: native GFSK generation with their original full-symbol ramps, centered
+double-precision phase, a shared native LDPC encoder, private audio snapshots,
+and a native parallel synchronization grid. Large grids use at most eight
+workers within CPU/OpenMP limits; fine grids remain serial, preserving the
+original peak/tie order. Open **View → TX quality — FT8 / FT4 / FT2** for shared
+diagnostics. FT8-specific thread controls are disabled in FT4/FT2.
+
+Recorded differential tests preserve all 19 FT4 and 6/2 FT2 messages across the four
+team configurations above. The local waveform timings are about 8.6 → 1.0 ms
+(FT4) and 4.2 → 0.4 ms (FT2), not full-decoder speedups. FFT, message packing and
+hybrid BP/OSD still contain Fortran. No on-air improvement has been measured.
 
 **Deutsch**
 
@@ -52,8 +104,8 @@ auswerten), Frequenz-/DT-Umrechnung und Timingparameter wurden daraus übernomme
 oder angepasst. Die unabhängige Implementierung wird dort als kompatibel zum
 FT2-Modus von IU8LMC beschrieben. Lizenz: **GNU GPLv3**, wie dieses Repository.
 Der vorhandene alte experimentelle `lib/ft2`-Codec wird hierfür nicht verwendet.
-Zusätzlich regeneriert der gemeinsame Wellenformgenerator seinen Gaussian-Puls
-bei einem Wechsel von Symbolzeit oder Sample-Rate.
+Der aktuelle native Wellenformgenerator hält unveränderliche Gaussian-Pulse
+für unterschiedliche Symbolzeiten getrennt im Cache; Details stehen oben.
 
 Validierung ohne Funkgerät: drei FT2-TX/RX-Roundtrips (500/1500/2900 Hz),
 FT4-Regressionsfall, wiederholter FT4/FT2-Wechsel, TX-Sequenzen einschließlich
@@ -90,8 +142,8 @@ DG2YCB**, now [WS Suite](https://wsjt-x-improved.sourceforge.io/), specifically
 its time-stretched FT4 receive strategy, frequency/DT conversion, and timing.
 Its independently developed implementation is described as compatible with
 IU8LMC's FT2. License: **GNU GPLv3**, the same as this repository. The old
-experimental codec in `lib/ft2` is not used. The shared waveform generator
-also rebuilds its Gaussian pulse when symbol duration or sample rate changes.
+experimental codec in `lib/ft2` is not used. The current native waveform
+generator caches immutable pulses for different symbol durations separately.
 
 Validation without a radio includes three FT2 TX/RX round trips at 500/1500/2900
 Hz, an FT4 regression case, repeated FT4/FT2 switches, reply sequences across

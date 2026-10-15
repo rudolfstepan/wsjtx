@@ -87,7 +87,10 @@ jobs:
       - name: Verify logbook and UDP regressions
         run: ./tools/Test-Core.ps1
 
-      - name: Verify FT2 and FT4 codecs
+      - name: Verify FT8 FT4 FT2 native kernels and transmit audio
+        run: ./tools/Test-TxQuality.ps1
+
+      - name: Verify FT2 and FT4 codecs and SMP limits
         run: ./tools/Test-Ft2.ps1
 
       - name: Package EXE, DLLs, and station data

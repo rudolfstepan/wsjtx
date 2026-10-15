@@ -60,6 +60,7 @@ subroutine multimode_decoder(ss,id2,params,nfsample)
   logical first,firstsd !ft8md
   logical(1) lhoundprev !ft8md
   integer nutc,ndelay
+  integer ft8_thread_budget,threadlimit
   type(params_block) :: params
   data ndelay/0/
   data first/.true./ !ft8md
@@ -257,30 +258,11 @@ subroutine multimode_decoder(ss,id2,params,nfsample)
            numcores=omp_get_num_procs()
            nuserthr=params%nmt
 
-           numthreads=1                                         ! fallback
-           if(nuserthr.eq.0) then                               ! auto
-              if(numcores.eq.1) then
-                 numthreads=1
-              else if(numcores.gt.1 .and. numcores.lt.5) then
-                 numthreads=numcores-1
-              else if(numcores.gt.4 .and. numcores.lt.9) then
-                 numthreads=numcores-2
-              else if(numcores.gt.8 .and. numcores.lt.16) then
-                 numthreads=numcores-3
-              else
-                 numthreads=12
-              endif
-           else if(nuserthr.gt.0 .and. nuserthr.lt.13) then
-              ! number of threads shall not exceed number of logical cores
-              if(numcores.ge.nuserthr) then
-                 numthreads=nuserthr
-              else
-                 numthreads=numcores
-              endif
-           endif
+           threadlimit=min(omp_get_max_threads(),omp_get_thread_limit())
+           if(omp_get_max_active_levels().eq.0) threadlimit=1
+           numthreads=ft8_thread_budget(numcores,nuserthr,threadlimit)
 
            call omp_set_dynamic(.false.)
-           call omp_set_nested(.true.)
 
            nfa=params%nfa
            nfb=params%nfb
