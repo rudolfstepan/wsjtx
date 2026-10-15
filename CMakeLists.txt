@@ -1648,6 +1648,22 @@ endif ()
 add_executable (ft2_ui_checks EXCLUDE_FROM_ALL tests/ft2/ft2_ui_checks.cpp)
 target_link_libraries (ft2_ui_checks wsjt_qt)
 add_executable (ft8_wave_checks EXCLUDE_FROM_ALL tests/ft8/ft8_wave_checks.f90)
+# Research-only alternative LDPC schedules; never linked into production decoders.
+add_executable (decoder_research EXCLUDE_FROM_ALL
+  tests/ft8/research/benchmark.cpp tests/ft8/research/layered.cpp)
+target_include_directories (decoder_research PRIVATE ${CMAKE_SOURCE_DIR})
+add_executable (sync_research EXCLUDE_FROM_ALL tests/ft8/research/sync_search.cpp)
+target_include_directories (sync_research PRIVATE ${CMAKE_SOURCE_DIR})
+target_link_libraries (sync_research wsjt_cxx)
+if (OPENMP_FOUND)
+  target_include_directories (decoder_research PRIVATE ${CMAKE_BINARY_DIR}/fortran_modules_omp)
+  target_link_libraries (decoder_research wsjt_fort_omp wsjt_cxx)
+else ()
+  target_link_libraries (decoder_research wsjt_fort wsjt_cxx)
+endif ()
+if (WIN32)
+  set_target_properties (decoder_research PROPERTIES LINK_FLAGS -Wl,--stack,16777216)
+endif ()
 add_executable (ft8_native_checks EXCLUDE_FROM_ALL tests/ft8/native_wave_checks.cpp
   tests/ft8/native_ldpc_checks.cpp tests/ft2/native_ft4_checks.cpp lib/ft8/gen_ft8wave.f90
   lib/ft8/encode174_91.f90 lib/ft8/bpdecode174_91.f90 lib/ft8var/bpdecode174_91var.f90
@@ -1721,13 +1737,20 @@ add_executable (ft8_reference_decoder EXCLUDE_FROM_ALL ${jt9_FSRCS}
   lib/ft4/gen_ft4wave.f90 lib/ft4/sync4d.f90 tests/ft2/reference_sync_search.f90)
 get_target_property (ft8_reference_libraries jt9 LINK_LIBRARIES)
 target_link_libraries (ft8_reference_decoder ${ft8_reference_libraries})
+add_executable (decoder_profile_phase EXCLUDE_FROM_ALL ${jt9_FSRCS}
+  docs/papers/reist-ftx/journal/experiment/decoder_profile.cpp)
+target_link_libraries (decoder_profile_phase ${ft8_reference_libraries})
 if (OPENMP_FOUND OR APPLE)
+  target_include_directories (decoder_profile_phase PRIVATE ${CMAKE_BINARY_DIR}/fortran_modules_omp)
+  target_compile_options (decoder_profile_phase PRIVATE $<$<COMPILE_LANGUAGE:Fortran>:-fopenmp>)
   target_include_directories (ft8_reference_decoder PRIVATE ${CMAKE_BINARY_DIR}/fortran_modules_omp)
   target_compile_options (ft8_reference_decoder PRIVATE $<$<COMPILE_LANGUAGE:Fortran>:-fopenmp>)
 else ()
+  target_include_directories (decoder_profile_phase PRIVATE ${CMAKE_BINARY_DIR})
   target_include_directories (ft8_reference_decoder PRIVATE ${CMAKE_BINARY_DIR})
 endif ()
 if (WIN32)
+  set_target_properties (decoder_profile_phase PROPERTIES LINK_FLAGS -Wl,--stack,16777216)
   set_target_properties (ft8_reference_decoder PROPERTIES LINK_FLAGS -Wl,--stack,16777216)
 endif ()
 

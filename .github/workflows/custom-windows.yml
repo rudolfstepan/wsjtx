@@ -93,6 +93,9 @@ jobs:
       - name: Verify FT2 and FT4 codecs and SMP limits
         run: ./tools/Test-Ft2.ps1
 
+      - name: Verify isolated LDPC research kernels
+        run: ./tools/Test-DecoderResearch.ps1 -SelfTestOnly
+
       - name: Package EXE, DLLs, and station data
         run: ./tools/Package-Custom.ps1
 
