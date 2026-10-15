@@ -12,6 +12,9 @@ Anleitung. Vollständig entpacken und **Start-WSJT-X.bat** öffnen.
 Die [Anleitung](docs/WINDOWS-QUICKSTART.html) liegt im Paket unter **docs/index.html**;
 sie ist auch separat als **documentation.zip** verfügbar.
 
+[Version 3.0.2-oe3sro.2](docs/releases/3.0.2-oe3sro.2.md) enthält die
+FT8-/FT4-/FT2-Kernoptimierungen, TX-Diagnose und Korrekturen für SMP, Logbuch und UDP.
+
 **[Neueste CI-Builds](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml):**
 Den neuesten erfolgreichen Lauf öffnen und unter **Artifacts** das versionierte
 `wsjtx-OE3SRO-…-windows-x64`-Paket herunterladen. GitHub-Anmeldung erforderlich.

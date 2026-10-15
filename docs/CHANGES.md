@@ -9,6 +9,13 @@ hier dokumentierten Erweiterungen auf WSJT-X 3.0.2-devel, Commit `967c85a61`.
 Die Einträge beschreiben den implementierten Stand vom 15. Oktober 2026;
 sie sind keine Veröffentlichung einer neuen offiziellen WSJT-X-Version.
 
+### 2026-10-15 — Windows-Release 3.0.2-oe3sro.2
+
+Die [zweite Custom-Paketversion](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-2) fasst die
+nachfolgenden FT8-/FT4-/FT2-Verbesserungen und Logbuch-/UDP-Korrekturen zusammen.
+Tag `oe3sro-v3.0.2-2` baut Windows-Anwendung und DE/EN-Dokumentation in GitHub
+Actions; beide ZIPs werden nach den Tests mit SHA256-Dateien veröffentlicht.
+
 ### 2026-10-15 — Erweiterung auf FT4 und FT2
 
 - Native C++-GFSK-Wellenformen einschließlich modusspezifischer Rampen,
@@ -174,6 +181,13 @@ This fork of [WSJTX/wsjtx](https://github.com/WSJTX/wsjtx) uses WSJT-X
 3.0.2-devel, commit `967c85a61`, as the base for these additions. The entries
 describe the implemented state on October 15, 2026; they do not announce a
 new official WSJT-X release.
+
+### 2026-10-15 — Windows release 3.0.2-oe3sro.2
+
+The [second custom package version](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-2) combines the
+FT8/FT4/FT2 improvements and logbook/UDP fixes below. Tag `oe3sro-v3.0.2-2`
+builds the Windows application and German/English documentation in GitHub
+Actions; both ZIPs are published with SHA256 files after the checks pass.
 
 ### 2026-10-15 — Extension to FT4 and FT2
 

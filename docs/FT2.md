@@ -5,22 +5,26 @@
 
 ## Aktuelles Windows-Release / Current Windows release
 
-[3.0.2-oe3sro.1](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-1)
-enthält FT2, die PSK-Reporter-Korrektur und die DE/EN-Anleitung. Windows-ZIP
+[3.0.2-oe3sro.2](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-2)
+enthält FT2, die nativen FT8-/FT4-/FT2-Kerne, TX-Diagnose, Fehlerkorrekturen
+und die DE/EN-Anleitung. Windows-ZIP
 vollständig entpacken und **Start-WSJT-X.bat** öffnen; Anleitung **docs/index.html**.
 Im lokalen Repository startet **Start-Custom.ps1** das Paket unter
 `dist-custom\OE3SRO-ftx-native`. Der historische Prüfstand vom 11. Oktober bleibt
 weiter unten dokumentiert. FT2 bleibt experimentell.
 
-The release includes FT2, the PSK Reporter fix, and the German/English guide.
+The release includes FT2, native FT8/FT4/FT2 kernels, TX diagnostics,
+bug fixes, and the German/English guide.
 Extract the complete Windows ZIP and launch **Start-WSJT-X.bat**; open
 **docs/index.html** for instructions. The local repository launcher is
 **Start-Custom.ps1**, using `dist-custom\OE3SRO-ftx-native`. The October 11 baseline
 below remains a historical verification record. FT2 remains experimental.
 
-Der [Release-CI-Lauf](https://github.com/rudolfstepan/wsjtx/actions/runs/38218198831)
+### Historischer Prüfstand des ersten Releases / First-release verification
+
+Der [CI-Lauf von 3.0.2-oe3sro.1](https://github.com/rudolfstepan/wsjtx/actions/runs/38218198831)
 bestand PSK-, FT2-/FT4- und eigenständige Paketprüfungen. Release-EXE-SHA256:
-The release CI passed PSK, FT2/FT4, and standalone runtime checks. EXE SHA256:
+The first-release CI passed PSK, FT2/FT4, and standalone runtime checks. EXE SHA256:
 
 ```text
 F61F611C41E059FBF4BB91CA9BB28502BF179ED88B591F76A47F4739B2EF9DB3
