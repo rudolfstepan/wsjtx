@@ -26,3 +26,18 @@ lib/tmp
 /.local/
 /.tools/
 /dist-custom/
+
+# Personal research and agent instructions are maintained privately.
+/docs/papers/
+/output/pdf/
+/docs/working_paper.md
+/docs/MATHEMATICAL-WRITING.md
+/PROJECT-MEMORY.txt
+AGENTS.md
+SKILL.md
+CLAUDE.md
+/.agents/
+/.codex/
+/.github/copilot-instructions.md
+/tests/ft8/research/
+/tools/Test-DecoderResearch.ps1
