@@ -3,7 +3,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
-$package = Join-Path $root 'dist-custom\OE3SRO-psk-fix'
+$package = Join-Path $root 'dist-custom\OE3SRO-bugfix'
 $output = Join-Path $root '.local\windows-artifacts'
 $exe = Join-Path $package 'bin\wsjtx.exe'
 if (!(Test-Path -LiteralPath $exe)) { throw 'Run Package-Custom.ps1 first.' }

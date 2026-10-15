@@ -6,6 +6,7 @@ SOURCES += \
   logbook/Multiplier.cpp
 
 HEADERS  += \
+  logbook/ADIFRecordReader.hpp \
   logbook/WorkedBefore.hpp \
   logbook/logbook.h \
   logbook/countriesworked.h \

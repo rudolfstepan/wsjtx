@@ -108,6 +108,13 @@ public:
 void MessageClient::impl::set_server (QString const& server_name, QStringList const& network_interface_names)
 {
   // qDebug () << "MessageClient server:" << server_name << "port:" << server_port_ << "interfaces:" << network_interface_names;
+  // A pending lookup must not overwrite a newer numeric address or re-enable
+  // a server that the user has since disabled.
+  if (dns_lookup_id_ != -1)
+    {
+      QHostInfo::abortHostLookup (dns_lookup_id_);
+      dns_lookup_id_ = -1;
+    }
   server_.setAddress (server_name);
   network_interfaces_.clear ();
   for (auto const& net_if_name : network_interface_names)
@@ -226,7 +233,7 @@ void MessageClient::impl::parse_message (QByteArray const& msg)
       // message format is described in NetworkMessage.hpp
       // 
       NetworkMessage::Reader in {msg};
-      if (OK == check_status (in))
+      if (OK == check_status (in) && in.id () == id_)
         {
           if (schema_ < in.schema ()) // one time record of server's
                                       // negotiated schema

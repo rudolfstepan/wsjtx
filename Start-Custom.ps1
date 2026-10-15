@@ -1,4 +1,4 @@
-param([string]$Executable = "$PSScriptRoot\dist-custom\OE3SRO-psk-fix\bin\wsjtx.exe")
+param([string]$Executable = "$PSScriptRoot\dist-custom\OE3SRO-bugfix\bin\wsjtx.exe")
 $ErrorActionPreference = 'Stop'
 if (!(Test-Path -LiteralPath $Executable)) { throw "Custom build not found: $Executable" }
 if (!(Test-Path -LiteralPath "$env:LOCALAPPDATA\WSJT-X - Custom\WSJT-X - Custom.ini")) {

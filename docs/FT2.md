@@ -9,13 +9,13 @@
 enthält FT2, die PSK-Reporter-Korrektur und die DE/EN-Anleitung. Windows-ZIP
 vollständig entpacken und **Start-WSJT-X.bat** öffnen; Anleitung **docs/index.html**.
 Im lokalen Repository startet **Start-Custom.ps1** das Paket unter
-`dist-custom\OE3SRO-psk-fix`. Der historische Prüfstand vom 11. Oktober bleibt
+`dist-custom\OE3SRO-bugfix`. Der historische Prüfstand vom 11. Oktober bleibt
 weiter unten dokumentiert. FT2 bleibt experimentell.
 
 The release includes FT2, the PSK Reporter fix, and the German/English guide.
 Extract the complete Windows ZIP and launch **Start-WSJT-X.bat**; open
 **docs/index.html** for instructions. The local repository launcher is
-**Start-Custom.ps1**, using `dist-custom\OE3SRO-psk-fix`. The October 11 baseline
+**Start-Custom.ps1**, using `dist-custom\OE3SRO-bugfix`. The October 11 baseline
 below remains a historical verification record. FT2 remains experimental.
 
 Der [Release-CI-Lauf](https://github.com/rudolfstepan/wsjtx/actions/runs/38218198831)

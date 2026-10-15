@@ -1,4 +1,5 @@
 #include "WorkedBefore.hpp"
+#include "ADIFRecordReader.hpp"
 
 #include <functional>
 #include <stdexcept>
@@ -314,43 +315,26 @@ namespace
                   }
                 buffer.remove (0, end_position + 5);
               }
-            while (!in.atEnd ())
+            for (auto record = next_adif_record (in, buffer); !record.isEmpty (); record = next_adif_record (in, buffer))
               {
-                end_position = buffer.indexOf ("<EOR>", 0, Qt::CaseInsensitive);
-                do
+                auto call = extractField (record, "CALL");
+                if (call.size ()) // require CALL field before we
+                                  // will parse a record
                   {
-                    if (!in.atEnd () && end_position < 0)
+                    auto const& entity = prefixes->lookup (call);
+                    auto mode = extractField (record, "MODE").toUpper ();
+                    if (!mode.size () || "MFSK" == mode)
                       {
-                        buffer += in.readLine () + '\n';
+                        mode = extractField (record, "SUBMODE").toUpper ();
                       }
-                  }
-                while ((end_position = buffer.indexOf ("<EOR>", 0, Qt::CaseInsensitive)) < 0 && !in.atEnd ());
-                if (end_position >= 0) // require valid ADIF record
-                                       // with terminator
-                  {
-                    auto record = buffer.left (end_position + 5).trimmed ();
-                    auto next_record = buffer.indexOf (QChar {'<'}, end_position + 5);
-                    buffer.remove (0, next_record >=0 ? next_record : buffer.size ());
-                    record = record.mid (record.indexOf (QChar {'<'}));
-                    auto call = extractField (record, "CALL");
-                    if (call.size ()) // require CALL field before we
-                                      // will parse a record
-                      {
-                        auto const& entity = prefixes->lookup (call);
-                        auto mode = extractField (record, "MODE").toUpper ();
-                        if (!mode.size () || "MFSK" == mode)
-                          {
-                            mode = extractField (record, "SUBMODE").toUpper ();
-                          }
-                        worked.emplace (call.toUpper ()
-                                        , extractField (record, "GRIDSQUARE").left (4).toUpper () // not interested in 6-digit grids
-                                        , extractField (record, "BAND").toUpper ()
-                                        , mode
-                                        , entity.entity_name
-                                        , entity.continent
-                                        , entity.CQ_zone
-                                        , entity.ITU_zone);
-                      }
+                    worked.emplace (call.toUpper ()
+                                    , extractField (record, "GRIDSQUARE").left (4).toUpper () // not interested in 6-digit grids
+                                    , extractField (record, "BAND").toUpper ()
+                                    , mode
+                                    , entity.entity_name
+                                    , entity.continent
+                                    , entity.CQ_zone
+                                    , entity.ITU_zone);
                   }
               }
           }

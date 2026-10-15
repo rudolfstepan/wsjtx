@@ -6,8 +6,27 @@
 
 Dieser Fork von [WSJTX/wsjtx](https://github.com/WSJTX/wsjtx) basiert für die
 hier dokumentierten Erweiterungen auf WSJT-X 3.0.2-devel, Commit `967c85a61`.
-Die Einträge beschreiben den implementierten Stand vom 12. Oktober 2026;
+Die Einträge beschreiben den implementierten Stand vom 15. Oktober 2026;
 sie sind keine Veröffentlichung einer neuen offiziellen WSJT-X-Version.
+
+### 2026-10-15 — Fehlerprüfung: Logbuch und UDP
+
+- Beim Einlesen des ADIF-Logbuchs werden vollständige, noch gepufferte QSOs
+  auch nach Erreichen des Dateiendes verarbeitet. Zuvor konnten einzeilige
+  Dateien oder mehrere QSOs in der letzten Zeile unvollständig eingelesen
+  werden; dadurch konnte die Anzeige „bereits gearbeitet“ falsch sein.
+  Die Logbuchdatei selbst wurde dabei nicht verändert.
+- UDP-Befehle werden nur bei passender Ziel-ID der WSJT-X-Instanz verarbeitet.
+  Zuvor wurden auch Befehle für andere Instanzen angenommen.
+- Ein UDP-Serverwechsel verwirft eine noch laufende DNS-Abfrage. Eine verspätete
+  Antwort kann die neue Adresse oder einen abgeschalteten Server nicht ersetzen.
+- Lokale Regressionstests unter `tests/core`, Aufruf `tools/Test-Core.ps1`;
+  auch in den Windows-CI-Workflow aufgenommen.
+- Neues lokales Paket `dist-custom\OE3SRO-bugfix`, da die bisherige Version
+  während der Korrektur lief. Start über `start.bat` oder `Start-Custom.ps1`.
+- Lokal bestanden: neue Regressionstests, Gesamtbuild, PSK-Tests, FT2/FT4
+  einschließlich beider Referenz-WAVs und Paketlaufzeitprüfung. Build- und
+  Paket-EXE sind hashgleich. Keine RF-Aussendung für diese Prüfungen.
 
 ### 2026-10-12 — Automatische Windows-Binaries
 
@@ -116,8 +135,26 @@ speichert den FT2-Fortsetzungspunkt; dieser Commit ändert keine Programmfunktio
 
 This fork of [WSJTX/wsjtx](https://github.com/WSJTX/wsjtx) uses WSJT-X
 3.0.2-devel, commit `967c85a61`, as the base for these additions. The entries
-describe the implemented state on October 12, 2026; they do not announce a
+describe the implemented state on October 15, 2026; they do not announce a
 new official WSJT-X release.
+
+### 2026-10-15 — Bug review: logbook and UDP
+
+- The ADIF log reader processes complete buffered QSOs even after reaching
+  EOF. Previously, single-line files or multiple QSOs on the final line could
+  be incompletely loaded, causing incorrect worked-before status. The log file
+  itself was not modified by this bug.
+- UDP commands are processed only when their target ID matches this WSJT-X
+  instance. Previously, commands for other instances were also accepted.
+- Changing the UDP server cancels a pending DNS lookup. A delayed result can
+  no longer overwrite the new address or restore a disabled server.
+- Local regression tests in `tests/core`, run with `tools/Test-Core.ps1`,
+  also included in the Windows CI workflow.
+- New local package `dist-custom\OE3SRO-bugfix` because the previous version
+  was still running. Start with `start.bat` or `Start-Custom.ps1`.
+- Passed locally: new regression tests, full build, PSK tests, FT2/FT4
+  including both reference WAVs, and package runtime verification. Build and
+  package executables have matching hashes. These checks did not transmit RF.
 
 ### 2026-10-12 — Automatic Windows binaries
 

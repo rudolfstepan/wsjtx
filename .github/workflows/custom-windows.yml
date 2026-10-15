@@ -84,6 +84,9 @@ jobs:
       - name: Verify PSK Reporter integration
         run: ./tools/Test-PskReporter.ps1
 
+      - name: Verify logbook and UDP regressions
+        run: ./tools/Test-Core.ps1
+
       - name: Verify FT2 and FT4 codecs
         run: ./tools/Test-Ft2.ps1
 

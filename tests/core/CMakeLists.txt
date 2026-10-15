@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 3.16)
+project(core_regressions LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_AUTOMOC ON)
+find_package(Qt5 REQUIRED COMPONENTS Widgets Network Test)
+
+add_executable(core_regressions core_regressions.cpp
+  ../../Network/MessageClient.cpp ../../Network/NetworkMessage.cpp)
+target_include_directories(core_regressions PRIVATE ../.. ../../Network)
+target_link_libraries(core_regressions PRIVATE Qt5::Widgets Qt5::Network Qt5::Test)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(core_regressions PRIVATE -Wall -Wextra -Werror)
+endif()
+enable_testing()
+add_test(NAME core_regressions COMMAND core_regressions -o "${CMAKE_CURRENT_BINARY_DIR}/test-results.txt,txt")

@@ -169,13 +169,14 @@ Führe im Repository-Verzeichnis aus:
 ```powershell
 .\tools\Setup-CustomBuild.ps1
 .\tools\Build-Custom.ps1
+.\tools\Test-Core.ps1
 .\tools\Test-PskReporter.ps1
 .\tools\Test-Ft2.ps1
 .\tools\Package-Custom.ps1
 ```
 
 Der Release-Build liegt unter `build-custom`; das Paket mit Laufzeitbibliotheken,
-Decodern und Stationsdaten unter `dist-custom\OE3SRO-psk-fix`.
+Decodern und Stationsdaten unter `dist-custom\OE3SRO-bugfix`.
 Die Skripte bauen WSJT-X mit den zugehörigen Hilfsprogrammen; MAP65 und die
 zusätzlichen Simulatoren werden für dieses Paket nicht gebaut.
 
@@ -205,6 +206,9 @@ Lokale Konfigurationen, API-Antworten, Werkzeuge und Build-Ausgaben unter
 `.local`, `.tools`, `build-custom` und `dist-custom` werden nicht in Git übernommen.
 
 ## Prüfungen
+
+`Test-Core.ps1` prüft ADIF-Einträge am Dateiende, die UDP-Zielinstanz und
+Serverwechsel während einer laufenden DNS-Abfrage mit lokalen Testdaten.
 
 `Test-PskReporter.ps1` verwendet einen lokalen HTTP-Testserver und Qt im
 Offscreen-Modus. Geprüft werden unter anderem Empfangsfilter, neueste Meldung
