@@ -7,6 +7,7 @@
 #include <QLineEdit>
 #include <QSettings>
 #include <QShortcut>
+#include <QSpinBox>
 #include <QDateTime>
 #include <QDesktopServices>
 #include <QElapsedTimer>
@@ -25,6 +26,8 @@
 #include <QXmlStreamReader>
 #include <QRegularExpression>
 #include <functional>
+#include "PskPropagation.hpp"
+#include "PskQueryThrottle.hpp"
 
 // The reported frequency belongs to our transmission, not to the receiver.
 // Reception reports cannot determine the receiver's TX frequency or sequence.
@@ -121,6 +124,9 @@ public:
     buttons->addWidget (refresh_);
     buttons->addWidget (automatic);
     buttons->addWidget (map);
+    auto propagation = new QPushButton {tr ("Personal DX windows"), this};
+    buttons->addWidget (propagation);
+    connect (propagation, &QPushButton::clicked, this, [this] { showPropagation (); });
     buttons->addWidget (use);
     layout->addLayout (buttons);
     connect (refresh_, &QPushButton::clicked, this, [this] { refresh (); });
@@ -173,10 +179,11 @@ public:
     auto timer = new QTimer {this};
     timer->setInterval (1000);
     connect (timer, &QTimer::timeout, this, [this, automatic] {
-      bool ready = !busy_ && (!lastRequest_.isValid () || lastRequest_.elapsed () >= 300000);
+      auto remaining = queryWait ();
+      bool ready = !busy_ && !remaining;
       refresh_->setEnabled (ready);
       refresh_->setText (ready ? tr ("Refresh") : busy_ ? tr ("Retrieving…")
-        : tr ("Refresh in %1 s").arg ((300000 - lastRequest_.elapsed () + 999) / 1000));
+        : tr ("Refresh in %1 s").arg ((remaining + 999) / 1000));
       if (isVisible () && table_->rowCount () && !sameContext (loaded_, context_ ())) {
         table_->setRowCount (0);
         auto current = context_ ();
@@ -191,7 +198,7 @@ public:
 
   void refresh ()
   {
-    if (busy_ || (lastRequest_.isValid () && lastRequest_.elapsed () < 300000)) return;
+    if (busy_ || queryWait ()) return;
     auto ctx = context_ ();
     if (ctx.call.isEmpty () || !ctx.dial) {
       status_->setText (tr ("Configure your callsign and select a working frequency first."));
@@ -208,6 +215,11 @@ public:
     query.addQueryItem ("rronly", "1");
     query.addQueryItem ("noactive", "1");
     url.setQuery (query);
+    if (!throttle_.reserve ()) {
+      status_->setText (tr ("PSK Reporter query cooldown is active, including requests from another profile or instance. Next attempt in %1 s.")
+                        .arg ((queryWait () + 999) / 1000));
+      return;
+    }
     busy_ = true;
     lastRequest_.start ();
     refresh_->setEnabled (false);
@@ -222,11 +234,20 @@ public:
     connect (reply, &QNetworkReply::readyRead, this, [reply] {
       if (reply->bytesAvailable () > 5 * 1024 * 1024) reply->abort ();
     });
-    connect (reply, &QNetworkReply::finished, this, [this, reply, ctx, range] {
+    auto setup = stationSetup_;
+    auto setupSince = setupSince_;
+    connect (reply, &QNetworkReply::finished, this, [this, reply, ctx, range, setup, setupSince] {
       busy_ = false;
       reply->deleteLater ();
       if (reply->error () != QNetworkReply::NoError) {
-        status_->setText (tr ("PSK Reporter request failed: %1. Retry after five minutes.").arg (reply->errorString ()));
+        int http = reply->attribute (QNetworkRequest::HttpStatusCodeAttribute).toInt ();
+        throttle_.failed (http, reply->rawHeader ("Retry-After"));
+        if (http == 429 || http == 503)
+          status_->setText (tr ("PSK Reporter query service is limiting requests (HTTP %1). The browser map may still work. Automatic queries paused for %2 s; existing observations are retained.")
+                            .arg (http).arg ((queryWait () + 999) / 1000));
+        else
+          status_->setText (tr ("PSK Reporter request failed (HTTP %1, network error %2). Next attempt in %3 s.")
+                            .arg (http).arg (int (reply->error ())).arg ((queryWait () + 999) / 1000));
         return;
       }
       if (!sameContext (ctx, context_ ())) {
@@ -235,6 +256,7 @@ public:
       }
       struct Report { QString call, grid, snr, mode; quint64 frequency; qint64 time; };
       QMap<QString, Report> reports;
+      QList<Report> observations;
       QXmlStreamReader xml {reply->readAll ()};
       bool rootSeen = false;
       while (!xml.atEnd ()) {
@@ -256,13 +278,30 @@ public:
             || r.time < QDateTime::currentSecsSinceEpoch () - 1800
             || r.time > QDateTime::currentSecsSinceEpoch () + 300) continue;
         if (r.mode.isEmpty ()) r.mode = ctx.mode;
+        observations.append (r);
         if (!reports.contains (r.call) || reports.value (r.call).time < r.time) reports.insert (r.call, r);
       }
       if (xml.hasError () || !rootSeen) {
         status_->setText (tr ("PSK Reporter returned an invalid response. Retry after five minutes."));
         return;
       }
+      throttle_.succeeded ();
       loaded_ = ctx;
+      if (country_ && bandName_) {
+        bool changed = false;
+        for (auto const& r : observations)
+          if (r.time >= setupSince)
+            changed = propagation_.add (ctx.call, setup, ctx.mode, country_ (r.call), bandName_ (r.frequency), r.call, r.time) || changed;
+        if (!settingsFile_.isEmpty () && (changed || !statisticsError_.isEmpty ())) {
+          QSettings saved {settingsFile_, settingsFormat_};
+          saved.beginGroup (settingsGroup_);
+          saved.setValue ("CustomPskReporter/PropagationV1", propagation_.save ());
+          saved.sync ();
+          if (saved.status () != QSettings::NoError)
+            statisticsError_ = tr ("Statistics could not be saved to the configuration file.");
+          else statisticsError_.clear ();
+        }
+      }
       table_->setSortingEnabled (false);
       table_->setRowCount (0);
       for (auto const& r : reports) {
@@ -298,16 +337,26 @@ public:
   }
 
   void setReportsUpdatedHandler (ReportsUpdated handler) { reportsUpdated_ = handler; }
+  void setPropagationProviders (std::function<QString (QString const&)> country,
+                                std::function<QString (quint64)> band)
+  { country_ = country; bandName_ = band; }
   void setBandRangeProvider (BandRange provider) { bandRange_ = provider; }
   void setStyleProvider (StyleProvider provider) { style_ = provider; refreshStyles (); }
   void setHaltTxHandler (std::function<void ()> handler) { haltTx_ = handler; halt_->setEnabled (bool (haltTx_)); }
   void setPreferences (QSettings const& settings)
   {
+    throttle_.configure (settings);
+    if (queryWait ())
+      status_->setText (tr ("Saved PSK Reporter query cooldown restored. Next attempt in %1 s.")
+                        .arg ((queryWait () + 999) / 1000));
     settingsFile_ = settings.fileName ();
     settingsFormat_ = settings.format ();
     settingsGroup_ = settings.group ();
     QSettings saved {settingsFile_, settingsFormat_};
     saved.beginGroup (settingsGroup_);
+    propagation_.load (saved.value ("CustomPskReporter/PropagationV1").toMap ());
+    stationSetup_ = saved.value ("CustomPskReporter/StationSetup", "Default").toString ();
+    setupSince_ = saved.value ("CustomPskReporter/StationSetupSince", 0).toLongLong ();
     auto favorites = saved.value ("CustomPskReporter/Favorites").toStringList ();
     favorites_.clear ();
     for (auto const& call : favorites) favorites_.insert (call.toUpper ());
@@ -351,6 +400,128 @@ public:
   }
 
 private:
+  qint64 queryWait () const
+  {
+    return qMax (throttle_.remaining (), lastRequest_.isValid ()
+                 ? qMax (qint64 {0}, 300000 - lastRequest_.elapsed ()) : qint64 {0});
+  }
+  void showPropagation ()
+  {
+    QDialog dialog {this};
+    dialog.setWindowTitle (tr ("Personal DX windows — empirical reception history"));
+    dialog.resize (1180, 640);
+    auto layout = new QVBoxLayout {&dialog};
+    auto info = new QLabel {tr ("Local observations of your transmitted signal, collected while Who hears me is open.\n"
+      "Most observed: ranked by UTC reception days, then receiver-days. Next 24 hours: ordered by the next start.\n"
+      "Upcoming times repeat historical hourly windows; they do not indicate current propagation or QSO probabilities.\n"
+      "Missing reports do not prove a closed path. Activity, power and reporting coverage affect the results.\n"
+      "Use a new station/antenna setup name after changing your antenna, location or power.")};
+    info->setWordWrap (true); layout->addWidget (info);
+    auto filters = new QHBoxLayout;
+    filters->addWidget (new QLabel {tr ("Station / antenna setup:")});
+    auto setup = new QLineEdit {stationSetup_};
+    setup->setMaxLength (80); filters->addWidget (setup);
+    auto month = new QComboBox;
+    month->setObjectName ("propagationMonth");
+    month->addItem (tr ("All months"), 0);
+    for (int m = 1; m <= 12; ++m) month->addItem (QString::number (m), m);
+    month->setCurrentIndex (QDateTime::currentDateTimeUtc ().date ().month ());
+    filters->addWidget (month);
+    auto search = new QLineEdit;
+    search->setObjectName ("propagationSearch");
+    search->setPlaceholderText (tr ("Filter country or band")); filters->addWidget (search);
+    layout->addLayout (filters);
+    auto options = new QHBoxLayout;
+    auto view = new QComboBox;
+    view->setObjectName ("propagationView");
+    view->addItems ({tr ("Most observed windows"), tr ("Next 24 hours (UTC)")});
+    options->addWidget (view);
+    auto history = new QComboBox;
+    history->setObjectName ("propagationHistory");
+    history->addItem (tr ("All collected history"), 0);
+    history->addItem (tr ("Last 90 UTC days"), 90);
+    history->addItem (tr ("Last 365 UTC days"), 365);
+    options->addWidget (history);
+    options->addWidget (new QLabel {tr ("Minimum reception days:")});
+    auto minimum = new QSpinBox;
+    minimum->setObjectName ("propagationMinimumDays");
+    minimum->setRange (1, 10000); minimum->setValue (1);
+    options->addWidget (minimum);
+    options->addStretch ();
+    layout->addLayout (options);
+    auto context = context_ ();
+    layout->addWidget (new QLabel {tr ("Own call: %1 · Mode: %2 · Months combine calendar years. Small samples remain tentative.")
+                                   .arg (context.call, context.mode)});
+    auto table = new QTableWidget {0, 10};
+    table->setHorizontalHeaderLabels ({tr ("DXCC country"), tr ("Band"), tr ("Month"), tr ("UTC window"),
+                                       tr ("Reception days"), tr ("Receivers"), tr ("Receiver-days"),
+                                       tr ("Next start (UTC)"), tr ("First observed"), tr ("Last observed")});
+    table->setEditTriggers (QAbstractItemView::NoEditTriggers);
+    table->horizontalHeader ()->setSectionResizeMode (QHeaderView::Stretch);
+    layout->addWidget (table);
+    auto status = new QLabel; status->setWordWrap (true); layout->addWidget (status);
+    auto update = [this, table, month, search, status, context, view, history, minimum] {
+      auto now = QDateTime::currentDateTimeUtc ();
+      int days = history->currentData ().toInt ();
+      auto since = days ? now.date ().addDays (1 - days) : QDate {};
+      auto windows = propagation_.windows (context.call, stationSetup_, context.mode, month->currentData ().toInt (), since);
+      if (view->currentIndex () == 1) {
+        // Stable sorting preserves the reception-day ranking for simultaneous windows.
+        std::stable_sort (windows.begin (), windows.end (), [&now] (PskPropagation::Window const& a, PskPropagation::Window const& b) {
+          auto first = PskPropagation::nextWindow (a, now), second = PskPropagation::nextWindow (b, now);
+          if (!first.isValid ()) return false;
+          return !second.isValid () || first < second;
+        });
+      }
+      table->setRowCount (0);
+      for (auto const& w : windows) {
+        auto next = PskPropagation::nextWindow (w, now);
+        if (w.days.size () < minimum->value () || (view->currentIndex () == 1 && !next.isValid ())) continue;
+        auto filter = search->text ().trimmed ();
+        if (!filter.isEmpty () && !w.country.contains (filter, Qt::CaseInsensitive)
+            && !w.band.contains (filter, Qt::CaseInsensitive)) continue;
+        int row = table->rowCount (); table->insertRow (row);
+        auto dates = w.days.values (); dates.sort ();
+        QStringList values {w.country, w.band, QString::number (w.month),
+          QString ("%1:00–%2:00").arg (w.hour, 2, 10, QChar {'0'}).arg ((w.hour + 1) % 24, 2, 10, QChar {'0'}),
+          QString::number (w.days.size ()), QString::number (w.receivers.size ()), QString::number (w.receiverDays),
+          !next.isValid () ? tr ("Outside next 24 h") : next == now ? tr ("Now") : next.toString ("MM-dd HH:mm"),
+          dates.first (), dates.last ()};
+        for (int c = 0; c < values.size (); ++c) table->setItem (row, c, new QTableWidgetItem {values[c]});
+        table->item (row, 4)->setToolTip (w.days.size () == 1
+          ? tr ("Only one observed day. Collect observations on more days before relying on this window.")
+          : tr ("Observed UTC dates:\n%1").arg (dates.join ("\n")));
+        table->item (row, 7)->setToolTip (tr ("Recurrence of a historical hourly window in its calendar month, not a live propagation forecast."));
+      }
+      status->setText (!statisticsError_.isEmpty () ? statisticsError_ : table->rowCount ()
+        ? tr ("%1 observed windows · %2 UTC. Each receiver counts once per UTC date/hour. First/last dates refer to the selected history.")
+          .arg (table->rowCount ()).arg (now.toString ("yyyy-MM-dd HH:mm"))
+        : tr ("No observations match these filters. Try All months, All collected history or fewer minimum reception days. Collect reports during normal operation."));
+    };
+    connect (setup, &QLineEdit::editingFinished, &dialog, [this, setup, update] {
+      auto name = setup->text ().trimmed (); name.remove (QChar {0x1f});
+      if (name.isEmpty ()) name = "Default";
+      if (stationSetup_ != name) setupSince_ = QDateTime::currentSecsSinceEpoch ();
+      stationSetup_ = name; setup->setText (name);
+      if (!settingsFile_.isEmpty ()) {
+        QSettings saved {settingsFile_, settingsFormat_}; saved.beginGroup (settingsGroup_);
+        saved.setValue ("CustomPskReporter/StationSetup", stationSetup_);
+        saved.setValue ("CustomPskReporter/StationSetupSince", setupSince_);
+      }
+      update ();
+    });
+    connect (month, QOverload<int>::of (&QComboBox::currentIndexChanged), &dialog, [update] { update (); });
+    connect (view, QOverload<int>::of (&QComboBox::currentIndexChanged), &dialog, [update, view, month] {
+      if (view->currentIndex () == 1) month->setCurrentIndex (0);
+      update ();
+    });
+    connect (history, QOverload<int>::of (&QComboBox::currentIndexChanged), &dialog, [update] { update (); });
+    connect (minimum, QOverload<int>::of (&QSpinBox::valueChanged), &dialog, [update] { update (); });
+    connect (search, &QLineEdit::textChanged, &dialog, [update] { update (); });
+    auto timer = new QTimer {&dialog};
+    connect (timer, &QTimer::timeout, &dialog, update); timer->start (5000);
+    update (); dialog.exec ();
+  }
   struct CallRecord { QString call, grid; Context context; qint64 time; int count; };
   static bool sameContext (Context const& a, Context const& b)
   { return a.call == b.call && a.mode == b.mode && a.dial == b.dial; }
@@ -528,6 +699,11 @@ private:
     }
   };
   ContextProvider context_;
+  PskPropagation propagation_;
+  QString stationSetup_ = "Default", statisticsError_;
+  qint64 setupSince_ = 0;
+  std::function<QString (QString const&)> country_;
+  std::function<QString (quint64)> bandName_;
   BandRange bandRange_;
   SelectStation select_;
   ReportsUpdated reportsUpdated_;
@@ -540,6 +716,7 @@ private:
   QNetworkAccessManager network_;
   QUrl endpoint_;
   QElapsedTimer lastRequest_;
+  PskQueryThrottle throttle_;
   Context loaded_;
   bool busy_ = false;
   QTableWidget *table_;

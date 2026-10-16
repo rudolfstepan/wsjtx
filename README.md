@@ -12,8 +12,9 @@ Anleitung. Vollständig entpacken und **Start-WSJT-X.bat** öffnen.
 Die [Anleitung](docs/WINDOWS-QUICKSTART.html) liegt im Paket unter **docs/index.html**;
 sie ist auch separat als **documentation.zip** verfügbar.
 
-[Version 3.0.2-oe3sro.2](docs/releases/3.0.2-oe3sro.2.md) enthält die
-FT8-/FT4-/FT2-Kernoptimierungen, TX-Diagnose und Korrekturen für SMP, Logbuch und UDP.
+[Version 3.0.2-oe3sro.3](docs/releases/3.0.2-oe3sro.3.md) ergänzt persönliche
+DX-Zeitfenster und eine über Neustarts erhaltene PSK-Reporter-Abfragepause mit
+verbesserter HTTP-429-/503-Behandlung.
 
 **[Neueste CI-Builds](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml):**
 Den neuesten erfolgreichen Lauf öffnen und unter **Artifacts** das versionierte
@@ -55,6 +56,7 @@ enthält Bedienung, technische Umsetzung, Quellen und den geprüften Buildstand.
 | **FT8 / FT4 / FT2: native Kerne und TX-Diagnose** | C++-Wellenformen, gemeinsamer LDPC-Encoder, FT8-BP-Kerne und parallele FT4-/FT2-Synchronisationssuche; Audio-/Start-/ALC-Anzeige unter View → TX quality — FT8 / FT4 / FT2. [FT8](docs/FT8.md), [FT4/FT2](docs/FT2.md). |
 | **FT2 (experimentell)** | 3,75-Sekunden-Durchgänge mit Sender, Decoder, Auto Seq, Wasserfall und PSK-Anrufhilfen; übernommen und angepasst aus WSJT-X Improved von DG2YCB. |
 | **PSK Reporter: Who hears me?** | Empfänger des eigenen Signals direkt in WSJT-X anzeigen, mit Rufzeichen, Locator, SNR, Empfangszeit und Modus. |
+| **Persönliche DX-Zeitfenster** | Empfangsmeldungen lokal nach DXCC-Land, Band, UTC-Stunde und Monat sammeln und nach unterschiedlichen Empfangstagen ordnen; getrennt nach Rufzeichen, Modus und Stations-/Antennenprofil. |
 | **Station direkt anrufen** | Rufzeichen und Locator übernehmen, die erste Standardnachricht wählen und **Enable Tx** aktivieren. |
 | **Empfangsmarkierung in Band Activity** | Rufzeichen aus der Empfangsliste erscheinen türkis, fett und unterstrichen; ein Tooltip zeigt die Empfangszeit. |
 | **Bestehende WSJT-X-Farben** | Die Liste verwendet deine Hervorhebungsregeln und das Logbuch, einschließlich Band, Modus, DXCC, Locator und LoTW. |
@@ -181,7 +183,7 @@ Führe im Repository-Verzeichnis aus:
 ```
 
 Der Release-Build liegt unter `build-custom`; das Paket mit Laufzeitbibliotheken,
-Decodern und Stationsdaten unter `dist-custom\OE3SRO-ftx-native`.
+Decodern und Stationsdaten unter `dist-custom\OE3SRO-psk-backoff`.
 Die Skripte bauen WSJT-X mit den zugehörigen Hilfsprogrammen; MAP65 und die
 zusätzlichen Simulatoren werden für dieses Paket nicht gebaut.
 

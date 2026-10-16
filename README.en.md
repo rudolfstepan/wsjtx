@@ -12,8 +12,8 @@ Extract it completely, then launch **Start-WSJT-X.bat**.
 The [guide](docs/WINDOWS-QUICKSTART.html) is included as **docs/index.html**
 and is also available separately as **documentation.zip**.
 
-[Version 3.0.2-oe3sro.2](docs/releases/3.0.2-oe3sro.2.md) includes the
-FT8/FT4/FT2 kernel improvements, TX diagnostics, and SMP, logbook, and UDP fixes.
+[Version 3.0.2-oe3sro.3](docs/releases/3.0.2-oe3sro.3.md) adds personal DX
+windows and a persistent PSK Reporter query cooldown with improved HTTP 429/503 handling.
 
 **[Latest CI builds](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml):**
 Open the latest successful run and download the versioned
@@ -55,6 +55,7 @@ operation, implementation, sources, and the verified build baseline.
 | **FT8 / FT4 / FT2 native kernels and TX diagnostics** | C++ waveforms, shared LDPC encoder, FT8 BP kernels and parallel FT4/FT2 synchronization; audio/start/ALC readings under View → TX quality — FT8 / FT4 / FT2. [FT8](docs/FT8.md), [FT4/FT2](docs/FT2.md). |
 | **FT2 (experimental)** | 3.75-second periods with transmit, decode, Auto Seq, waterfall, and PSK calling tools; adapted from WSJT-X Improved by DG2YCB. |
 | **PSK Reporter: Who hears me?** | Show receivers of your signal directly in WSJT-X, including callsign, grid locator, SNR, reception time, and mode. |
+| **Personal DX windows** | Collect local reception history by DXCC country, band, UTC hour and month, ranked by distinct reception days; separate callsigns, modes and station/antenna setups. |
 | **Call a station directly** | Fill in the callsign and locator, select the first standard message, and turn on **Enable Tx**. |
 | **Receiver markers in Band Activity** | Callsigns from the receiver list appear in turquoise, bold, and underlined; a tooltip shows the reception time. |
 | **Existing WSJT-X colors** | The list uses your highlighting rules and logbook, including band, mode, DXCC, grid locator, and LoTW. |
@@ -175,7 +176,7 @@ Run these commands from the repository directory:
 ```
 
 The release build is placed in `build-custom`; the package with runtime
-libraries, decoders, and station data is placed in `dist-custom\OE3SRO-ftx-native`.
+libraries, decoders, and station data is placed in `dist-custom\OE3SRO-psk-backoff`.
 The scripts build WSJT-X and its supporting utilities. MAP65 and the
 additional simulators are not built for this package.
 

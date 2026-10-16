@@ -53,19 +53,86 @@ int main (int argc, char **argv)
   }
   QFontDatabase::addApplicationFont ("C:/Windows/Fonts/segoeui.ttf");
   app.setFont (QFont {"Segoe UI", 10});
+  auto retryClock = QDateTime {QDate {2026, 10, 16}, QTime {12, 0}, Qt::UTC};
+  require (PskQueryThrottle::retryAfter ("1800", retryClock) == 1800000
+           && PskQueryThrottle::retryAfter ("Fri, 16 Oct 2026 12:30:00 GMT", retryClock) == 1800000
+           && PskQueryThrottle::retryAfter ("invalid", retryClock) == 0,
+           "Retry-After seconds/date/invalid handling failed");
+  QTemporaryDir throttleDir;
+  QSettings throttleSettings {throttleDir.filePath ("throttle.ini"), QSettings::IniFormat};
+  throttleSettings.beginGroup ("FirstProfile");
+  PskQueryThrottle firstThrottle;
+  firstThrottle.configure (throttleSettings);
+  require (firstThrottle.reserve (), "Initial query reservation failed");
+  throttleSettings.endGroup (); throttleSettings.beginGroup ("OtherProfile");
+  PskQueryThrottle secondThrottle;
+  secondThrottle.configure (throttleSettings);
+  require (!secondThrottle.reserve () && secondThrottle.remaining () > 295000,
+           "Restart/profile change bypassed the shared five-minute cooldown");
+  secondThrottle.failed (429, {});
+  require (secondThrottle.remaining () > 595000, "HTTP 429 did not back off for ten minutes");
+  secondThrottle.failed (429, {});
+  require (secondThrottle.remaining () > 1195000, "Repeated rate limit did not increase the backoff");
+  secondThrottle.failed (503, "7200");
+  PskQueryThrottle reopenedThrottle;
+  reopenedThrottle.configure (throttleSettings);
+  require (reopenedThrottle.remaining () > 7195000, "Server Retry-After did not survive restart");
+  PskPropagation statistics;
+  auto sample = QDateTime {QDate {2025, 10, 1}, QTime {23, 59}, Qt::UTC}.toSecsSinceEpoch ();
+  statistics.add ("OE1TEST", "A", "FT8", "Japan", "20m", "JA1AAA", sample);
+  statistics.add ("oe1test", "A", "FT8", "Japan", "20m", "JA1AAA", sample - 120);
+  statistics.add ("OE1TEST", "A", "FT8", "Japan", "20m", "JA2BBB", sample);
+  statistics.add ("OE1TEST", "A", "FT8", "Japan", "20m", "JA1AAA", sample + 86400);
+  statistics.add ("OE1TEST", "A", "FT8", "Japan", "20m", "JA1AAA", sample + 120);
+  statistics.add ("OE1TEST", "B", "FT8", "Japan", "20m", "JA1AAA", sample);
+  statistics.add ("OTHER", "A", "FT8", "Japan", "20m", "JA1AAA", sample);
+  statistics.add ("OE1TEST", "A", "FT4", "Japan", "20m", "JA1AAA", sample);
+  PskPropagation reloaded;
+  reloaded.load (statistics.save ());
+  auto windows = reloaded.windows ("OE1TEST", "A", "FT8", 10);
+  require (windows.size () == 2 && windows[0].hour == 23 && windows[0].days.size () == 2
+           && windows[0].receivers.size () == 2 && windows[0].receiverDays == 3,
+           "Propagation persistence, distinct days/receivers, UTC boundary or setup/call/mode isolation failed");
+  require (reloaded.windows ("OE1TEST", "A", "FT8", 11).isEmpty (), "Propagation month filter failed");
+  require (!statistics.add ("OE1TEST", "A", "FT8", "Japan", "20m", "JA1AAA", sample),
+           "Repeated observations should not trigger another storage update");
+  auto recentWindows = reloaded.windows ("OE1TEST", "A", "FT8", 10, QDate {2025, 10, 2});
+  require (recentWindows.size () == 2 && recentWindows[0].days.size () == 1,
+           "History date cutoff failed");
+  auto hourWindow = windows[0];
+  auto clock = QDateTime {QDate {2026, 10, 16}, QTime {23, 30}, Qt::UTC};
+  require (PskPropagation::nextWindow (hourWindow, clock) == clock,
+           "A window currently in progress was not recognized");
+  hourWindow.hour = 1;
+  require (PskPropagation::nextWindow (hourWindow, clock) == QDateTime (QDate {2026, 10, 17}, QTime {1, 0}, Qt::UTC),
+           "Next UTC day scheduling failed");
+  clock = QDateTime {QDate {2026, 12, 31}, QTime {23, 30}, Qt::UTC};
+  hourWindow.month = 1;
+  require (PskPropagation::nextWindow (hourWindow, clock) == QDateTime (QDate {2027, 1, 1}, QTime {1, 0}, Qt::UTC),
+           "Year/month boundary scheduling failed");
+  hourWindow.month = 12;
+  require (!PskPropagation::nextWindow (hourWindow, clock).isValid (),
+           "Historical month was wrongly scheduled in a different month");
+  QVariantMap corrupt;
+  corrupt.insert (QStringList {"OE1TEST", "A", "FT8", "Japan", "20m", "2025-10-01", "invalid"}.join (QChar {0x1f}),
+                  QStringList {"JA1AAA"});
+  PskPropagation invalid;
+  invalid.load (corrupt);
+  require (invalid.save ().isEmpty (), "Malformed saved hour was accepted as midnight");
   QTcpServer server;
   require (server.listen (QHostAddress::LocalHost), "Cannot start fixture server");
   QUrl endpoint {QString ("http://127.0.0.1:%1/query").arg (server.serverPort ())};
   QByteArray body;
   QByteArray request;
   int requests = 0;
+  QByteArray responseStatus = "200 OK", retryHeader;
   QObject::connect (&server, &QTcpServer::newConnection, [&] {
     auto socket = server.nextPendingConnection ();
     QObject::connect (socket, &QTcpSocket::readyRead, socket, [&, socket] {
       request += socket->readAll ();
       if (!request.contains ("\r\n\r\n")) return;
       ++requests;
-      socket->write ("HTTP/1.1 200 OK\r\nContent-Type: application/xml\r\nContent-Length: "
+      socket->write ("HTTP/1.1 " + responseStatus + "\r\n" + retryHeader + "Content-Type: application/xml\r\nContent-Length: "
                      + QByteArray::number (body.size ()) + "\r\nConnection: close\r\n\r\n" + body);
       socket->disconnectFromHost ();
     });
@@ -100,6 +167,8 @@ int main (int argc, char **argv)
   settings.setValue ("ExistingRadioSetting", "unchanged");
   settings.sync ();
   dialog.setPreferences (settings);
+  dialog.setPropagationProviders ([] (QString const& call) { return call.startsWith ("DL") ? "Germany" : "England"; },
+                                   [] (quint64) { return QString {"20m"}; });
   require (!settings.contains ("CustomPskReporter/Favorites"), "Opening the list wrote settings");
   int halts = 0;
   dialog.setHaltTxHandler ([&] { ++halts; });
@@ -130,6 +199,42 @@ int main (int argc, char **argv)
   wait ();
   auto table = dialog.findChild<QTableWidget *> ();
   require (table && table->rowCount () == 2, "Deduplication / age / frequency / mode filtering failed");
+  QSettings statsSaved {settings.fileName (), settings.format ()};
+  statsSaved.beginGroup ("TestProfile");
+  PskPropagation collected;
+  collected.load (statsSaved.value ("CustomPskReporter/PropagationV1").toMap ());
+  require (collected.windows ("OE1TEST", "Default", "FT8", 0).size () >= 2,
+           "Validated API observations were not persisted");
+  QTimer::singleShot (100, [&] {
+    auto popup = qobject_cast<QDialog *> (QApplication::activeModalWidget ());
+    require (popup != nullptr, "Personal DX windows did not open");
+    auto summary = popup->findChild<QTableWidget *> ();
+    require (summary && summary->rowCount () >= 2, "Personal DX windows did not display collected observations");
+    require (summary->columnCount () == 10 && !summary->item (0, 8)->text ().isEmpty (),
+             "Propagation observation date range is missing");
+    int unfiltered = summary->rowCount ();
+    auto minimum = popup->findChild<QSpinBox *> ("propagationMinimumDays");
+    minimum->setValue (2);
+    require (summary->rowCount () == 0, "Minimum reception-day filter failed");
+    minimum->setValue (1);
+    auto search = popup->findChild<QLineEdit *> ("propagationSearch");
+    search->setText ("Germany");
+    require (summary->rowCount () > 0 && summary->rowCount () < unfiltered, "Propagation country search failed");
+    search->clear ();
+    QDir {}.mkpath (".local");
+    require (popup->grab ().save (".local/psk-propagation-preview.png"), "Cannot save propagation preview");
+    popup->findChild<QComboBox *> ("propagationView")->setCurrentIndex (1);
+    require (popup->findChild<QComboBox *> ("propagationMonth")->currentIndex () == 0,
+             "Upcoming view must include next-month windows at a month boundary");
+    int expectedUpcoming = 0;
+    for (auto const& w : collected.windows ("OE1TEST", "Default", "FT8", 0))
+      if (PskPropagation::nextWindow (w, QDateTime::currentDateTimeUtc ()).isValid ()) ++expectedUpcoming;
+    require (summary->rowCount () == expectedUpcoming, "Upcoming view month/hour filtering failed");
+    require (popup->grab ().save (".local/psk-propagation-upcoming-preview.png"), "Cannot save upcoming preview");
+    popup->accept ();
+  });
+  for (auto button : dialog.findChildren<QPushButton *> ())
+    if (button->text () == "Personal DX windows") button->click ();
   require (activity.extraSelections ().size () == 2, "Matching Band Activity callsigns were not marked");
   require (activity.toPlainText () == original, "PSK markers changed decoded text");
   for (auto const& marker : activity.extraSelections ()) {
@@ -313,5 +418,21 @@ int main (int argc, char **argv)
   for (auto candidate : ft2Dialog.findChildren<QPushButton *> ())
     if (candidate->text ().startsWith ("Call station")) candidate->click ();
   require (selectedCall == "DL2FT2", "FT2 PSK station could not be selected for calling");
-  std::cout << "PSK Reporter checks passed: query, filters, newest report, call action, throttle, malformed XML, Band Activity markers, expiry, station colors, QSO status, favorites, history persistence, recall guards, next station, FT2 reports/calling and Halt Tx.\n";
+  responseStatus = "429 Too Many Requests";
+  retryHeader = "Retry-After: 1800\r\n";
+  request.clear ();
+  QSettings limitedSettings {preferences.filePath ("limited.ini"), QSettings::IniFormat};
+  PskReporterDialog limited {nullptr, ctx, select, endpoint};
+  limited.setPreferences (limitedSettings);
+  int beforeLimited = requests;
+  limited.refresh (); wait ();
+  bool rateMessage = false;
+  for (auto label : limited.findChildren<QLabel *> ()) rateMessage |= label->text ().contains ("HTTP 429");
+  require (requests == beforeLimited + 1 && rateMessage, "HTTP 429 did not show a specific query-service message");
+  limited.refresh (); wait ();
+  PskReporterDialog restarted {nullptr, ctx, select, endpoint};
+  restarted.setPreferences (limitedSettings);
+  restarted.refresh (); wait ();
+  require (requests == beforeLimited + 1, "HTTP 429 cooldown was bypassed by refresh/restart");
+  std::cout << "PSK Reporter checks passed: query, filters, newest report, call action, shared persistent throttle, Retry-After, HTTP 429 backoff, malformed XML, Band Activity markers, expiry, station colors, QSO status, favorites, history persistence, recall guards, next station, FT2 reports/calling and Halt Tx.\n";
 }

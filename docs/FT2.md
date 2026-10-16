@@ -5,19 +5,19 @@
 
 ## Aktuelles Windows-Release / Current Windows release
 
-[3.0.2-oe3sro.2](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-2)
+[3.0.2-oe3sro.3](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-3)
 enthält FT2, die nativen FT8-/FT4-/FT2-Kerne, TX-Diagnose, Fehlerkorrekturen
 und die DE/EN-Anleitung. Windows-ZIP
 vollständig entpacken und **Start-WSJT-X.bat** öffnen; Anleitung **docs/index.html**.
 Im lokalen Repository startet **Start-Custom.ps1** das Paket unter
-`dist-custom\OE3SRO-ftx-native`. Der historische Prüfstand vom 11. Oktober bleibt
+`dist-custom\OE3SRO-psk-backoff`. Der historische Prüfstand vom 11. Oktober bleibt
 weiter unten dokumentiert. FT2 bleibt experimentell.
 
 The release includes FT2, native FT8/FT4/FT2 kernels, TX diagnostics,
 bug fixes, and the German/English guide.
 Extract the complete Windows ZIP and launch **Start-WSJT-X.bat**; open
 **docs/index.html** for instructions. The local repository launcher is
-**Start-Custom.ps1**, using `dist-custom\OE3SRO-ftx-native`. The October 11 baseline
+**Start-Custom.ps1**, using `dist-custom\OE3SRO-psk-backoff`. The October 11 baseline
 below remains a historical verification record. FT2 remains experimental.
 
 ### Historischer Prüfstand des ersten Releases / First-release verification

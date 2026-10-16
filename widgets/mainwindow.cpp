@@ -607,6 +607,9 @@ MainWindow::MainWindow(QDir const& temp_directory, bool multiple,
     return PskReporterDialog::StationStyle {style.background, style.foreground, worked, style.criterion,
                                            style.worked, style.worked_on_band};
   });
+  pskReporter->setPropagationProviders ([this] (QString const& call) {
+    return m_logBook.countries ()->lookup (call).entity_name;
+  }, [this] (quint64 frequency) { return m_config.bands ()->find (frequency); });
   pskReporter->setPreferences (*m_settings);
   pskReporter->setHaltTxHandler ([this] { on_stopTxButton_clicked (); });
   auto pskAction = ui->menuView->addAction (tr ("PSK Reporter — Who hears me?"));

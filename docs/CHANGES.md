@@ -6,8 +6,37 @@
 
 Dieser Fork von [WSJTX/wsjtx](https://github.com/WSJTX/wsjtx) basiert für die
 hier dokumentierten Erweiterungen auf WSJT-X 3.0.2-devel, Commit `967c85a61`.
-Die Einträge beschreiben den implementierten Stand vom 15. Oktober 2026;
+Die Einträge beschreiben den implementierten Stand vom 16. Oktober 2026;
 sie sind keine Veröffentlichung einer neuen offiziellen WSJT-X-Version.
+
+### 2026-10-16 — Windows-Release 3.0.2-oe3sro.3
+
+[Release Notes](releases/3.0.2-oe3sro.3.md): persönliche DX-Zeitfenster und
+persistente PSK-Reporter-Abfragepause. Tag **oe3sro-v3.0.2-3** baut die Anwendung
+und veröffentlicht Windows-/Dokumentations-ZIP mit SHA256 nach erfolgreicher CI.
+
+### 2026-10-16 — Persönliche empirische DX-Zeitfenster
+
+- HTTP-429-/503-Behandlung: steigende Wartezeit, `Retry-After` beachten und
+  Abfragepause über Neustarts/Profilwechsel mit derselben Konfiguration erhalten.
+  Spezifische Statusmeldung statt langer Fehler-URL. Aktuelles lokales Paket
+  mit unverändertem Custom-Profil: `dist-custom/OE3SRO-psk-backoff`.
+
+- **Personal DX windows** im PSK-Reporter-Fenster: lokale Aggregation nach
+  DXCC-Land, Band, UTC-Stunde und Kalendermonat mit Monats-/Land-/Bandfilter.
+- Rangfolge nach unterschiedlichen Empfangstagen, danach Empfänger-Tagen;
+  wiederholte Abfragen zählen denselben Empfänger pro Datum/Stunde einmal.
+  Rufzeichen, Modus und benennbare Stations-/Antennenprofile bleiben getrennt.
+- Ansicht **Next 24 hours (UTC)** mit zeitlicher Reihenfolge und **Now** für
+  laufende historische Stundenfenster. Filter nach mindestens N Empfangstagen
+  und den letzten 90/365 UTC-Tagen; erste/letzte Beobachtung je Fenster sichtbar.
+- Unveränderte Beobachtungen lösen keinen erneuten Schreibvorgang aus;
+  ungültige gespeicherte Stunden werden beim Laden verworfen.
+- Positive Beobachtungen sind keine QSO-Wahrscheinlichkeiten. Datensammlung
+  mit den bestehenden Abfragen; keine historischen Downloads. Details unter
+  [CUSTOM-BUILD](../CUSTOM-BUILD.md#persönliche-ausbreitungsstatistik).
+- PSK-/Statistiktests, visueller Dialogcheck, vollständiger Windows-Build und
+  Paketlaufzeitprüfung bestanden. Neues lokales Paket: `dist-custom/OE3SRO-propagation`.
 
 ### 2026-10-15 — Windows-Release 3.0.2-oe3sro.2
 
@@ -177,9 +206,36 @@ speichert den FT2-Fortsetzungspunkt; dieser Commit ändert keine Programmfunktio
 
 ## English
 
+### 2026-10-16 — Windows release 3.0.2-oe3sro.3
+
+[Release notes](releases/3.0.2-oe3sro.3.md): personal DX windows and persistent
+PSK Reporter query cooldown. Tag **oe3sro-v3.0.2-3** builds the application and
+publishes Windows/documentation ZIPs with SHA256 after successful CI checks.
+
+### 2026-10-16 — Personal empirical DX windows
+
+- HTTP 429/503 now triggers increasing backoff, honors `Retry-After`, and shares
+  a persistent query cooldown across restarts/profiles using the same settings
+  file. Specific status message replaces the long error URL. Current local
+  package: `dist-custom/OE3SRO-psk-backoff`, preserving the Custom profile.
+
+- **Personal DX windows** in the PSK Reporter dialog groups local observations
+  by DXCC country, band, UTC hour and calendar month, with month/country/band filters.
+- Ranking uses distinct reception days, followed by receiver-days. Repeated
+  queries count a receiver once per UTC date/hour. Callsigns, modes and named
+  station/antenna setups remain separate. These are positive observations,
+  not QSO probabilities. Collection uses existing queries without historical backfill.
+- **Next 24 hours (UTC)** orders recurring historical hourly windows by time,
+  marking an ongoing window **Now**. Filter by minimum reception days and the
+  last 90/365 UTC days; first/last observed dates are shown for each window.
+- Unchanged observations avoid redundant storage writes; malformed saved hours
+  are rejected when loading statistics.
+- Statistics and PSK tests, visual inspection, the full Windows build and
+  package runtime checks passed. Local package: `dist-custom/OE3SRO-propagation`.
+
 This fork of [WSJTX/wsjtx](https://github.com/WSJTX/wsjtx) uses WSJT-X
 3.0.2-devel, commit `967c85a61`, as the base for these additions. The entries
-describe the implemented state on October 15, 2026; they do not announce a
+describe the implemented state on October 16, 2026; they do not announce a
 new official WSJT-X release.
 
 ### 2026-10-15 — Windows release 3.0.2-oe3sro.2

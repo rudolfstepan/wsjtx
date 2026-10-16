@@ -75,6 +75,21 @@
     </table>
   </section>
 
+  <section id="propagation">
+    <h2>Persönliche DX-Zeitfenster und Abfragepausen</h2>
+    <p><strong>Personal DX windows</strong> im PSK-Reporter-Fenster sammelt lokal Meldungen des eigenen Signals nach
+      DXCC-Land, Band, UTC-Stunde und Monat. Die Rangfolge verwendet unterschiedliche Empfangstage und Empfänger-Tage;
+      wiederholte Abfragen zählen denselben Empfänger pro Datum/Stunde einmal. Rufzeichen, Modus und Stations-/Antennenprofile bleiben getrennt.</p>
+    <p><strong>Next 24 hours (UTC)</strong> zeigt die nächste Wiederkehr historischer Stundenfenster; <strong>Now</strong> bedeutet,
+      dass die Stunde bereits läuft. Filter für Monat, Land/Band, Mindestzahl an Empfangstagen sowie gesamte oder letzte 90/365 UTC-Tage
+      und erste/letzte Beobachtung helfen, die Datenbasis einzuschätzen. Das ist keine Live-Prognose oder QSO-Wahrscheinlichkeit.</p>
+    <p>Die Daten wachsen mit regulären Abfragen bei geöffnetem PSK-Fenster. Keine historischen Rückabfragen.
+      Nach Änderungen an Antenne, Standort oder Leistung einen neuen Stations-/Antennenprofilnamen eingeben und das Feld verlassen.</p>
+    <p>Bei <strong>HTTP 429/503</strong> steigt die Pause von zehn bis auf 60 Minuten; längere Servervorgaben haben Vorrang.
+      Der Countdown und die Pause bleiben über Neustarts und Profilwechsel derselben Konfigurationsdatei erhalten.
+      Die Browserkarte kann unabhängig davon funktionieren. Fremde Programme/Browser werden nicht koordiniert.</p>
+  </section>
+
   <section id="english" lang="en">
     <h2>English — Installation and first launch</h2>
     <ol>
@@ -99,6 +114,16 @@
     <p>Reports are delayed. Without reports of your own signal, the list remains empty.
       Mode/frequency changes clear old entries; the next allowed request uses the new context.
       Request errors appear below the table and preserve existing reports until they expire.</p>
+
+    <h3>Personal DX windows and query cooldown</h3>
+    <p><strong>Personal DX windows</strong> collects local observations by DXCC country, band, UTC hour and month, separated by
+      callsign, mode and named station/antenna setup. Rank by distinct reception days and receiver-days without duplicate polling counts.
+      <strong>Next 24 hours (UTC)</strong> shows recurring historical hourly windows, not a live propagation forecast or QSO probability.</p>
+    <p>Filter by month, country/band, minimum reception days and all/90/365-day history. First/last observation dates show sample age.
+      Collection uses regular queries while the PSK window is open, without backfill. Enter a new setup name after antenna/location/power changes.</p>
+    <p><strong>HTTP 429/503</strong> triggers increasing backoff from ten to 60 minutes, respecting longer server instructions.
+      Cooldowns survive restarts and profile changes using the same settings file. The browser map may remain available;
+      other applications and browser requests are not coordinated.</p>
 
     <h3>Calling a station and stopping TX</h3>
     <p><strong>Call station</strong> or double-click fills callsign and locator, selects Tx1, and turns on <strong>Enable Tx</strong>.

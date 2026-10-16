@@ -1,5 +1,96 @@
 # Eigene WSJT-X-Version mit PSK Reporter
 
+## Abfragebegrenzung und HTTP 429
+
+Die XML-Abfrage kann mit **Too Many Requests** abgelehnt werden, während die
+Browserkarte weiterhin funktioniert. Die Karte kann andere oder bereits
+zwischengespeicherte Daten verwenden; ein funktionierender Browserzugriff hebt
+die Beschränkung der API-Abfrage nicht auf.
+
+Der Fork speichert den nächsten erlaubten Abfragezeitpunkt vor jedem Abruf.
+Diese Pause gilt über Neustarts sowie für Profile und Instanzen mit derselben
+Konfigurationsdatei. Band-/Moduswechsel verkürzen sie nicht. Bei HTTP 429 oder
+503 wartet er zunächst zehn Minuten, bei wiederholter Ablehnung 20, 40 und
+maximal 60 Minuten als eigene Rückfallwartezeit. Ein längerer `Retry-After`-Wert
+des Servers (Sekunden oder HTTP-Datum) hat Vorrang. Ein erfolgreicher gültiger
+XML-Abruf setzt die Fehlerstufe zurück. Bestehende Beobachtungen bleiben bei
+Fehlern erhalten. Der Refresh-Knopf zeigt die verbleibende Pause in Sekunden.
+
+Die gemeinsamen Werte liegen unter `CustomPskReporterService` außerhalb der
+einzelnen Profilgruppen. Andere Programme oder Browserzugriffe lassen sich
+damit nicht koordinieren. Die allgemeinen Abfragevorgaben stehen in der
+[PSK-Reporter-Entwicklerdokumentation](https://www.pskreporter.info/pskdev.html).
+
+English: HTTP 429/503 triggers increasing query backoff (10, 20, 40, then 60
+minutes), honoring a longer server `Retry-After` in seconds or HTTP-date form.
+The next-query deadline is shared by profiles/instances using the same settings
+file and survives restarts. The browser map can remain available independently.
+Other applications and browser requests are not coordinated by this local gate.
+
+## Persönliche Ausbreitungsstatistik
+
+Unter **View → PSK Reporter — Who hears me? → Personal DX windows** zeigt
+die Anwendung empirische Zeitfenster für das eigene gesendete Signal.
+Während die PSK-Liste geöffnet und ihre automatische Aktualisierung aktiv ist,
+wachsen die lokalen Daten mit den regulären Abfragen im Fünfminutenabstand.
+Es gibt keine zusätzlichen API-Abfragen oder historischen Rückabfragen.
+
+Die Gruppierung erfolgt nach DXCC-Land aus der vorhandenen Rufzeichendatenbank,
+Band, UTC-Stunde und Kalendermonat. Rufzeichen, Betriebsart und frei benennbares
+Stations-/Antennenprofil bleiben getrennt. Der Monatfilter startet beim aktuellen
+UTC-Monat; **All months** zeigt auch andere Monate. Das Suchfeld filtert Land
+oder Band. Monate fassen mehrere Kalenderjahre zusammen.
+
+**Most observed windows** ordnet nach der bisherigen Datenbasis.
+**Next 24 hours (UTC)** zeigt die im passenden Kalendermonat beobachteten
+Stundenfenster in zeitlicher Reihenfolge für die nächsten 24 Stunden.
+Ein bereits laufendes Stundenfenster trägt **Now**. Beim Umschalten werden
+automatisch alle Monate berücksichtigt, damit auch der nächste UTC-Monat am
+Monatsende einbezogen wird. Diese Wiederkehr historischer Stundenfenster ist
+keine Aussage über die aktuellen Ausbreitungsbedingungen.
+
+**Minimum reception days** blendet Fenster mit weniger unterschiedlichen
+Empfangstagen aus. Die Historienauswahl begrenzt die Auswertung wahlweise auf
+alle Daten oder die letzten 90 bzw. 365 UTC-Kalendertage einschließlich heute.
+**First observed** und **Last observed** zeigen den Zeitraum der tatsächlich
+verwendeten Beobachtungen je Fenster. So bleiben alte Daten und kleine
+Stichproben erkennbar; ein einzelner Empfangstag bekommt einen entsprechenden
+Hinweis im Tooltip.
+
+Die Reihenfolge bevorzugt viele unterschiedliche Empfangstage, danach viele
+Empfänger-Tage. Ein Empfänger zählt pro UTC-Datum und Stunde einmal, auch bei
+wiederholten oder überlappenden Abfragen. Die Spalten nennen Empfangstage,
+unterschiedliche Empfänger und Empfänger-Tage. Das sind positive Beobachtungen,
+keine QSO-Erfolge oder Erfolgswahrscheinlichkeiten: Eigene Sendeaktivität,
+Leistung und die Aktivität der meldenden Empfänger beeinflussen die Statistik.
+Fehlende Meldungen belegen keinen geschlossenen Ausbreitungsweg.
+
+Nach Änderungen an Antenne, Standort oder Leistung einen neuen Namen unter
+**Station / antenna setup** vergeben und das Eingabefeld verlassen. Alte Daten
+bleiben unter ihrem bisherigen Namen verfügbar. Ab einem Profilwechsel werden
+nur Meldungen ab dem Wechselzeitpunkt neu gesammelt, damit verspätete Berichte
+der vorherigen Anlage nicht dem neuen Profil zugeschrieben werden.
+Speicherung ausschließlich lokal im jeweiligen Konfigurationsprofil unter
+`CustomPskReporter/PropagationV1`, ohne Upload. Vor der ersten Datensammlung ist
+die Ansicht leer; für Schwechat werden die tatsächlich abgefragten Meldungen
+des konfigurierten eigenen Rufzeichens verwendet, kein fester Standort.
+
+English: **Personal DX windows** stores local positive reception observations
+by DXCC country, band, UTC hour and calendar month. Ranking uses distinct
+reception days followed by receiver-days; each receiver counts once per UTC
+date/hour regardless of repeated polling. Callsigns, modes and named station
+setups are separate. Collection uses the existing five-minute queries while
+the receiver list is open; no historical backfill is performed. Select a new
+setup name after antenna, location or power changes. Earlier observations remain
+available under their original setup name. Only reports timestamped after a
+setup change are added to the selected setup. These counts describe observed
+windows, not QSO probabilities; transmitting and receiver activity bias them.
+The **Next 24 hours (UTC)** view orders matching historical hourly windows by
+their next occurrence, including UTC month/year transitions. It is not a live
+propagation forecast. Filter by minimum distinct reception days and by the last
+90/365 UTC calendar days (including today), or use all history. First/last
+observed dates describe the samples used in each row.
+
 ## Automatischer Windows-Download
 
 Das [aktuelle GitHub-Release](https://github.com/rudolfstepan/wsjtx/releases/latest)
@@ -66,7 +157,7 @@ denselben Launcher und dasselbe Custom-Profil wie der PowerShell-Aufruf:
 .\Start-Custom.ps1
 ```
 
-Das Startskript verwendet `dist-custom\OE3SRO-ftx-native\bin\wsjtx.exe --rig-name Custom`.
+Das Startskript verwendet `dist-custom\OE3SRO-psk-backoff\bin\wsjtx.exe --rig-name Custom`.
 Eine noch laufende frühere Custom-Version vor dem Neustart normal beenden.
 Die Versionsanzeige, der Fenstertitel und das About-Fenster enthalten
 **build by OE3SRO**.
