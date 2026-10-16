@@ -43,36 +43,36 @@ jobs:
           }
           "version=$version" >> $env:GITHUB_OUTPUT
 
-      - name: Install MinGW64 and Qt dependencies
+      - name: Install UCRT64 and Qt dependencies
         id: msys2
         uses: msys2/setup-msys2@v2
         with:
-          msystem: MINGW64
+          msystem: UCRT64
           update: true
           cache: true
           install: >-
-            mingw-w64-x86_64-gcc
-            mingw-w64-x86_64-gcc-fortran
-            mingw-w64-x86_64-cmake
-            mingw-w64-x86_64-ninja
-            mingw-w64-x86_64-qt5-base
-            mingw-w64-x86_64-qt5-multimedia
-            mingw-w64-x86_64-qt5-serialport
-            mingw-w64-x86_64-qt5-svg
-            mingw-w64-x86_64-qt5-tools
-            mingw-w64-x86_64-qt5-websockets
-            mingw-w64-x86_64-qt5-activeqt
-            mingw-w64-x86_64-fftw
-            mingw-w64-x86_64-boost
-            mingw-w64-x86_64-libusb
-            mingw-w64-x86_64-openssl
-            mingw-w64-x86_64-pkgconf
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-gcc-fortran
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-qt5-base
+            mingw-w64-ucrt-x86_64-qt5-multimedia
+            mingw-w64-ucrt-x86_64-qt5-serialport
+            mingw-w64-ucrt-x86_64-qt5-svg
+            mingw-w64-ucrt-x86_64-qt5-tools
+            mingw-w64-ucrt-x86_64-qt5-websockets
+            mingw-w64-ucrt-x86_64-qt5-activeqt
+            mingw-w64-ucrt-x86_64-fftw
+            mingw-w64-ucrt-x86_64-boost
+            mingw-w64-ucrt-x86_64-libusb
+            mingw-w64-ucrt-x86_64-openssl
+            mingw-w64-ucrt-x86_64-pkgconf
 
       - name: Set toolchain path
         env:
           MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
         run: |
-          $prefix = Join-Path $env:MSYS2_LOCATION 'mingw64'
+          $prefix = Join-Path $env:MSYS2_LOCATION 'ucrt64'
           "WSJTX_MINGW_PREFIX=$prefix" >> $env:GITHUB_ENV
 
       - name: Prepare pinned Hamlib and OmniRig dependencies

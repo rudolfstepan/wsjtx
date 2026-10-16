@@ -12,7 +12,7 @@ Extract it completely, then launch **Start-WSJT-X.bat**.
 The [guide](docs/WINDOWS-QUICKSTART.html) is included as **docs/index.html**
 and is also available separately as **documentation.zip**.
 
-[Version 3.0.2-oe3sro.3](docs/releases/3.0.2-oe3sro.3.md) adds personal DX
+[Version 3.0.2-oe3sro.4](docs/releases/3.0.2-oe3sro.4.md) adds personal DX
 windows and a persistent PSK Reporter query cooldown with improved HTTP 429/503 handling.
 
 **[Latest CI builds](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml):**

@@ -12,7 +12,7 @@ Anleitung. Vollständig entpacken und **Start-WSJT-X.bat** öffnen.
 Die [Anleitung](docs/WINDOWS-QUICKSTART.html) liegt im Paket unter **docs/index.html**;
 sie ist auch separat als **documentation.zip** verfügbar.
 
-[Version 3.0.2-oe3sro.3](docs/releases/3.0.2-oe3sro.3.md) ergänzt persönliche
+[Version 3.0.2-oe3sro.4](docs/releases/3.0.2-oe3sro.4.md) ergänzt persönliche
 DX-Zeitfenster und eine über Neustarts erhaltene PSK-Reporter-Abfragepause mit
 verbesserter HTTP-429-/503-Behandlung.
 

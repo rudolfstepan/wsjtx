@@ -5,7 +5,7 @@
 
 ## Aktuelles Windows-Release / Current Windows release
 
-[3.0.2-oe3sro.3](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-3)
+[3.0.2-oe3sro.4](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-4)
 enthält FT2, die nativen FT8-/FT4-/FT2-Kerne, TX-Diagnose, Fehlerkorrekturen
 und die DE/EN-Anleitung. Windows-ZIP
 vollständig entpacken und **Start-WSJT-X.bat** öffnen; Anleitung **docs/index.html**.

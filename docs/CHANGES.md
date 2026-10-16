@@ -4,6 +4,13 @@
 
 ## Deutsch
 
+### 2026-10-16 — Release 3.0.2-oe3sro.4: GitHub-Build mit UCRT64
+
+Die Installation des entfallenen MinGW64-libusb-Pakets verhinderte den Build
+von 3.0.2-oe3sro.3 vor der Kompilierung. Keine ZIPs dieser Version veröffentlicht.
+Die GitHub-CI verwendet jetzt MSYS2 UCRT64; lokale MinGW64-Builds bleiben möglich.
+Tag **oe3sro-v3.0.2-4**, [Release Notes](releases/3.0.2-oe3sro.4.md).
+
 Dieser Fork von [WSJTX/wsjtx](https://github.com/WSJTX/wsjtx) basiert für die
 hier dokumentierten Erweiterungen auf WSJT-X 3.0.2-devel, Commit `967c85a61`.
 Die Einträge beschreiben den implementierten Stand vom 16. Oktober 2026;
@@ -205,6 +212,12 @@ ergänzt. [8bf344fde](https://github.com/rudolfstepan/wsjtx/commit/8bf344fde)
 speichert den FT2-Fortsetzungspunkt; dieser Commit ändert keine Programmfunktion.
 
 ## English
+
+### 2026-10-16 — Release 3.0.2-oe3sro.4: UCRT64 GitHub build
+
+The unavailable MinGW64 libusb package stopped 3.0.2-oe3sro.3 before compilation;
+no ZIPs were published. GitHub CI now uses MSYS2 UCRT64; local MinGW64 builds
+remain possible. Tag **oe3sro-v3.0.2-4**, [release notes](releases/3.0.2-oe3sro.4.md).
 
 ### 2026-10-16 — Windows release 3.0.2-oe3sro.3
 
