@@ -45,6 +45,8 @@ $manifest = [ordered]@{
 $docs = Join-Path $package 'docs'
 New-Item -ItemType Directory -Force -Path $docs | Out-Null
 Copy-Item -LiteralPath "$root\docs\WINDOWS-QUICKSTART.html" -Destination "$docs\index.html" -Force
+New-Item -ItemType Directory -Force -Path "$docs\images" | Out-Null
+Copy-Item -LiteralPath "$root\docs\images\ft2-qso-oe3sro-og5o-2026-10-16.png" -Destination "$docs\images" -Force
 foreach ($document in @('FT2.md', 'FT8.md', 'CHANGES.md')) {
     $content = [IO.File]::ReadAllText("$root\docs\$document")
     # Repository source links should also work from an extracted binary package.

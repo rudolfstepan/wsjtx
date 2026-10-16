@@ -3,6 +3,38 @@
 [README Deutsch](../README.md) | [README English](../README.en.md) |
 [Änderungshistorie / Change history](CHANGES.md)
 
+## FT2-Praxisnachweis / On-air evidence — 2026-10-16
+
+Der von OE3SRO bereitgestellte Original-Screenshot dokumentiert ein erfolgreiches
+FT2-QSO mit **OG5O, KP20, Finnland**, am **16. Oktober 2026** auf **20 m** bei
+**14,084 MHz Dialfrequenz**. Die Anwendung zeigt FT2, 3,75-Sekunden-Perioden,
+864 Hz TX-/RX-Audiofrequenz und eine Entfernung von 1483 km. Der Austausch
+enthält den empfangenen Rapport, das empfangene **RR73** und das abschließend
+gesendete **73**. Damit liegt neben den automatisierten Prüfungen ein vom
+Benutzer dokumentierter Nachweis des funktionierenden FT2-Funkbetriebs vor.
+
+**English:** The original screenshot supplied by OE3SRO documents a successful
+FT2 QSO with **OG5O, KP20, Finland**, on **16 October 2026**, using **20 m** at
+a **14.084 MHz dial frequency**. The application shows FT2, 3.75-second periods,
+864 Hz TX/RX audio frequency, and a distance of 1483 km. The exchange includes
+the received signal report, received **RR73**, and final transmitted **73**,
+providing user-documented evidence of working FT2 operation on air.
+
+![FT2-QSO OE3SRO–OG5O am 16. Oktober 2026 auf 20 m, mit empfangenem RR73 und gesendetem 73](images/ft2-qso-oe3sro-og5o-2026-10-16.png)
+
+Sichtbarer QSO-Ablauf / Visible QSO exchange (UTC):
+
+| UTC | Richtung / Direction | Nachricht / Message |
+| --- | --- | --- |
+| 09:05:00 | TX | `OG5O OE3SRO JN88` |
+| 09:05:03 | RX | `OE3SRO OG5O +00` |
+| 09:05:07 | TX | `OG5O OE3SRO R+06` |
+| 09:05:11 | RX | `OE3SRO OG5O RR73` |
+| 09:05:15 | TX | `OG5O OE3SRO 73` |
+
+Unveränderte Originaldatei / Unmodified original file: 1675 × 1028 px.
+SHA256: `d950dc2cc46d4e24859e34d5fa4e8f60fc4631cc42f1877e76d5799862ae463a`.
+
 ## Aktuelles Windows-Release / Current Windows release
 
 [3.0.2-oe3sro.4](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-4)
@@ -115,8 +147,9 @@ Validierung ohne Funkgerät: drei FT2-TX/RX-Roundtrips (500/1500/2900 Hz),
 FT4-Regressionsfall, wiederholter FT4/FT2-Wechsel, TX-Sequenzen einschließlich
 UTC-Tageswechsel, Erhalt von Frequenzeinträgen und beide unten genannten
 offiziellen FT2-Aufnahmen. Sie ergeben sechs bzw. zwei Stationen.
-Der echte Funkbetrieb und die Umschaltzeiten eines konkreten Transceivers
-wurden nicht getestet.
+Der oben dokumentierte Benutzer-Screenshot vom 16. Oktober 2026 ergänzt diese
+Prüfungen um ein erfolgreiches FT2-QSO im Funkbetrieb. Die Umschaltzeiten eines
+konkreten Transceivers wurden nicht separat gemessen.
 
 ```powershell
 .\tools\Build-Custom.ps1
@@ -152,8 +185,9 @@ generator caches immutable pulses for different symbol durations separately.
 Validation without a radio includes three FT2 TX/RX round trips at 500/1500/2900
 Hz, an FT4 regression case, repeated FT4/FT2 switches, reply sequences across
 UTC midnight, preservation of user frequencies, and both official FT2 WAVs
-below (six and two decoded stations). Live RF operation and individual
-transceiver switching times have not been tested. Use the commands above.
+below (six and two decoded stations). The user screenshot dated 16 October 2026
+above adds evidence of a successful on-air FT2 QSO. Individual transceiver
+switching times have not been measured separately. Use the commands above.
 
 ## Sources and reproducibility
 
