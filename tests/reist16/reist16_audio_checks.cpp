@@ -1,0 +1,184 @@
+#include "lib/reist16/reist16.hpp"
+#include "lib/reist16/qso_address.hpp"
+#include "Modulator/Modulator.hpp"
+#include "Audio/soundout.h"
+#include "Decoder/decodedtext.h"
+#include "models/Modes.hpp"
+#include "helper_functions.h"
+#include "wsjtx_config.h"
+#include "commons.h"
+#include "Logger.hpp"
+#include <QCoreApplication>
+#include <QFile>
+#include <QDir>
+#include <QElapsedTimer>
+#include <QProcess>
+#include <QSharedMemory>
+#include <QStringList>
+#include <algorithm>
+#include <cmath>
+#include <cstring>
+#include <iostream>
+#include <stdexcept>
+
+BOOST_LOG_GLOBAL_LOGGER_CTOR_ARGS(sys,
+  boost::log::sources::severity_channel_logger_mt<boost::log::trivial::severity_level>,
+  (boost::log::keywords::channel = "REIST16 test"));
+extern "C" {
+  decltype(foxcom_) foxcom_;
+  void gen_reist16_(char*,char*,float*,int*,float*,int*,fortran_charlen_t,fortran_charlen_t);
+}
+int volatile itone[250]={};
+int volatile icw[250]={};
+float gran() { return 0.f; } // Synthetic-noise output is disabled in this test.
+class MemoryOutput final : public SoundOutput {
+public:
+  void restart(QIODevice*) override {}
+  void stop() override {}
+  void reset() override {}
+};
+class TestModulator final : public Modulator {
+public:
+  TestModulator() : Modulator(48000,15.) {}
+  qint64 now=0;
+protected:
+  qint64 millisecondsSinceEpoch() const override { return now; }
+};
+void check(bool ok,char const* message) {if(!ok) throw std::runtime_error(message);}
+
+int main(int argc,char**argv) {
+  QCoreApplication app(argc,argv);
+  try {
+    check(Modes::FT2==13 && Modes::FT8==8 && Modes::Q65==12,"persisted mode IDs");
+    check(Modes::value("REIST16")==Modes::REIST16,"mode lookup");
+    check(QString(Modes::name(Modes::REIST16))=="REIST16","mode name");
+    for(unsigned start=0;start<86400;start+=15)
+      check(received_in_second_period(start,15.)==bool((start/15)%2),"UTC alternating slots");
+    check(tx_duration("REIST16",15,6912,false)>=10.6 && tx_duration("REIST16",15,6912,false)<15,"complete late frame fits TX window");
+
+    // Real packer -> encoder -> production audio thread interface -> decoder.
+    // No SoundOutput device is opened and no MainWindow/CAT is instantiated.
+    QByteArray message=QByteArray("CQ OE3SRO JN87").leftJustified(37,' '), sent(37,' ');
+    QVector<float> wave(reist16::tx_samples);
+    float frequency=1500.375f;
+    int sequence=731,ok=0;
+    gen_reist16_(message.data(),sent.data(),&frequency,&sequence,wave.data(),&ok,37,37);
+    check(ok==1 && sent==message,"Fortran QSO encoder");
+    for(qint64 now : {0LL,300LL,500LL,800LL,15000LL,30500LL}) {
+      MemoryOutput output;
+      TestModulator modulator;
+      modulator.now=now;
+      modulator.setWaveform(wave);
+      icw[0]=12; // stale CW ID must never extend the immutable QSO frame
+      modulator.start("REIST16",120,960.,frequency,-4.,&output,AudioDevice::Mono,true,false,99.,15.);
+      QByteArray pcm;
+      while(pcm.size()<1500000) {
+        auto block=modulator.read(4096);
+        if(block.isEmpty()) break;
+        pcm+=block;
+      }
+      int intoSlot=int(now%15000);
+      int silence=std::max(0,500-intoSlot)*48;
+      check(pcm.size()==2*(silence+reist16::tx_samples),"complete PCM frame and sync delay");
+      auto samples=reinterpret_cast<int16_t const*>(pcm.constData());
+      std::vector<float> rx(180000,0);
+      for(int i=0;i<pcm.size()/2;i+=4) rx[intoSlot*12+i/4]=samples[i]/32768.f;
+      auto result=reist16::decode(rx.data(),int(rx.size()),100,4000,2);
+      check(result.size()==1 && result[0].sequence==sequence,"production audio round trip");
+      check(std::abs(result[0].dt-(std::max(500,intoSlot)/1000.-.5))<.02,"audio UTC alignment");
+      check(!modulator.isActive(),"audio exact stop");
+    }
+
+    // Read actual jt9 stdout from the script, including six standard QSO stages.
+    check(argc==2,"provide jt9 decoder output file");
+    QFile file(QString::fromLocal8Bit(argv[1]));
+    check(file.open(QIODevice::ReadOnly),"read decoder output");
+    int count=0;
+    for(auto line : QString::fromUtf8(file.readAll()).split('\n')) {
+      if(!line.contains(" % ")) continue;
+      DecodedText decoded(line.trimmed());
+      check(decoded.isStandardMessage(),"standard decoded message");
+      check(decoded.frequencyOffset()==300+500*count,"display frequency column");
+      check(decoded.timeInSeconds()==0,"display UTC column");
+      check(decoded.snr()>10,"display SNR column");
+      check(decoded.messageWords().size()>=4,"QSO token parsing");
+      if(count==0) check(decoded.CQersCall()=="OE3SRO","CQ call parsing");
+      ++count;
+    }
+    check(count==6,"all six decoded QSO stages");
+    // Same base call, different explicitly encoded station identities.
+    // This used to make Pluto OE3SRO/P silently reject a clicked OE3SRO CQ.
+    for(QString suffix:{"/P","/R"}) {
+      QString portable="OE3SRO"+suffix;
+      check(!reist16::sameStation("OE3SRO",portable),"full partner comparison replaces saved portable self DX call with base sender");
+      check(!reist16::sameStation(portable,"OE3SRO"),"full partner comparison replaces saved base self DX call with portable sender");
+      check(reist16::sameStation("<"+portable.toLower()+">",portable),"partner comparison ignores brackets and case, preserves suffix");
+      auto parse=[](QString body) {return DecodedText("000000 -10  0.0 1500 %  "+body);};
+      auto cq=parse("CQ OE3SRO JN88");
+      check(cq.isStandardMessage(),"portable QSO CQ is standard");
+      auto selected=reist16::qsoAddress(cq,portable);
+      check(!selected.fromUs && !selected.toUs,"base-call CQ belongs to other endpoint, not an addressed reply");
+      auto own=parse("CQ "+portable+" JN88");
+      check(own.isStandardMessage() && reist16::qsoAddress(own,portable).fromUs,"own complete callsign remains rejected");
+      for(QString payload:{"JN88","-10","R-08","RR73","73"}) {
+        auto reply=parse(portable+" OE3SRO "+payload);
+        check(reply.isStandardMessage(),"portable QSO response is standard");
+        auto address=reist16::qsoAddress(reply,portable);
+        check(address.toUs && !address.fromUs,"portable endpoint receives every QSO response");
+        check(!reist16::qsoAddress(reply,"OE3SRO").toUs,"base endpoint cannot consume portable-addressed response");
+        auto inverse=parse("OE3SRO "+portable+" "+payload);
+        check(inverse.isStandardMessage(),"inverse portable QSO response is standard");
+        address=reist16::qsoAddress(inverse,"OE3SRO");
+        check(address.toUs && !address.fromUs,"base endpoint receives every portable response");
+      }
+    }
+
+    // Exercise the exact shared-memory worker path used by MainWindow, with
+    // the live 44-half-symbol capture length, then an empty slot and repeat.
+    QSharedMemory memory(QString("reist16-check-%1").arg(app.applicationPid()));
+    check(memory.create(sizeof(dec_data_t)),"create decoder shared memory");
+    check(memory.lock(),"lock decoder shared memory");
+    auto shared=static_cast<dec_data_t*>(memory.data());
+    std::memset(shared,0,sizeof(*shared));
+    shared->params.nmode=116;
+    shared->params.ntxmode=116;
+    shared->params.ntrperiod=15;
+    shared->params.nfa=100;
+    shared->params.nfb=4000;
+    shared->params.ndepth=2;
+    shared->params.kin=44*3456;
+    shared->params.nzhsym=44;
+    shared->params.newdat=true;
+    memory.unlock();
+    QProcess worker;
+    worker.start(QDir(app.applicationDirPath()).filePath("jt9"),
+                 {"-s",memory.key(),"-a",QDir::currentPath(),"-t",QDir::currentPath()});
+    check(worker.waitForStarted(5000),"start shared-memory jt9");
+    for(int slot=0;slot<3;++slot) {
+      check(memory.lock(),"lock next slot");
+      std::fill(shared->d2,shared->d2+180000,0);
+      if(slot!=1) for(int i=0;i<wave.size()/4;++i) shared->d2[6000+i]=int16_t(wave[4*i]*6000);
+      shared->params.nutc=slot*15;
+      shared->ipc[0]=44;
+      shared->ipc[1]=1;
+      memory.unlock();
+      QElapsedTimer timer;
+      timer.start();
+      QByteArray answer;
+      while(!answer.contains("<DecodeFinished>") && timer.elapsed()<10000) {
+        worker.waitForReadyRead(100);
+        answer+=worker.readAllStandardOutput();
+      }
+      check(answer.contains("<DecodeFinished>"),"shared-memory decode completed");
+      check(answer.contains("CQ OE3SRO JN87")==bool(slot!=1),"live capture / empty slot / repeated capture");
+      check(memory.lock(),"acknowledge decode");
+      shared->ipc[2]=1;
+      memory.unlock();
+    }
+    check(memory.lock(),"terminate test worker");
+    shared->ipc[1]=999;
+    memory.unlock();
+    check(worker.waitForFinished(5000) && worker.exitCode()==0,"worker shutdown");
+    std::cout<<"PASS REIST16: mode IDs, UTC parity, 6 production PCM round trips, QSO parser, live IPC worker lifecycle.\n";
+  } catch(std::exception const& e) { std::cerr<<e.what()<<'\n'; return 1; }
+}

@@ -4,6 +4,22 @@
 
 ## Deutsch
 
+### 2026-10-21 — REIST16 und PlutoSDR (experimentell)
+
+- Neue eigene Betriebsart REIST16: 15-s-UTC-Slots, 16-FSK, 77-Bit-
+  Standardnachrichten, K7-Fehlerschutz, Interleaver, CRC32 und Auto Seq.
+- Native TX-/RX-Kette und eigene Moduskennung; keine FT8-Funkkompatibilität.
+- Pluto als Funkgerät einer zweiten Instanz über lokale TCI-Bridge, mit
+  Frequenzsteuerung, PTT und Audio. TX: vier 40-ms-Puffer; RX: 10 ms.
+- Vollrufzeichen mit /P oder /R bleiben bei Adressierung und DX-Auswahl getrennt.
+- Benutzer-Versuch vom 21.10.: Yaesu OE3SRO und Pluto OE3SRO/P auf 432,500 MHz,
+  beidseitige Decodes, Auto Seq bis RR73 und danach 73-TX. Keine gemessene
+  Empfangsschwelle; letzter 73-Empfang nicht im Screenshot sichtbar.
+- [REIST16-Dokumentation](REIST16.md), [Profilvertrag](REIST16.txt),
+  [Pluto](PLUTO-WSJTX.txt); Original-Screenshot, native und Bridge-Tests in CI.
+- REIST16 gehört zum aktuellen Quellstand, nicht rückwirkend zum Release 3.0.2-oe3sro.4.
+
+
 ### 2026-10-16 — Release 3.0.2-oe3sro.4: GitHub-Build mit UCRT64
 
 Die Installation des entfallenen MinGW64-libusb-Pakets verhinderte den Build
@@ -212,6 +228,19 @@ ergänzt. [8bf344fde](https://github.com/rudolfstepan/wsjtx/commit/8bf344fde)
 speichert den FT2-Fortsetzungspunkt; dieser Commit ändert keine Programmfunktion.
 
 ## English
+
+### 2026-10-21 — REIST16 and PlutoSDR (experimental)
+
+- New independent 15-second UTC CQ/QSO mode: 16-FSK, 77-bit standard messages,
+  K7 coding, interleaving, CRC32 and Auto Seq; incompatible with FT8 on air.
+- Local Pluto TCI radio bridge with frequency control, PTT and audio;
+  four 40 ms TX buffers, 10 ms RX blocks, complete /P and /R station identities.
+- User-operated 432.500 MHz Yaesu/Pluto exchange confirms two-way decoding
+  through RR73, followed by a transmitted 73; its reception is not visible.
+  Sensitivity and general reliability are not measured by this example.
+- [REIST16](REIST16.md), profile contract, original screenshot and CI tests
+  included. The source feature does not change the older stable release.
+
 
 ### 2026-10-16 — Release 3.0.2-oe3sro.4: UCRT64 GitHub build
 

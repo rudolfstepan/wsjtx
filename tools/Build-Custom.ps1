@@ -17,5 +17,5 @@ $build = Join-Path $root 'build-custom'
     '-DCMAKE_Fortran_FLAGS=-fallow-argument-mismatch' '-DBoost_NO_BOOST_CMAKE=OFF' '-DCMAKE_POLICY_DEFAULT_CMP0167=NEW'
 if ($LASTEXITCODE) { throw 'CMake configuration failed.' }
 if ($ConfigureOnly) { return }
-& "$mingw\bin\cmake.exe" --build $build --target wsjtx jt9 wsprd fmtave fcal fmeasure wsjtx_app_version --parallel 6
+& "$mingw\bin\cmake.exe" --build $build --target wsjtx jt9 wsprd fmtave fcal fmeasure wsjtx_app_version wsjtx_pluto_bridge --parallel 6
 if ($LASTEXITCODE) { throw 'Build failed.' }

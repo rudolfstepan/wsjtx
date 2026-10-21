@@ -412,6 +412,7 @@ public:
   // Set modulation start TCI audio
   //
   Q_SLOT void transceiver_modulator_stop (bool = false);
+  Q_SLOT void transceiver_waveform (QVector<float> const&);
 
   // Set spread for TCI audio
   //
@@ -473,6 +474,7 @@ public:
   // re-established with a call to transceiver_online(true) assuming
   // the fault condition has been rectified or is transient.
   Q_SIGNAL void transceiver_failure (QString const& reason) const;
+  Q_SIGNAL void transceiver_transmit_abort (QString const& reason) const;
 
   // signal announces audio devices are being enumerated
   //

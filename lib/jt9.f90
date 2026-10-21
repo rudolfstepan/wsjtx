@@ -33,7 +33,7 @@ program jt9
        bLowSidelobes = .false., nexp_decode_set = .false.,                   &
        have_ntol = .false.,multift8 = .false.,hidedupes = .false.,           &
        lft8lowth = .true.,lft8subpass = .true.,lwidedxcsearch = .true.
-  type (option) :: long_options(42) = [                                      &
+  type (option) :: long_options(43) = [                                      &
     option ('help', .false., 'h', 'Display this help message', ''),          &
     option ('shmem',.true.,'s','Use shared memory for sample data','KEY'),   &
     option ('tr-period', .true., 'p', 'Tx/Rx period, default SECONDS=60',    &
@@ -84,6 +84,7 @@ program jt9
     option ('q65', .false., '3', 'Q65 mode', ''),                            &
     option ('jt4', .false., '4', 'JT4 mode', ''),                            &
     option ('ft2', .false., '2', 'FT2 mode (3.75-second periods)', ''),      &
+    option ('reist16', .false., 'I', 'REIST16 QSO mode (15-second periods)', ''), &
     option ('ft4', .false., '5', 'FT4 mode', ''),                            &
     option ('jt65', .false.,'6', 'JT65 mode', ''),                           &
     option ('fst4', .false., '7', 'FST4 mode', ''),                          &
@@ -120,7 +121,7 @@ program jt9
   TRperiod=60.d0
 
   do
-     call getopt('hs:e:a:b:r:m:p:d:f:F:w:t:98765432WYqkTMUSZL:S:H:c:G:x:g:X:Q:C:R:N:E:D:',     &
+     call getopt('hs:e:a:b:r:m:p:d:f:F:w:t:98765432IWYqkTMUSZL:S:H:c:G:x:g:X:Q:C:R:N:E:D:',     &
           long_options,c,optarg,arglen,stat,offset,remain,.true.)
      if (stat .ne. 0) then
         exit
@@ -180,6 +181,9 @@ program jt9
            mode = 144
         case ('Q')
            read (optarg(:arglen), *) nQSOProg
+        case ('I')
+           mode = 116
+           TRperiod = 15.d0
         case ('2')
            mode = 52
            TRperiod = 3.75d0
@@ -350,6 +354,7 @@ program jt9
      shared_data%params%nfb=fhigh
      shared_data%params%ntol=ntol
      shared_data%params%kin=64800
+     if(mode.eq.116) shared_data%params%kin=min(k,npts)
      if(mode.eq.240) shared_data%params%kin=720000   !### 60 s periods ###
      shared_data%params%nzhsym=nhsym
      shared_data%params%ndepth=ndepth

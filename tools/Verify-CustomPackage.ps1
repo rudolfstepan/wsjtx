@@ -1,7 +1,8 @@
-param([switch]$PortableOnly)
+param([switch]$PortableOnly,[string]$Package = '')
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
-$bin = Join-Path $root 'dist-custom\OE3SRO-psk-backoff\bin'
+$packageRoot = if ($Package) { $Package } else { Join-Path $root 'dist-custom\OE3SRO-reist16-pluto' }
+$bin = Join-Path $packageRoot 'bin'
 $checker = Join-Path $bin 'pskreporter-runtime-check.exe'
 $previousPath = $env:PATH
 Copy-Item -LiteralPath "$root\build-custom\pskreporter-checks\pskreporter_checks.exe" -Destination $checker -Force

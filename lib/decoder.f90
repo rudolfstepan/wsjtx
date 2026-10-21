@@ -60,7 +60,7 @@ subroutine multimode_decoder(ss,id2,params,nfsample)
   logical first,firstsd !ft8md
   logical(1) lhoundprev !ft8md
   integer nutc,ndelay
-  integer ft8_thread_budget,threadlimit
+  integer ft8_thread_budget,threadlimit,nreist
   type(params_block) :: params
   data ndelay/0/
   data first/.true./ !ft8md
@@ -89,6 +89,7 @@ subroutine multimode_decoder(ss,id2,params,nfsample)
   type(counting_fst4_decoder) :: my_fst4
   type(counting_q65_decoder) :: my_q65  
 
+  nreist=0
   if(.not.params%newdat .and. params%ntr.gt.ntr0) go to 800
   ntr0=params%ntr
   rms=sqrt(dot_product(float(id2(1:180000)),float(id2(1:180000)))/180000.0)
@@ -1171,6 +1172,14 @@ subroutine multimode_decoder(ss,id2,params,nfsample)
      go to 800
   endif    ! end of code for FT8 mode
 
+  if(params%nmode.eq.116) then
+     call timer('reist16 ',0)
+     call decode_reist16(id2,params%kin,params%nutc,params%nfa,params%nfb, &
+          params%ndepth,ios13,nreist)
+     call timer('reist16 ',1)
+     go to 800
+  endif
+
   ! FT2 receive strategy adapted from WSJT-X Improved by DG2YCB (GPLv3).
   ! Stretch the 288-sample symbols to FT4's 576 samples, then restore
   ! physical frequency and DT in the callback. See docs/FT2.md.
@@ -1381,7 +1390,7 @@ subroutine multimode_decoder(ss,id2,params,nfsample)
 ! JT65 is not yet producing info for nsynced, ndecoded.
 800 ndecoded = my_jt4%decoded + my_jt65%decoded + my_jt9%decoded +       &
          my_ft8%decoded + my_ft8var%decodedvar + my_ft4%decoded +        &
-         my_fst4%decoded + my_q65%decoded
+         my_fst4%decoded + my_q65%decoded + nreist
   if(params%lmultift8 .and. params%nmode.eq.8) then
      if(params%nzhsym.eq.41) ndec41=0
      if(params%nzhsym.eq.46) ndec46=ndecoded

@@ -17,10 +17,21 @@
 <body>
   <h1>WSJT-X OE3SRO Custom</h1>
   <p><strong>build by OE3SRO</strong> · Windows x64 · <a href="#deutsch">Deutsch</a> / <a href="#english">English</a></p>
-  <div class="intro">Windows-Paket mit integrierter PSK-Reporter-Liste, Anrufhilfen und experimentellem FT2.
+  <div class="intro">Windows-Paket mit integrierter PSK-Reporter-Liste, Anrufhilfen, FT2 und experimentellem REIST16.
     Die Paketversion und der Quellstand stehen in <code>build-info.json</code> im Hauptordner.</div>
 
   <section id="deutsch">
+    <h2>REIST16 — neue experimentelle Betriebsart</h2>
+    <p><strong>Mode → REIST16</strong> aktiviert den neuen CQ-/QSO-Modus mit festen 15-Sekunden-Slots.
+      Er verwendet Soundkarten-Audio, beispielsweise Yaesu USB-Audio. Eine passende Frequenz selbst einstellen.
+      <strong>start-pluto.bat</strong> startet die Pluto-Bridge und die zweite WSJT-X-Instanz mit eigenem Profil.
+      <a href="PLUTO-WSJTX.txt">Pluto einrichten</a>. Diese Verbindung benötigt keinen zusätzlichen Codec-Flow.
+      <a href="REIST16.txt">Profilvertrag und Prüfstand</a>. Der Benutzer-Screenshot belegt
+      beidseitige Dekodierung zwischen Yaesu OE3SRO und Pluto OE3SRO/P auf 432,500 MHz,
+      mit Auto Seq bis RR73 und anschließendem 73-Senden. Keine gemessene Empfangsschwelle.
+      <a href="REIST16.md">Ausführlicher Versuch und Grenzen</a>.</p>
+    <figure><img src="images/REIST16_QSO.png" alt="REIST16 zwischen Yaesu links und Pluto rechts">
+      <figcaption>21. Oktober 2026: Original-Screenshot des Benutzer-Versuchs.</figcaption></figure>
     <h2>Deutsch — Installation und erster Start</h2>
     <ol>
       <li>Das ZIP mit <strong>windows-x64</strong> im Namen von der <a href="https://github.com/rudolfstepan/wsjtx/releases">GitHub-Releases-Seite</a> herunterladen.</li>
@@ -101,6 +112,12 @@
   </section>
 
   <section id="english" lang="en">
+    <h2>REIST16 — new experimental mode</h2>
+    <p><strong>Mode → REIST16</strong> selects the experimental CQ/QSO mode with fixed 15-second UTC slots.
+      Use a frequency agreed with the peer. <strong>start-pluto.bat</strong> launches the Pluto bridge and a separate WSJT-X profile;
+      see <a href="PLUTO-WSJTX.txt">Pluto setup</a> and <a href="REIST16.txt">the protocol and test notes</a>. The user screenshot above confirms two-way decoding
+      and Auto Seq through RR73, followed by Pluto transmitting 73. Final 73 reception
+      is not visible; sensitivity remains unmeasured. <a href="REIST16.md">Test details</a>.</p>
     <h2>English — Installation and first launch</h2>
     <ol>
       <li>Download the ZIP named <strong>windows-x64</strong> from <a href="https://github.com/rudolfstepan/wsjtx/releases">GitHub Releases</a>.</li>

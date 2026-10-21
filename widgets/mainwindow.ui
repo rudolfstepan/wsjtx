@@ -4914,6 +4914,7 @@ QPushButton[state=&quot;ok&quot;] {
     </property>
     <addaction name="actionFST4"/>
     <addaction name="actionFT2"/>
+    <addaction name="actionREIST16"/>
     <addaction name="actionFT4"/>
     <addaction name="actionFT8"/>
     <addaction name="actionJT4"/>
@@ -5392,6 +5393,11 @@ QPushButton[state=&quot;ok&quot;] {
    <property name="text">
     <string>Erase WSPR hashtable</string>
    </property>
+  </action>
+  <action name="actionREIST16">
+   <property name="checkable"><bool>true</bool></property>
+   <property name="text"><string>REIST16</string></property>
+   <property name="toolTip"><string>Experimental REIST16 CQ/QSO, 15-second UTC slots</string></property>
   </action>
   <action name="actionFT2">
    <property name="checkable"><bool>true</bool></property>

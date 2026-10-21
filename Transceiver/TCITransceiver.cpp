@@ -67,6 +67,7 @@ namespace
   static const QString CmdDds("dds");
   static const QString CmdIf("if");
   static const QString CmdTrx("trx");
+  static const QString CmdTxAbort("tx_abort");
   static const QString CmdRxEnable("rx_enable");
   static const QString CmdTxEnable("tx_enable");
   static const QString CmdRxChannelEnable("rx_channel_enable");
@@ -223,6 +224,7 @@ TCITransceiver::TCITransceiver (logger_type * logger, std::unique_ptr<Transceive
   mapCmd_[CmdModeList]     = Cmd_ModeList;
   mapCmd_[CmdMode]         = Cmd_Mode;
   mapCmd_[CmdReady]        = Cmd_Ready;
+  mapCmd_[CmdTxAbort]      = Cmd_TxAbort;
   mapCmd_[CmdStop]         = Cmd_Stop;
   mapCmd_[CmdStart]        = Cmd_Start;
   mapCmd_[CmdPreamp]       = Cmd_Preamp;
@@ -713,7 +715,9 @@ void TCITransceiver::onMessageReceived(const QString &str)
           if (started_mode_.isEmpty()) started_mode_ = mode_;
           if (busy_mode_) {
             if (requested_mode_.isEmpty() || requested_mode_ == mode_) tci_done8();
-            return;
+            // A WebSocket message can contain several TCI commands. Keep
+            // parsing so a mode reply cannot swallow START/READY or VFOs.
+            break;
           }
           else if (!requested_mode_.isEmpty() && requested_mode_ != mode_ && !band_change) {
             sendTextMessage(mode_to_command(requested_mode_));
@@ -743,6 +747,12 @@ void TCITransceiver::onMessageReceived(const QString &str)
         }
         break;
       case Cmd_Volume:
+        break;
+      case Cmd_TxAbort:
+        if(args.size()>=2 && args.at(0)==rx_) {
+          do_modulator_stop(true);
+          Q_EMIT transmitAbort(tr("Pluto TX audio timeout: transmission aborted. Receiving continues; enable Tx to retry."));
+        }
         break;
       case Cmd_Trx:
         printf("%s Cmd_Trx : %s\n",QDateTime::QDateTime::currentDateTimeUtc().toString("hh:mm:ss.zzz").toStdString().c_str(),args.join("|").toStdString().c_str());
@@ -828,7 +838,7 @@ void TCITransceiver::onMessageReceived(const QString &str)
         break;
       case Cmd_Ready:
         printf("%s CmdReady : %s\n",QDateTime::QDateTime::currentDateTimeUtc().toString("hh:mm:ss.zzz").toStdString().c_str(),args.join("|").toStdString().c_str());
-        tci_done7(); //was tci_done1 (do_frequency)
+        tci_done6(); // Complete the startup wait, not a frequency command.
         break;
 
       default:
@@ -847,6 +857,11 @@ void TCITransceiver::sendTextMessage(const QString &message)
 
 void TCITransceiver::onBinaryReceived(const QByteArray &data)
 {
+  if(data.size()<int(AudioHeaderSize)) return;
+  quint32 header[16];
+  memcpy(header,data.constData(),AudioHeaderSize);
+  if(header[1]!=48000 || header[2]!=3 || header[3]!=0 || header[5]>8192 || header[5]%2) return;
+  if(header[6]!=TxChrono && data.size()<int(AudioHeaderSize+header[5]*sizeof(float))) return;
   Data_Stream *pStream = (Data_Stream*)(data.data());
   if (pStream->type != last_type) {
     last_type = pStream->type;
@@ -868,9 +883,10 @@ void TCITransceiver::onBinaryReceived(const QByteArray &data)
     writeAudioData(pStream->data,pStream->length);
   } else if (pStream->type == TxChrono &&  pStream->receiver == rx_.toUInt()) {
     mtx_.lock(); tx_fifo += 1; tx_fifo &= 7;
-    int ssize = AudioHeaderSize+pStream->length*sizeof(float)*2;
+    int ssize = AudioHeaderSize+pStream->length*sizeof(float);
     quint16 tehtud;
     if (m_tx1[tx_fifo].size() != ssize) m_tx1[tx_fifo].resize(ssize);
+    m_tx1[tx_fifo].fill(0);
     Data_Stream * pOStream1 = (Data_Stream*)(m_tx1[tx_fifo].data());
     pOStream1->receiver = pStream->receiver;
     pOStream1->sampleRate = pStream->sampleRate;
@@ -1484,6 +1500,12 @@ void TCITransceiver::do_modulator_start (QString mode, unsigned symbolsLength, d
   if(mode=="Q65" and m_nsps<=3600) delay_ms=500;              //Q65-15 and Q65-30
   if(mode=="FT2") delay_ms=150;                               //FT2
   if(mode=="FT4") delay_ms=300;                               //FT4
+  snapshotActive_=mode=="REIST16" && toneSpacing==-4.0 && !m_tuning;
+  if(snapshotActive_) {
+    if(pendingWave_.size()!=460800) throw error {tr("REIST16 TCI waveform is missing")};
+    activeWave_=pendingWave_;
+    delay_ms=500;
+  } else activeWave_.clear();
 
   // noise generator parameters
   if (m_addNoise) {
@@ -1501,8 +1523,9 @@ void TCITransceiver::do_modulator_start (QString mode, unsigned symbolsLength, d
   }
 
   m_silentFrames = 0;
+  if(snapshotActive_) m_ic=0;
   // calculate number of silent frames to send
-  if (m_ic == 0 && synchronize && !m_tuning)	{
+  if (m_ic == 0 && synchronize && !m_tuning && mstr<delay_ms)	{
     m_silentFrames = audioSampleRate / (1000 / delay_ms) - (mstr * (audioSampleRate / 1000));
   }
   m_state = (synchronize && m_silentFrames) ?
@@ -1529,6 +1552,22 @@ void TCITransceiver::do_modulator_stop (bool quick)
 
 quint16 TCITransceiver::readAudioData (float * data, qint32 maxSize, qreal txAtten)
 {
+  if(snapshotActive_ && !m_tuning) {
+    float gain=float(std::pow(std::max(0.,std::min(1.,(45.-txAtten)/45.)),2));
+    for(int k=0;k<maxSize/2;++k) {
+      float sample=0;
+      if(m_state!=Idle) {
+        if(m_silentFrames>0) --m_silentFrames;
+        else if(m_ic<unsigned(activeWave_.size())) sample=gain*activeWave_[m_ic++];
+        if(!m_silentFrames && m_ic>=unsigned(activeWave_.size())) {
+          m_state=Idle;
+          Q_EMIT tci_mod_active(false);
+        }
+      }
+      data[2*k]=data[2*k+1]=sample;
+    }
+    return maxSize;
+  }
   double toneFrequency=1500.0;
   if(m_nsps==6) {
     toneFrequency=1000.0;

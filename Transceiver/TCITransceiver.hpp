@@ -113,7 +113,8 @@ Cmd_RxSensors,
 Cmd_TxSensors,
 Cmd_AgcMode,
 Cmd_AgcGain,
-Cmd_Lock
+Cmd_Lock,
+Cmd_TxAbort
 };
 Q_ENUM (Tci_Cmd);
 
@@ -121,6 +122,7 @@ qreal rxAtten;
 qreal txAtten;
 
 public slots:
+  void setWaveform(QVector<float> const& wave) override {pendingWave_=wave;}
 //  void close();
   void sendTextMessage(const QString &message);
 //  void trxChanged(quint32 trx, bool state);
@@ -201,6 +203,7 @@ protected:
   enum ModulatorState {Synchronizing, Active, Idle};
 
 private:
+  friend struct PlutoTciChecks;
   MODE get_mode (bool requested = false);
   QString frequency_to_string (Frequency) const;
   Frequency string_to_frequency (QString) const;
@@ -315,6 +318,8 @@ private:
   quint16 readAudioData (float * data, qint32 maxSize, qreal txVolume);
   qint16 postProcessSample (qint16 sample) const;
   bool m_quickClose = false;
+  QVector<float> pendingWave_,activeWave_;
+  bool snapshotActive_=false;
 
   unsigned m_symbolsLength;
 

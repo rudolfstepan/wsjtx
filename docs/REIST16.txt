@@ -1,0 +1,153 @@
+REIST16 — experimenteller CQ-/QSO-Modus
+build by OE3SRO
+Stand: 21. Oktober 2026
+
+Dieser Build ergänzt WSJT-X um REIST16. Der Modus verwendet den Weak16-
+Kanalcode aus dem REIST-/SDR-suite-Ansatz und übernimmt das feste UTC-
+Zeitraster für kurze Funkgespräche. FT8, FT4 und FT2 bleiben auswählbar.
+REIST16 ist ein eigenständiges Protokoll und nicht zu FT8 kompatibel.
+
+Start und Bedienung
+-------------------
+Im Repository startet start.bat bzw. Start-Custom.ps1 das neue Paket unter
+dist-custom/OE3SRO-reist16-pluto-timing mit dem vorhandenen Profil Custom. Im entpackten
+Windows-ZIP dient Start-WSJT-X.bat als Einstieg. Eine vorherige Custom-
+Instanz vor dem Neustart desselben Custom-Profils normal schließen.
+
+Unter Mode -> REIST16 auswählen. Als Audioverbindung dient die Soundkarte,
+beispielsweise USB-Audio des Yaesu FT-991A. Für den Pluto dient die neue
+TCI-Bridge mit eigenem Profil: siehe PLUTO-WSJTX.txt und start-pluto.bat.
+Der Modus hat keine vorgegebene Funkfrequenz; für einen
+Versuch die mit der Gegenstelle vereinbarte Frequenz selbst einstellen.
+Die angezeigte TX-/RX-Audiofrequenz bezeichnet jeweils den untersten Ton.
+Von dort liegen die übrigen 15 Tonmitten bis 375 Hz höher. Bei einem üblichen
+SSB-Audiokanal ist z.B. eine unterste Audiofrequenz von 1500 Hz geeignet.
+
+Tx even/1st wählt die Slots bei :00 und :30, die Gegenstelle verwendet :15
+und :45. CQ, Rufzeichen/Locator, Rapport, R-Rapport, RR73 und 73 verwenden
+die üblichen Nachrichtenfelder. Doppelklick auf eine decodierte CQ-Nachricht
+und Auto Seq sind an den bestehenden QSO-Ablauf angeschlossen. Ein mitten
+im Slot aktiviertes Enable Tx wartet bis zum nächsten passenden Sendeslot.
+Änderungen am Nachrichtentext während einer Aussendung gelten ab dem
+nächsten Rahmen. Halt Tx bricht die Aussendung wie gewohnt ab.
+
+REIST16 unterscheidet vollständige Stationsrufzeichen einschließlich /P und
+/R. Für einen lokalen Zwei-Geräte-Test können deshalb z.B. OE3SRO und
+OE3SRO/P verwendet werden: Doppelklick auf das empfangene CQ übernimmt die
+Gegenstelle, erzeugt die Standardnachrichten und wählt die Gegenperiode.
+Ein Doppelklick auf das eigene vollständige Rufzeichen bleibt wirkungslos.
+
+Diese erste Version akzeptiert nur standardmäßig gepackte QSO-Nachrichten
+der pack77-Typen 1 und 2, einschließlich der dort unterstützten /P- und
+/R-Rufzeichen. Freitext, Telemetrie, Contest- und Fox/Hound-Sonderformate
+gehören nicht zu diesem Profil. Ein nicht unterstützter Sendetext wird
+abgelehnt. Das Auswählen von REIST16 beendet eine Sonderbetriebsart.
+PSK-Reporter-Spots werden für diesen experimentellen Modus nicht gesendet.
+Das lokale Logbuch verwendet den Namen REIST16; beim Export ist dieser
+experimentelle MODE-Wert nicht als registrierter ADIF-Modus zu verstehen.
+
+Profilvertrag REIST16-QSO/1
+--------------------------
+Eine Zeiteinheit dauert 15 Sekunden. Der nominelle Rahmenstart liegt bei
+Slotbeginn +0,500 s. Neue PTT-Anforderungen werden nur in den ersten 300 ms
+des zugewiesenen Slots zugelassen. Wird Audio nach einer verzögerten PTT-
+Bestätigung erst bis +1,000 s gestartet, bleibt der ganze Rahmen erhalten.
+Spätere Bestätigungen brechen die Aussendung ab. Das TX-Zeitfenster reicht
+bis +11 s, sodass auch ein solcher Rahmen und die Audioausgabe auslaufen
+können. Empfangsstartzeiten werden von 0 bis 2 s im aufgezeichneten Slot
+gesucht; DT bezeichnet die Abweichung vom nominellen Start bei +0,500 s.
+
+Ein Symbol dauert 80 ms. Es wird jeweils genau einer von 16 Tönen mit
+25 Hz Abstand gesendet. Die Phase bleibt zwischen den Symbolen stetig;
+die ersten und letzten 5 ms des aktiven Signals werden weich ein-/ausgeblendet.
+Die 375 Hz sind der Abstand der äußeren Tonmitten, keine Messung der
+belegten Bandbreite. Die Audioausgabe hat 48 kHz; der Decoder erhält die
+12-kHz-Abtastwerte von WSJT-X. Er verarbeitet 100 bis 4000 Hz als unterste
+Tonfrequenz und meldet mehrere voneinander getrennte Stationen je Slot.
+
+Die Nachrichtenpackung liefert 77 Bits. Bit i (ab 0) liegt in Bit i mod 8
+des Bytes floor(i/8). Die oberen drei Bits des zehnten Bytes sind null.
+Der CFP2-Kopf ist genau zehn Bytes lang:
+
+  Byte 0..1: ASCII CF
+  Byte 2:    Version 2
+  Byte 3:    Nutzlastlänge 10
+  Byte 4..5: Sequenznummer, Little Endian
+  Byte 6..9: Profilkennung 0x31515352, Little Endian, ASCII RSQ1
+
+Die Sequenznummer entspricht beim WSJT-X-Sender floor(Unixzeit_ms/15000)
+modulo 65536. Der Empfänger verwendet sie nicht als Zeit- oder Adressfilter.
+RSQ1 ist eine explizite Profilkennung, kein berechneter Flow-JSON-Hash.
+
+Hinter dem Kopf folgen zehn Nutzlastbytes und vier CRC-Bytes, Little Endian.
+Die CRC32 wird über den unkodierten Kopf und die zehn Nutzlastbytes gebildet
+(reflektiertes Polynom 0xedb88320, Initialwert und Schluss-XOR 0xffffffff).
+Kopf und Nutzlast samt CRC werden getrennt mit dem K7-Faltungscode der Rate
+1/2 kodiert, Generatoren (171,133) oktal, sechs Nullbits zum Terminieren.
+Bytes werden LSB zuerst gelesen. Je Eingabebit wird das Register nach links
+geschoben und das Bit an Position 0 eingesetzt; Parität 171 steht vor 133.
+Der 16-spaltige Interleaver gibt zuerst die Positionen 0,16,32,... aus,
+dann 1,17,33,... bis Spalte 15. Vier aufeinanderfolgende Ausgangsbits bilden
+LSB zuerst die Tonnummer 0..15. Unbesetzte Bits des letzten Symbols sind null.
+
+Der Rahmen besteht aus 16 Trainingssymbolen, 43 Kopfsymbolen, 59 Symbolen
+für Nutzlast/CRC und zwei stummen Symbolen. Die Trainingsfolge lautet
+0,15,1,14,2,13,3,12,4,11,5,10,6,9,7,8. Insgesamt sind das 120 * 80 ms = 9,60 s,
+also 460800 Samples bei 48 kHz. Die aktive Tonfolge dauert 9,44 s.
+Magic, Version, Länge, Profilkennung, CRC und Null-Padding werden geprüft,
+bevor die Nachricht an unpack77 und die WSJT-X-Anzeige gelangt.
+
+Prüfstand und Grenzen
+--------------------
+tools/Test-Reist16.ps1 prüft acht zufällige 77-Bit-Rahmen bei -12 dB SNR,
+bezogen auf 2500 Hz, in additivem weißem Rauschen. Er prüft außerdem drei
+gleichzeitige, spektral getrennte Stationen, Frequenz-/Zeit-/SNR-Schätzungen,
+Stille, Rauschen, einen unmodulierten Träger und gemischte FEC-Blöcke mit
+ungültiger CRC. Sechs Standardnachrichten laufen über pack77, Wellenform,
+jt9 und den tatsächlichen QSO-Anzeigeparser. Die Produktions-Audioausgabe
+wird bei sechs Startzeiten in Speicher ausgelesen und wieder decodiert.
+Zusätzlich wird der jt9-Prozess über dieselbe Shared-Memory-Schnittstelle
+wie im Hauptfenster mit Signal, leerem Slot und erneutem Signal geprüft.
+
+Die vorhandenen Core-, PSK-Reporter-, TX-Audio-, FT8-/FT4-/FT2-Tests wurden
+ebenfalls ausgeführt, einschließlich vorhandener Funkaufzeichnungen.
+Diese Softwaretests liefern keine gemessene Empfangsschwelle. Der unten
+beschriebene Hardwareversuch ergänzt sie um einen konkreten QSO-Ablauf. Drift, Fading, dicht überlappende Signale und
+ein realer Yaesu-/Pluto-Audioweg sind noch nicht systematisch vermessen.
+Eine FT8-gleiche Empfindlichkeit wird damit nicht behauptet.
+
+Die zweite WSJT-X-Instanz kann den Pluto jetzt unmittelbar über die lokale
+TCI-Bridge als USB-Funkgerät verwenden. Dafür ist kein zusätzlicher Codec-
+Flow erforderlich. Ein eigenständiger SDR-suite-Flow wäre weiterhin auf
+diesen Profilvertrag anzupassen; vorhandene WTX1-Textblöcke und Slow-Sync-
+Flows sind keine passende Gegenstelle.
+
+Hardwareversuch vom 21. Oktober 2026
+----------------------------------
+docs/images/REIST16_QSO.png zeigt Yaesu FT-991A / OE3SRO links und PlutoSDR /
+OE3SRO/P rechts, beide Dial432,500MHz. CQ, Locator, Rapport, R-Rapport und
+RR73 werden an der jeweiligen Gegenstelle dekodiert; anschließend sendet
+Pluto73. Der Empfang dieser letzten73 sowie ein Logbucheintrag sind im
+Bild nicht sichtbar. Yaesu meldet -2/-1dB, Pluto+13/+14dB, DT jeweils0,1s.
+Das belegt Funktion und Auto-Seq-Fortschritt in diesem Aufbau, keine
+Empfangsschwelle oder allgemeine Zuverlässigkeit. Der Benutzer meldete
+TxGain-89dB als funktionierend; dies ist keine kalibrierte Sendeleistung.
+Die ausführliche DE/EN-Dokumentation mit Nachrichtenfolge ist REIST16.md.
+Die TX-Bridge bündelt jetzt vier10ms-Blöcke zu40ms und nutzt vier
+Kernelpuffer; RX bleibt bei10ms. Vollständige Calls einschließlich/P
+und/R werden beim Adressieren und Wechseln der Gegenstelle unterschieden.
+
+English summary
+---------------
+Select Mode -> REIST16 for experimental standard CQ/QSO messages in fixed
+15-second UTC slots. Use sound-card audio and a frequency agreed with the
+peer; no RF default is installed. The mode uses 16 tones, 25 Hz spacing,
+80 ms symbols, K7 rate-1/2 FEC, interleaving and CRC32. A frame is 9.60 s.
+This is REIST16-QSO/1 (RSQ1), not FT8 or the existing WTX1 Flow text format.
+Synthetic modem, production PCM, QSO parsing and shared-memory worker tests
+pass. A second WSJT-X instance can now use Pluto through the local TCI/USB
+bridge (start-pluto.bat); see PLUTO-WSJTX.txt. The user screenshot of
+21 October 2026 confirms two-way decoding and Auto Seq through RR73, followed
+by Pluto transmitting73. Final73 reception is not visible. RF sensitivity
+and general reliability remain unmeasured; see REIST16.md. Existing Custom settings
+are reused. No PSK Reporter spots are submitted for this experimental mode.

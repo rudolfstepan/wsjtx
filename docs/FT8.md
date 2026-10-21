@@ -5,7 +5,7 @@
 ## Deutsch
 
 Start mit `start.bat` beziehungsweise `Start-Custom.ps1` aus dem Projektordner.
-Das aktuelle lokale Paket liegt in `dist-custom\OE3SRO-psk-backoff` und verwendet
+Das aktuelle lokale Paket liegt in `dist-custom\OE3SRO-reist16-pluto` und verwendet
 weiterhin das vorhandene Profil `Custom`.
 
 ### Bedienung und FT-991A

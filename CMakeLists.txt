@@ -1303,12 +1303,30 @@ if (WSJT_BUILD_TESTS AND EXISTS ${CMAKE_SOURCE_DIR}/tests AND IS_DIRECTORY ${CMA
 endif ()
 
 # build a library of package functionality (without and optionally with OpenMP support)
+list (APPEND wsjt_CXXSRCS lib/reist16/reist16.cpp)
+list (APPEND wsjt_FSRCS lib/reist16/reist16.f90)
 add_library (wsjt_cxx STATIC ${wsjt_CSRCS} ${wsjt_CXXSRCS})
-target_link_libraries (wsjt_cxx ${LIBM_LIBRARIES} Boost::log_setup ${LIBM_LIBRARIES})
+target_include_directories (wsjt_cxx PRIVATE ${FFTW3_INCLUDE_DIRS})
+target_link_libraries (wsjt_cxx ${LIBM_LIBRARIES} Boost::log_setup ${LIBM_LIBRARIES} ${FFTW3_LIBRARIES})
+
+add_executable (reist16_checks EXCLUDE_FROM_ALL tests/reist16/reist16_checks.cpp)
+target_link_libraries (reist16_checks wsjt_cxx)
+add_executable (wsjtx_pluto_bridge PlutoBridge/main.cpp PlutoBridge/Bridge.cpp PlutoBridge/Iio.cpp)
+set_target_properties (wsjtx_pluto_bridge PROPERTIES AUTOMOC ON)
+target_link_libraries (wsjtx_pluto_bridge Qt5::Core Qt5::WebSockets)
+add_executable (pluto_bridge_checks EXCLUDE_FROM_ALL tests/pluto/pluto_bridge_checks.cpp PlutoBridge/Bridge.cpp PlutoBridge/Iio.cpp)
+set_target_properties (pluto_bridge_checks PROPERTIES AUTOMOC ON)
+target_link_libraries (pluto_bridge_checks wsjt_qt wsjt_fort wsjt_cxx Qt5::WebSockets)
+if (WIN32)
+  add_library (pluto_fake_iio SHARED EXCLUDE_FROM_ALL tests/pluto/fake_iio.cpp)
+  add_dependencies (pluto_bridge_checks pluto_fake_iio)
+endif ()
 
 # build an OpenMP variant of the Fortran library routines
 add_library (wsjt_fort STATIC ${wsjt_FSRCS})
 target_link_libraries (wsjt_fort  ${FFTW3_LIBRARIES})
+add_executable (reist16_wave_checks EXCLUDE_FROM_ALL tests/reist16/reist16_wave_checks.f90)
+target_link_libraries (reist16_wave_checks wsjt_fort wsjt_cxx)
 if (${OPENMP_FOUND} OR APPLE)
   add_library (wsjt_fort_omp STATIC ${wsjt_FSRCS})
   target_link_libraries (wsjt_fort_omp  ${FFTW3_LIBRARIES})
@@ -1647,6 +1665,10 @@ else ()
 endif ()
 add_executable (ft2_ui_checks EXCLUDE_FROM_ALL tests/ft2/ft2_ui_checks.cpp)
 target_link_libraries (ft2_ui_checks wsjt_qt)
+add_executable (reist16_audio_checks EXCLUDE_FROM_ALL tests/reist16/reist16_audio_checks.cpp
+  Modulator/Modulator.cpp Audio/soundout.cpp Decoder/decodedtext.cpp)
+set_target_properties (reist16_audio_checks PROPERTIES AUTOMOC ON)
+target_link_libraries (reist16_audio_checks wsjt_fort wsjt_cxx wsjt_qt Qt5::Multimedia)
 add_executable (ft8_wave_checks EXCLUDE_FROM_ALL tests/ft8/ft8_wave_checks.f90)
 add_executable (ft8_native_checks EXCLUDE_FROM_ALL tests/ft8/native_wave_checks.cpp
   tests/ft8/native_ldpc_checks.cpp tests/ft2/native_ft4_checks.cpp lib/ft8/gen_ft8wave.f90

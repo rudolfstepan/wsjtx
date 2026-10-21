@@ -48,11 +48,25 @@ The [fork change history](docs/CHANGES.md) records the custom additions and
 their implementation commits. The [FT2 documentation](docs/FT2.md) covers
 operation, implementation, sources, and the verified build baseline.
 
+## REIST16: new experimental mode
+
+The current source and upcoming CI artifacts add **REIST16**, a separate
+CQ/QSO protocol with fixed 15-second UTC slots, 16-FSK, K7 coding,
+standard messages and Auto Seq. A user-operated Yaesu/Pluto test confirms
+decoding in both directions. This does not establish FT8-equivalent sensitivity.
+The stable release linked above predates REIST16; use a successful CI build
+of this source or build locally. See [REIST16](docs/REIST16.md),
+[the profile contract](docs/REIST16.txt) and [Pluto setup](docs/PLUTO-WSJTX.txt).
+
+![Yaesu OE3SRO / Pluto OE3SRO/P REIST16 exchange](docs/images/REIST16_QSO.png)
+
 ## New features by OE3SRO
 
 | Feature | Benefit |
 | --- | --- |
 | **FT8 / FT4 / FT2 native kernels and TX diagnostics** | C++ waveforms, shared LDPC encoder, FT8 BP kernels and parallel FT4/FT2 synchronization; audio/start/ALC readings under View → TX quality — FT8 / FT4 / FT2. [FT8](docs/FT8.md), [FT4/FT2](docs/FT2.md). |
+| **REIST16 (experimental)** | New 15-second CQ/QSO mode, native TX/RX and Auto Seq; Yaesu/Pluto exchange documented. [Details](docs/REIST16.md). |
+| **PlutoSDR radio bridge** | Separate WSJT-X instance with TCI frequency control, PTT and USB audio conversion. [Setup](docs/PLUTO-WSJTX.txt). |
 | **FT2 (experimental)** | 3.75-second periods with transmit, decode, Auto Seq, waterfall, and PSK calling tools; adapted from WSJT-X Improved by DG2YCB. |
 | **PSK Reporter: Who hears me?** | Show receivers of your signal directly in WSJT-X, including callsign, grid locator, SNR, reception time, and mode. |
 | **Personal DX windows** | Collect local reception history by DXCC country, band, UTC hour and month, ranked by distinct reception days; separate callsigns, modes and station/antenna setups. |
@@ -79,8 +93,8 @@ no custom FT2 entries.
 
 The integration adapts [WSJT-X Improved / WS Suite](https://wsjt-x-improved.sourceforge.io/)
 by **Uwe Risse, DG2YCB** (GPLv3). FT2 remains experimental. Transmit/receive
-WAV round trips and two official FT2 recordings passed; live RF operation
-has not been tested. See [FT2 documentation and sources](docs/FT2.md).
+WAV round trips and two official FT2 recordings passed; a user screenshot
+also documents an FT2 on-air QSO on 16 October 2026. See [FT2 documentation and sources](docs/FT2.md).
 
 ## Using the features
 
@@ -172,11 +186,16 @@ Run these commands from the repository directory:
 .\tools\Test-TxQuality.ps1
 .\tools\Test-PskReporter.ps1
 .\tools\Test-Ft2.ps1
+.\tools\Test-Reist16.ps1
 .\tools\Package-Custom.ps1
 ```
 
 The release build is placed in `build-custom`; the package with runtime
-libraries, decoders, and station data is placed in `dist-custom\OE3SRO-psk-backoff`.
+libraries, decoders, and station data is placed in `dist-custom\OE3SRO-reist16-pluto`.
+The additional **REIST16** mode uses 15-second UTC slots for short CQ/QSO messages.
+See [REIST16.txt](docs/REIST16.txt) for operation, the wire profile and test limits.
+**start-pluto.bat** launches a second instance using PlutoSDR through the local
+CAT/USB-audio bridge: [Pluto setup](docs/PLUTO-WSJTX.txt).
 The scripts build WSJT-X and its supporting utilities. MAP65 and the
 additional simulators are not built for this package.
 

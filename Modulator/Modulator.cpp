@@ -78,6 +78,7 @@ void Modulator::start (QString mode, unsigned symbolsLength, double framesPerSym
   if(mode=="Q65" and m_nsps<=3600) delay_ms=500;              //Q65-15 and Q65-30
   if(mode=="FT2") delay_ms=150;                               //FT2
   if(mode=="FT4") delay_ms=300;                               //FT4
+  if(mode=="REIST16") delay_ms=500;
 
 // noise generator parameters
   if (m_addNoise) {
@@ -89,7 +90,8 @@ void Modulator::start (QString mode, unsigned symbolsLength, double framesPerSym
   m_silentFrames = 0;
   m_ic=0;
   bool const privateWave = (mode == "FT8" && toneSpacing == -3.0)
-    || ((mode == "FT4" || mode == "FT2") && toneSpacing == -2.0);
+    || ((mode == "FT4" || mode == "FT2") && toneSpacing == -2.0)
+    || (mode == "REIST16" && toneSpacing == -4.0);
   if (!privateWave) m_waveform.clear ();
   if (!m_tuning && !m_bFastMode)
     {
@@ -107,7 +109,12 @@ void Modulator::start (QString mode, unsigned symbolsLength, double framesPerSym
         }
     }
   if(mode=="Echo") m_ic=0;
-  if (!m_tuning) Q_EMIT startTiming (mode, int (1000 * qint64 (m_ic) / m_frameRate));
+  // REIST16 needs its complete training header; never clip a late frame.
+  // MainWindow admits new transmissions only at the start of the UTC slot.
+  if(mode=="REIST16") m_ic=0;
+  if (!m_tuning) Q_EMIT startTiming (mode, mode=="REIST16"
+    ? int(mstr > delay_ms ? mstr-delay_ms : 0)
+    : int (1000 * qint64 (m_ic) / m_frameRate));
 
   initialize (QIODevice::ReadOnly, channel);
   Q_EMIT stateChanged ((m_state = (synchronize && m_silentFrames) ?

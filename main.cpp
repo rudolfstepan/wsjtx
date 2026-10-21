@@ -50,6 +50,7 @@
 #include "lib/init_random_seed.h"
 #include "Radio.hpp"
 #include "models/FrequencyList.hpp"
+#include "PlutoBridge/Profile.hpp"
 #include "widgets/SplashScreen.hpp"
 #include "widgets/MessageBox.hpp"       // last to avoid nasty MS macro definitions
 
@@ -110,6 +111,10 @@ int main(int argc, char *argv[])
   // make the Qt type magic happen
   Radio::register_types ();
   register_types ();
+  // QSettings decodes every custom QVariant while reading an INI. Register
+  // ALL production types before the headless profile path reads and syncs it.
+  for(int i=1;i<argc;++i)
+    if(std::string(argv[i])=="--prepare-pluto-profile") return pluto::prepareProfileCommand(argc,argv);
 
   // Multiple instances communicate with jt9 via this
   QSharedMemory mem_jt9;

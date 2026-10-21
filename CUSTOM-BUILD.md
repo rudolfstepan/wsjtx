@@ -1,4 +1,11 @@
-# Eigene WSJT-X-Version mit PSK Reporter
+# Eigene WSJT-X-Version mit PSK Reporter und experimentellem REIST16
+
+REIST16 ergänzt den aktuellen Quellstand um einen eigenen15-s-CQ-/QSO-Modus.
+[Bedienung und Hardwareversuch](docs/REIST16.md), [Profilvertrag](docs/REIST16.txt)
+und [Pluto-Bridge](docs/PLUTO-WSJTX.txt). Die Yaesu-/Pluto-Dekodierung wurde
+vom Benutzer dokumentiert; eine Empfangsschwelle ist noch nicht vermessen.
+Die lokale Pluto-Laufzeit lässt sich mit `tools/Setup-PlutoBridge.ps1 -Download`
+aus dem per SHA256 geprüften offiziellen libiio0.26-Archiv vorbereiten.
 
 ## Abfragebegrenzung und HTTP 429
 
@@ -157,7 +164,7 @@ denselben Launcher und dasselbe Custom-Profil wie der PowerShell-Aufruf:
 .\Start-Custom.ps1
 ```
 
-Das Startskript verwendet `dist-custom\OE3SRO-psk-backoff\bin\wsjtx.exe --rig-name Custom`.
+Das Startskript verwendet `dist-custom\OE3SRO-reist16-pluto\bin\wsjtx.exe --rig-name Custom`.
 Eine noch laufende frühere Custom-Version vor dem Neustart normal beenden.
 Die Versionsanzeige, der Fenstertitel und das About-Fenster enthalten
 **build by OE3SRO**.

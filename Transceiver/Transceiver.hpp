@@ -7,6 +7,7 @@
 #include <boost/log/sources/severity_channel_logger.hpp>
 
 #include <QObject>
+#include <QVector>
 
 #include "qt_helpers.hpp"
 #include "Radio.hpp"
@@ -230,6 +231,7 @@ public:
   // Connect and disconnect.
   Q_SLOT virtual void start (unsigned sequence_number) noexcept = 0;
   Q_SLOT virtual void stop () noexcept = 0;
+  Q_SLOT virtual void setWaveform (QVector<float> const&) {}
 
   //
   // asynchronous status updates
@@ -253,6 +255,7 @@ public:
                         unsigned sequence_number) const;
   // something went wrong - not recoverable, start new instance
   Q_SIGNAL void failure (QString const& reason) const;
+  Q_SIGNAL void transmitAbort (QString const& reason) const;
 
   // Ready to be destroyed.
   Q_SIGNAL void finished () const;

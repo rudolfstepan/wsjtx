@@ -706,6 +706,7 @@ private:
   Q_SIGNAL void set_transceiver (Transceiver::TransceiverState const&,
                                  unsigned sequence_number) const;
   Q_SIGNAL void stop_transceiver () const;
+  Q_SIGNAL void set_transceiver_waveform (QVector<float> const&) const;
 
   Configuration * const self_;	// back pointer to public interface
 
@@ -1288,6 +1289,11 @@ void Configuration::transceiver_modulator_start(QString jtmode, unsigned symbols
 #endif
 
   m_->transceiver_modulator_start(jtmode, symbolslength,framespersymbol,trfrequency,tonespacing,synchronize,fastmode,dbsnr,trperiod);
+}
+
+void Configuration::transceiver_waveform (QVector<float> const& wave)
+{
+  Q_EMIT m_->set_transceiver_waveform(wave);
 }
 
 void Configuration::transceiver_modulator_stop (bool on)
@@ -2595,7 +2601,7 @@ void Configuration::impl::read_settings ()
   specOp_in_comments_ = settings_->value("specOptoComments", false).toBool ();
   rig_params_.rig_name = settings_->value ("Rig", TransceiverFactory::basic_transceiver_name_).toString ();
   rig_is_dummy_ = TransceiverFactory::basic_transceiver_name_ == rig_params_.rig_name;
-  is_tci_ = rig_params_.rig_name.startsWith("TCI Cli");
+  is_tci_ = (rig_params_.rig_name.startsWith("TCI Cli") || rig_params_.rig_name=="PlutoSDR (TCI bridge)");
   rig_params_.tci_port = settings_->value ("CATTCIPort","").toString ();
   rig_params_.network_port = settings_->value ("CATNetworkPort").toString ();
   rig_params_.usb_port = settings_->value ("CATUSBPort").toString ();
@@ -2999,7 +3005,7 @@ void Configuration::impl::set_rig_invariants ()
   auto asynchronous_CAT = transceiver_factory_.has_asynchronous_CAT (rig);
   auto is_hw_handshake = ui_->CAT_handshake_group_box->isEnabled ()
     && TransceiverFactory::handshake_hardware == static_cast<TransceiverFactory::Handshake> (ui_->CAT_handshake_button_group->checkedId ());
-  is_tci_ = ui_->rig_combo_box->currentText().startsWith("TCI Cli");
+  is_tci_ = (ui_->rig_combo_box->currentText().startsWith("TCI Cli") || ui_->rig_combo_box->currentText()=="PlutoSDR (TCI bridge)");
   ui_->tci_audio_check_box->setVisible(is_tci_);
   ui_->TCI_spin_box->setVisible(is_tci_);
 //  ui_->refresh_push_button->setVisible(is_tci_);
@@ -3336,7 +3342,7 @@ void Configuration::impl::accept ()
   rig_params_ = temp_rig_params; // now we can go live with the rig
                                  // related configuration parameters
   rig_is_dummy_ = TransceiverFactory::basic_transceiver_name_ == rig_params_.rig_name;
-  is_tci_ = rig_params_.rig_name.startsWith("TCI Cli");
+  is_tci_ = (rig_params_.rig_name.startsWith("TCI Cli") || rig_params_.rig_name=="PlutoSDR (TCI bridge)");
   // Check to see whether SoundInThread must be restarted,
   // and save user parameters.
   {
@@ -5067,6 +5073,8 @@ bool Configuration::impl::open_rig (bool force)
           // these connections cross the thread boundary
           rig_connections_ << connect (this, &Configuration::impl::set_transceiver,
                                        rig.get (), &Transceiver::set);
+          rig_connections_ << connect (this, &Configuration::impl::set_transceiver_waveform,
+                                       rig.get (), &Transceiver::setWaveform);
 
           // hook up Transceiver signals to Configuration signals
           //
@@ -5078,6 +5086,7 @@ bool Configuration::impl::open_rig (bool force)
           rig_connections_ << connect (rig.get (), &Transceiver::tci_mod_active, this, &Configuration::impl::handle_transceiver_tci_mod_active);
           rig_connections_ << connect (rig.get (), &Transceiver::update, this, &Configuration::impl::handle_transceiver_update);
           rig_connections_ << connect (rig.get (), &Transceiver::failure, this, &Configuration::impl::handle_transceiver_failure);
+          rig_connections_ << connect (rig.get (), &Transceiver::transmitAbort, self_, &Configuration::transceiver_transmit_abort);
 
           // setup thread safe startup and close down semantics
           rig_connections_ << connect (this, &Configuration::impl::start_transceiver, rig.get (), &Transceiver::start);

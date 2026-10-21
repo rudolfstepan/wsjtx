@@ -52,6 +52,7 @@ public:
     FST4W,
     Q65,
     FT2,                        // appended to preserve persisted mode values
+    REIST16,
     MODES_END_SENTINAL_AND_COUNT // this must be last
   };
   Q_ENUM (Mode)

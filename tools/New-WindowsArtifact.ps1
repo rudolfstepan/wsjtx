@@ -1,9 +1,10 @@
 param(
-    [Parameter(Mandatory)][ValidatePattern('^[0-9A-Za-z][0-9A-Za-z._-]+$')][string]$Version
+    [Parameter(Mandatory)][ValidatePattern('^[0-9A-Za-z][0-9A-Za-z._-]+$')][string]$Version,
+    [string]$Package = ''
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
-$package = Join-Path $root 'dist-custom\OE3SRO-psk-backoff'
+$package = if ($Package) { $Package } else { Join-Path $root 'dist-custom\OE3SRO-reist16-pluto' }
 $output = Join-Path $root '.local\windows-artifacts'
 $exe = Join-Path $package 'bin\wsjtx.exe'
 if (!(Test-Path -LiteralPath $exe)) { throw 'Run Package-Custom.ps1 first.' }
@@ -37,6 +38,9 @@ $manifest = [ordered]@{
     branding = 'build by OE3SRO'
     platform = 'windows-x64'
     commit = $commit
+    sourceDirty = [bool](& git -C $root status --porcelain --untracked-files=normal)
+    experimentalMode = 'REIST16-QSO/1'
+    plutoBridge = (Test-Path -LiteralPath (Join-Path $package 'bin\pluto\libiio.dll'))
     run = $env:GITHUB_RUN_ID
     exe = 'bin/wsjtx.exe'
     exeSha256 = (Get-FileHash -LiteralPath $exe).Hash.ToLowerInvariant()
@@ -44,10 +48,13 @@ $manifest = [ordered]@{
 [IO.File]::WriteAllText((Join-Path $package 'build-info.json'), ($manifest | ConvertTo-Json), $utf8)
 $docs = Join-Path $package 'docs'
 New-Item -ItemType Directory -Force -Path $docs | Out-Null
+Copy-Item -LiteralPath "$root\docs\REIST16.txt" -Destination $docs -Force
+Copy-Item -LiteralPath "$root\docs\PLUTO-WSJTX.txt" -Destination $docs -Force
 Copy-Item -LiteralPath "$root\docs\WINDOWS-QUICKSTART.html" -Destination "$docs\index.html" -Force
 New-Item -ItemType Directory -Force -Path "$docs\images" | Out-Null
 Copy-Item -LiteralPath "$root\docs\images\ft2-qso-oe3sro-og5o-2026-10-16.png" -Destination "$docs\images" -Force
-foreach ($document in @('FT2.md', 'FT8.md', 'CHANGES.md')) {
+Copy-Item -LiteralPath "$root\docs\images\REIST16_QSO.png" -Destination "$docs\images" -Force
+foreach ($document in @('FT2.md', 'FT8.md', 'REIST16.md', 'CHANGES.md')) {
     $content = [IO.File]::ReadAllText("$root\docs\$document")
     # Repository source links should also work from an extracted binary package.
     $content = [regex]::Replace($content, '\]\(\.\./([^)]+)\)', [Text.RegularExpressions.MatchEvaluator]{ param($match)

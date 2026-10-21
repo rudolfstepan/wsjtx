@@ -734,6 +734,7 @@ void DisplayText::displayTransmittedText(QString text, QString modeTx, qint32 tx
                                          bool bFastMode, double TRperiod,bool bSuperfox)
 {
     QString t1=" @  ";
+    if(modeTx=="REIST16") t1=" %  ";
     if(modeTx=="FT2") t1=" *  ";
     if(modeTx=="FT4") t1=" +  ";
     if(modeTx.contains("FT8")) t1=" ~  ";

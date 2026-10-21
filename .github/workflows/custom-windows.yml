@@ -93,6 +93,15 @@ jobs:
       - name: Verify FT2 and FT4 codecs and SMP limits
         run: ./tools/Test-Ft2.ps1
 
+      - name: Verify experimental REIST16 modem, QSO and production audio
+        run: ./tools/Test-Reist16.ps1
+
+      - name: Verify Pluto bridge without RF hardware
+        run: ./tools/Test-PlutoBridge.ps1
+
+      - name: Prepare pinned Pluto runtime
+        run: ./tools/Setup-PlutoBridge.ps1 -Download
+
       - name: Package EXE, DLLs, and station data
         run: ./tools/Package-Custom.ps1
 

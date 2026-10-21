@@ -1,0 +1,181 @@
+PlutoSDR als Funkgerät für die zweite WSJT-X-Instanz
+build by OE3SRO — 21. Oktober 2026
+
+Start im Repository
+------------------
+start.bat startet die bisherige Custom-/Yaesu-Instanz.
+start-pluto.bat startet die lokale Pluto-Bridge und eine eigene WSJT-X-
+Instanz mit --rig-name Pluto. Beide Instanzen können gleichzeitig laufen.
+Die Bridge überträgt Frequenzsteuerung, PTT und Audio gemeinsam über die
+eingebaute TCI-Schnittstelle. Virtuelle Audiokabel werden nicht benötigt.
+
+Das neue Profil heißt WSJT-X - Pluto. Beim ersten Start werden nur Rufzeichen
+und Locator aus dem bestehenden Custom-Profil übernommen. CAT, Audio,
+Frequenz, Logbuch und UDP-Port sind getrennt. Ein vorhandenes Pluto-Profil
+wird nicht zurückgesetzt. Als Funkgerät ist PlutoSDR (TCI bridge) eingestellt,
+TCI-Audio aktiviert und CAT-PTT ausgewählt. Die Bridge hört ausschließlich
+auf 127.0.0.1:40002; UDP-Statusmeldungen der Pluto-Instanz verwenden Port 2238.
+Der Yaesu-Instanz bleibt ihr bisheriges Profil mit eigenem Stationsbetrieb.
+
+Der voreingestellte Pluto-Zugang ist ip:192.168.2.1. Für eine andere Adresse:
+
+  .\Start-Pluto.ps1 -Uri 'ip:192.168.3.1'
+
+Auch ein vollständiger libiio-USB-URI kann mit -Uri übergeben werden.
+Die Anfangs-Dialfrequenz ist 432500000 Hz. Sie ist ein Startwert, keine
+aus einem Bandplan abgeleitete Betriebsfrequenz. Vor einem Funkversuch
+beide Stationen auf die tatsächlich vereinbarte Frequenz einstellen.
+Die Frequenz kann im WSJT-X-Hauptfenster geändert werden; die Bridge liest
+die Pluto-LOs zur Bestätigung zurück. Während einer Aussendung wird ein
+Frequenzwechsel abgelehnt und die Aussendung beendet.
+
+Standardmäßig sind 30 dB manuelle RX-Verstärkung und -40 dB TX-Hardwaregain
+eingestellt. Diese Werte sind keine kalibrierte Ausgangsleistungsangabe.
+Andere Werte werden beim Start ausdrücklich angegeben, beispielsweise:
+
+  .\Start-Pluto.ps1 -RxGain 25 -TxGain -50 -FrequencyHz 432500000
+
+Die WSJT-X-Ausgangsdämpfung wirkt zusätzlich auf die digitalen Audiosamples.
+Die Bridge erzeugt USB mit 48 kHz Audio und 3,072 MS/s komplexen I/Q-Samples.
+RX und TX benutzen die normalen getrennten Pluto-RF-Anschlüsse.
+Der Empfang arbeitet weiter mit 10-ms-IIO-Blöcken. Beim Senden werden vier
+aufeinanderfolgende Audioblöcke verlustfrei zu einem 40-ms-I/Q-Block gebündelt;
+vier Kernelpuffer bieten nominell 160 ms Pufferplatz. Dadurch sinkt die Zahl
+der Netzwerk-/IIO-Übergaben. Kurze Verzögerungen des Hosts sollen nicht mehr
+zu Lücken und einer Verlängerung des gesendeten Symbolrasters führen. Ein
+stummer 40-ms-Block wird vor dem Einschalten des TX-LOs übertragen. Das
+erhöht die feste Sendelatenz; es ändert weder Symbolzahl noch Symbolabstand.
+Halt Tx verwirft auch einen noch nicht vollständig gefüllten Sendeblock.
+Eine unvollständige IIO-Übertragung gilt als Fehler und beendet die Bridge.
+Als unterste REIST16-Audiofrequenz sind 1500 Hz voreingestellt. Für diese
+USB-Anbindung werden Tonfrequenzen ab 300 Hz empfohlen. Der Hilbert-Filter
+hat in der Nähe von 0 Hz eine Übergangszone. Die Tonmitten müssen innerhalb
+des brauchbaren Audiokanals liegen; beim REIST16-Signal reicht der Kamm
+375 Hz über die eingestellte unterste Frequenz hinaus.
+
+Die zweite WSJT-X-Instanz verwendet denselben REIST16-Encoder/Decoder wie
+die Yaesu-Instanz. Ein zusätzlicher WTX1- oder QSO-Flow-Adapter ist für diese
+Verbindung nicht erforderlich. Die frühere Adapter-Anforderung bezog sich
+auf einen eigenständigen SDR-suite-Flow als Codec-Gegenstelle.
+
+Die neue Pluto-Instanz startet im Modus REIST16. Ihr erstes TX-Zeitfenster
+liegt bei :00/:30, die Gegenstelle muss :15/:45 wählen. Enable Tx bleibt
+beim Start aus. Für einen vollständigen QSO-Ablauf benötigen die Stationen
+unterscheidbare, für den jeweiligen Versuch passende Rufzeichen; beim ersten
+Start kann durch die Übernahme derselbe Rufzeichenwert in beiden Fenstern
+stehen. Das gewünschte Stationsrufzeichen unter Settings selbst einstellen.
+
+Für den eingerichteten Yaesu-/Pluto-Versuch gilt:
+  links / Custom / Yaesu: My Call OE3SRO,   DX Call OE3SRO/P
+  rechts / Pluto:        My Call OE3SRO/P, DX Call OE3SRO
+In einer adressierten Nachricht steht zuerst der Empfänger, danach der
+Absender: Pluto sendet beispielsweise "OE3SRO OE3SRO/P -10", Yaesu sendet
+"OE3SRO/P OE3SRO -10". Der /P-Zusatz gehört zur vollständigen Identität.
+REIST16 verwendet sie auch beim Ersetzen einer gespeicherten Gegenstelle.
+
+Andere Programme mit Zugriff auf denselben Pluto vorher normal schließen.
+Ein gestarteter Bridge-Prozess reserviert den URI gegenüber weiteren
+WSJT-X-Pluto-Bridges. Ein zweiter TCI-Client an derselben Bridge wird
+abgewiesen. Die Bridge ist als lokale USB-Gegenstelle ausgelegt; FM, LSB,
+ein externer Leistungsverstärker und eine Antennenumschaltung sind darin
+nicht implementiert. Die USB-Audiowandlung ist nicht an REIST16 gebunden;
+weitere digitale Betriebsarten erfordern passende Einstellungen und Tests.
+
+Beenden und Fehler
+------------------
+Halt Tx wirkt über CAT auf die Bridge und schaltet den TX-LO ab. Bei
+Client-Verlust wird PTT beendet. Bleibt ein angefordertes TX-Audiopaket
+länger als 250 ms aus, bricht der Audio-Watchdog die aktuelle Aussendung ab,
+schaltet TX aus und setzt den Empfang fort. Die Bridge bleibt erreichbar.
+WSJT-X stoppt den Modulator und automatische Aussendungen; eine Statusmeldung
+fordert zum erneuten Aktivieren von Enable Tx auf. Ein beschädigter Rahmen
+wird nicht fortgesetzt. Das Bridge-Log nennt Blocknummer und Zeit seit PTT;
+die Statusdatei enthält txAborts und lastTxWarning.
+IIO-Fehler führen weiterhin zum Prozessabbruch über den Aufräumpfad:
+TX-LO stummschalten, Puffer freigeben, RX-LO aus
+und den AD936x in ALERT versetzen. Beim Start wird er zuerst in ALERT geweckt,
+da der Treiber im Zustand sleep alle LO-Schreibzugriffe mit IIO -22 ablehnt.
+Erst nach dem Stummschalten des TX-LOs wird FDD aktiviert. Die Zustandswechsel
+werden zurückgelesen. Das IIO-Timeout beträgt 500 ms; ein bereits
+laufender IIO-Aufruf kann das Ausführen des Abschaltpfads entsprechend
+verzögern. Diese Host-Software ersetzt keine unabhängige Hardwareabschaltung.
+
+Das Schließen der Pluto-WSJT-X-Instanz beendet die Bridge geordnet. Das
+Startskript wartet auf diese Bereinigung. Laufzeitstatus und Fehlerlogs
+stehen unter %LOCALAPPDATA%\WSJT-X - Pluto\bridge. Eine bereits verwendete
+Portnummer führt vor dem Öffnen des Pluto zu einem Startfehler.
+
+Simulation und Prüfstand
+-----------------------
+  .\Start-Pluto.ps1 -Simulate
+
+Dieser Start verwendet dieselbe TCI-Verbindung und eine USB-IQ-Schleife,
+öffnet aber keinen Pluto. Ein versehentlich als Simulation gestarteter
+Versuch wird entsprechend im Bridge-Log gekennzeichnet. Bei einem bereits
+vorhandenen Profil bleiben dessen Einstellungen erhalten.
+
+  .\tools\Test-PlutoBridge.ps1
+
+Die Tests prüfen die Typen des erzeugten Profils und seine Erhaltung,
+12-/16-Bit-IIO-Ausrichtung, Filterzustände, USB-Seitenbandunterdrückung
+bei 300/1500/4000 Hz und einen kompletten REIST16-Rahmen durch Audio ->
+3,072-MHz-IQ -> Audio -> Decoder. Der TCI-REIST16-Sendepuffer wird bis zum
+letzten Sample und nach einer nachträglichen Text-/Pufferänderung geprüft.
+Der tatsächliche WSJT-X-TCI-Treiber verbindet sich mit der simulierten
+Bridge und prüft CAT-Frequenz, empfangene Audiodaten, PTT und Halt Tx.
+Eine libiio-Test-DLL prüft Start mit stummem TX-LO, Nullpuffer vor PTT,
+Pufferfreigabe und Stummschaltung nach einem provozierten TX-Schreibfehler.
+Sie prüft außerdem Samplefolge und I/Q-Zuordnung über die 40-ms-Grenzen,
+den kontinuierlichen DAC-Zeitverlauf bei simulierten 25-ms-Hostpausen,
+das Verwerfen eines Teilblocks sowie Fehler bei verkürzten IIO-Transfers.
+Die echte libiio 0.26-DLL wird zusätzlich auf ladbare ABI-Symbole geprüft,
+ohne einen Hardware-Kontext zu öffnen.
+
+Der TCI-Test umfasst auch Modusbestätigung plus START/READY in einer
+gemeinsamen Nachricht sowie einen separaten Bridge-Prozess mit CAT-Thread.
+Beim Vorbereiten älterer Pluto-Profile wird eine ungültige Dialfrequenz
+(z.B. 0 Hz) auf die Startfrequenz gesetzt und das TCI-Audio-Flag ergänzt.
+Gültige Dialfrequenzen und die übrigen Benutzereinstellungen bleiben erhalten.
+Der Profilbefehl registriert vor dem Lesen alle WSJT-X-QVariant-Typen, damit
+CAT-Enums, Frequenzlisten und andere gespeicherte Werte beim Schreiben
+erhalten bleiben. Bereits ungültige Werte aus älteren Builds werden vor der
+Reparatur in einer INI-Kopie mit Endung .before-invalid-repair gesichert und
+anschließend durch die normalen WSJT-X-Standardwerte ersetzt.
+Der Starter schreibt zusätzlich eigene wsjtx-stdout/stderr-Protokolle in
+den Bridge-Logordner und meldet einen fehlerhaften Prozess-Exit ausdrücklich.
+
+Das sind Software- und Schnittstellennachweise. Bei zwei vom Benutzer am
+21.10.2026 ausgelösten Pluto-CQs wurden Yaesu-Audiopuffer nur lesend erfasst.
+Die Originalaufnahmen dekodierten nicht; nach einer zeitlichen Verkürzung
+um ungefähr ein Prozent dekodierten beide zu CQ OE3SRO/P JN88. Die erste
+Aufnahme zeigt gegenüber der exakt erzeugten Symbolfolge gegen Ende etwa
+80 bis 100 ms Verzögerung und kurze Amplitudeneinbrüche. Die gemessenen
+PCM-Spitzen lagen unter 1300 von 32767, ohne geclippte Samples. Das belegt
+eine zeitliche Verzerrung im bisherigen Übertragungsweg; der genaue Anteil
+von Host, Transport und Hardware ist damit noch nicht getrennt gemessen.
+Der anschließende Benutzer-Screenshot docs/images/REIST16_QSO.png belegt
+beidseitige REIST16-Dekodierung im aktualisierten Aufbau und Auto Seq bis
+RR73, danach73-TX vom Pluto. Eine neue quantitative Messung des verbleibenden
+Zeitfehlers oder der Empfangsschwelle liegt nicht vor. Der Benutzer meldet
+TxGain-89dB als funktionierend; dieser Aufbauwert ist keine allgemeine
+Leistungs- oder Empfindlichkeitsangabe. Details und Nachrichtenfolge: REIST16.md.
+
+Build und Laufzeit
+-----------------
+tools/Setup-PlutoBridge.ps1 kopiert die vorhandene libiio 0.26-Laufzeit samt
+Lizenzen aus SDR-suite nach .tools/pluto/runtime. Ein anderer vorhandener
+Laufzeitordner kann mit -RuntimeSource angegeben werden. Mit -Download lädt
+das Skript stattdessen das offizielle Windows-Archiv von Analog Devices,
+prüft dessen festgelegte SHA256 und übernimmt die x64-DLLs mit Lizenztexten.
+Die GitHub-CI verwendet diesen Weg ohne lokale SDR-suite-Installation.
+Build-Custom.ps1
+baut wsjtx_pluto_bridge.exe; Package-Custom.ps1 legt sie zusammen mit den
+Pluto-DLLs im Paket ab. libiio 1.x ist mit dieser Puffer-API inkompatibel.
+Die Windows-DLLs liegen getrennt in bin/pluto, damit ihre Abhängigkeiten
+nicht mit den Hamlib-Bibliotheken der Yaesu-Instanz vermischt werden.
+
+Öffentliche Schnittstellenreferenzen:
+TCI: https://github.com/ExpertSDR3/TCI
+libiio 0.26: https://github.com/analogdevicesinc/libiio/tree/v0.26
+AD9361-Beispiel der 0.x-API:
+https://analogdevicesinc.github.io/libiio/v0.24/libiio/ad9361-iiostream_8c-example.html

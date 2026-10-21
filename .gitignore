@@ -41,3 +41,9 @@ CLAUDE.md
 /.github/copilot-instructions.md
 /tests/ft8/research/
 /tools/Test-DecoderResearch.ps1
+
+# Local decoder output and temporary screenshots.
+/decoded.txt
+/jt9_wisdom.dat
+/timer.out
+/test/
