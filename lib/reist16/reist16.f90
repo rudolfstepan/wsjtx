@@ -6,14 +6,14 @@ subroutine gen_reist16(message,msgsent,frequency,sequence,wave,ok)
   character(len=37), intent(out) :: msgsent
   real(c_float), intent(in) :: frequency
   integer(c_int), intent(in) :: sequence
-  real(c_float), intent(out) :: wave(460800)
+  real(c_float), intent(out) :: wave(614400)
   integer(c_int), intent(out) :: ok
   character(len=77) :: packed
   integer(c_int8_t) :: bits(77)
   integer :: i3,n3,i,n
   logical :: valid
   interface
-    function encode(bits,seq,freq,out,capacity) bind(C,name='reist16_encode') result(n)
+    function encode(bits,seq,freq,out,capacity) bind(C,name='reist16_qso2_encode') result(n)
       import
       integer(c_int8_t), intent(in) :: bits(77)
       integer(c_int), value :: seq,capacity
@@ -35,8 +35,8 @@ subroutine gen_reist16(message,msgsent,frequency,sequence,wave,ok)
   do i=1,77
     bits(i)=iachar(packed(i:i))-iachar('0')
   enddo
-  n=encode(bits,sequence,frequency,wave,460800)
-  if(n.eq.460800) ok=1
+  n=encode(bits,sequence,frequency,wave,614400)
+  if(n.eq.614400) ok=1
 end subroutine
 
 subroutine decode_reist16(id2,npts,nutc,nfa,nfb,depth,ios13,decoded)

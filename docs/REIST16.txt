@@ -1,3 +1,20 @@
+REIST16-QSO/2 — aktueller Stand vom 22. Oktober 2026
+build by OE3SRO
+
+Dieser Build sendet QSO/2: 77 Informationsbits, CRC14 + LDPC(174,91),
+16-GFSK, 200 ms/Symbol, 5 Hz Tonabstand, 64 Symbole / 12,8 s in 15-s-Slots.
+Nomineller Start +0,500 s, letzter erlaubter Start +1,000 s.
+TX-Fenster bis +14,200 s, RX-Aufnahme bis +13,824 s.
+Äußere Tonmitten: 75 Hz; keine gemessene belegte Bandbreite.
+Das neue Format benötigt auf beiden Seiten die aktualisierte Anwendung.
+QSO/1 bleibt im neuen Empfänger unterstützt. FT8 ist ein separates Format.
+Der vollständige neue Profilvertrag und die Messbedingungen stehen in
+docs/REIST16-QSO2.md bzw. REIST16-QSO2.md im Paket.
+
+Das folgende Dokument bleibt als historischer QSO/1-Profilvertrag erhalten.
+Sein Hardwarebild und seine Messwerte gelten für QSO/1.
+======================================================================
+
 REIST16 — experimenteller CQ-/QSO-Modus
 build by OE3SRO
 Stand: 21. Oktober 2026

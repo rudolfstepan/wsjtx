@@ -7,13 +7,15 @@ try {
     $env:PATH = "$mingw\bin;$env:PATH"
     $build = Join-Path $root 'build-custom'
     if (!$SkipBuild) {
-        & "$mingw\bin\cmake.exe" --build $build --target reist16_checks reist16_wave_checks reist16_audio_checks jt9 --parallel 6
+        & "$mingw\bin\cmake.exe" --build $build --target reist16_qso2_checks reist16_checks reist16_wave_checks reist16_audio_checks jt9 --parallel 6
         if ($LASTEXITCODE) { throw 'REIST16 test build failed.' }
     }
     $work = Join-Path $root '.local\reist16-checks'
     New-Item -ItemType Directory -Force -Path $work | Out-Null
     Push-Location $work
     try {
+        & "$build\reist16_qso2_checks.exe" --unit
+        if ($LASTEXITCODE) { throw 'QSO/2 contract tests failed.' }
         & "$build\reist16_checks.exe"
         if ($LASTEXITCODE) { throw 'REIST16 native tests failed.' }
         & "$build\reist16_wave_checks.exe"

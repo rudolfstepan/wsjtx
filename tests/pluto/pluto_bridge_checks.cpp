@@ -2,7 +2,7 @@
 #include "PlutoBridge/Profile.hpp"
 #include "PlutoBridge/Iio.hpp"
 #include "Transceiver/TCITransceiver.hpp"
-#include "lib/reist16/reist16.hpp"
+#include "lib/reist16/qso2.hpp"
 #include "Logger.hpp"
 #include "qt_helpers.hpp"
 #include "widgets/itoneAndicw.h"
@@ -55,10 +55,10 @@ struct PlutoTciChecks {
  }
  static void pcm(TCITransceiver& rig,QVector<float> wave) {
    rig.setWaveform(wave);
-   rig.do_modulator_start("REIST16",120,960.,1500.,-4.,false,false,99.,15.);
+   rig.do_modulator_start("REIST16",64,2400.,1500.,-4.,false,false,99.,15.);
    rig.setWaveform(QVector<float>(wave.size(),-.9f));
    std::vector<float> packet(960);
-   for(int block=0;block<960;++block) {
+   for(int block=0;block<int(wave.size()/480);++block) {
      check(rig.readAudioData(packet.data(),int(packet.size()),0)==packet.size(),"TCI complete audio packet");
      for(int n=0;n<480;++n) {
        check(packet[2*n]==wave[block*480+n] && packet[2*n+1]==packet[2*n],"immutable TCI waveform / exact sample");
@@ -143,6 +143,11 @@ int main(int argc,char**argv) {
    auto txSample=reinterpret_cast<int(*)(unsigned)>(fake.resolve("fake_iio_tx_sample"));
    check(txSample!=nullptr,"fake IIO transmitted sample accessor");
    check(status->ensm==0,"regression starts with Pluto asleep");
+   QString missingContext;
+   try {pluto::IioRadio radio(fakePath,"missing:",432500000,30,-40);}
+   catch(std::exception const& e) {missingContext=QString::fromUtf8(e.what());}
+   check(missingContext.contains("IIO context") && missingContext.contains("missing:") && status->contexts==0 && status->buffers==0,
+         "missing Pluto context reports requested URI before any RF configuration");
    {
      pluto::IioRadio radio(fakePath,"fake:",432500000,30,-40);
      check(status->ensm==2 && status->txPowerdown==1 && status->contexts==1 && status->buffers==1,"RX startup wakes sleeping Pluto and keeps TX LO muted");
@@ -205,7 +210,8 @@ int main(int argc,char**argv) {
    auto started=std::chrono::steady_clock::now();
    reist16::Bits bits{};
    for(int k=0;k<77;++k) bits[k]=(k*19+7)%3==0;
-   auto wave=reist16::waveform(bits,392,1500.375);
+   bits[74]=0;bits[75]=0;bits[76]=1;
+   auto wave=reist16::qso2::waveform(bits,1500.375);
    wave.resize(wave.size()+4800,0);
    pluto::UsbModulator tx;
    pluto::UsbDemodulator rx;
@@ -217,10 +223,10 @@ int main(int argc,char**argv) {
      for(size_t k=0;k<audio.size();k+=4) decoded.push_back(audio[k]);
    }
    decoded.resize(180000,0);
-   auto found=reist16::decode(decoded.data(),int(decoded.size()),100,4000,3);
-   check(found.size()==1 && found[0].bits==bits && found[0].sequence==392,"REIST16 through USB IQ / 3.072 MHz / audio");
+   auto found=reist16::qso2::decode(decoded.data(),int(decoded.size()),100,4000,3);
+   check(found.size()==1 && found[0].bits==bits && found[0].sequence==0,"REIST16 through USB IQ / 3.072 MHz / audio");
    check(std::abs(found[0].dt)<.02,"USB filter delay within 20 ms");
-   std::cout<<"USB IQ modem round trip: "<<std::chrono::duration<double>(std::chrono::steady_clock::now()-started).count()<<" s for 9.7 s audio\n";
+   std::cout<<"USB IQ modem round trip: "<<std::chrono::duration<double>(std::chrono::steady_clock::now()-started).count()<<" s for 12.9 s audio\n";
    // Opposite sideband rejection after filter settling.
    for(int frequency:{300,1500,4000}) for(int sign:{-1,1}) {
      pluto::UsbDemodulator usb;
@@ -246,11 +252,12 @@ int main(int argc,char**argv) {
 
    Transceiver::logger_type logger(boost::log::keywords::channel="Pluto TCI test");
    {TCITransceiver isolated(&logger,{},"0","127.0.0.1:40002",true,tci__audio);
-    PlutoTciChecks::pcm(isolated,QVector<float>(wave.data(),wave.data()+460800));}
+    PlutoTciChecks::pcm(isolated,QVector<float>(wave.data(),wave.data()+614400));}
    QTcpServer portProbe;
    check(portProbe.listen(QHostAddress::LocalHost,0),"allocate test port");
    auto port=portProbe.serverPort();portProbe.close();
-   pluto::Options options;options.simulate=true;options.port=port;
+   pluto::Options options;
+   options.hackrf=app.arguments().contains("--hackrf-simulation");options.simulate=true;options.port=port;
    pluto::Bridge bridge(options);bridge.start();
    // Allow the worker's queued ready event to bind the loopback listener.
    QElapsedTimer pause;pause.start();waitUntil([&]{return pause.elapsed()>30;});
@@ -283,8 +290,8 @@ int main(int argc,char**argv) {
    bool hardwareRx=app.arguments().contains("--pluto-hardware-rx");
    QStringList serviceArgs={"--port",QString::number(externalPort),"--ready-file",readyPath,"--stop-file",stopPath};
    if(hardwareRx) serviceArgs<<"--library"<<QDir::current().filePath(".tools/pluto/runtime/libiio.dll");
-   else serviceArgs<<"--simulate"<<"--uri"<<"thread-test:";
-   service.start(QDir(app.applicationDirPath()).filePath("wsjtx_pluto_bridge.exe"),serviceArgs);
+   else serviceArgs<<"--simulate"<<(options.hackrf?"--serial":"--uri")<<"thread-test:";
+   service.start(QDir(app.applicationDirPath()).filePath(options.hackrf?"wsjtx_hackrf_bridge.exe":"wsjtx_pluto_bridge.exe"),serviceArgs);
    check(service.waitForStarted(),"separate bridge process starts");
    waitUntil([&]{QFile f(readyPath);return f.open(QIODevice::ReadOnly) && QJsonDocument::fromJson(f.readAll()).object().value("ok").toBool();});
    QThread catThread;

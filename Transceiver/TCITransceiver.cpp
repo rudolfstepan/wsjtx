@@ -751,7 +751,9 @@ void TCITransceiver::onMessageReceived(const QString &str)
       case Cmd_TxAbort:
         if(args.size()>=2 && args.at(0)==rx_) {
           do_modulator_stop(true);
-          Q_EMIT transmitAbort(tr("Pluto TX audio timeout: transmission aborted. Receiving continues; enable Tx to retry."));
+          Q_EMIT transmitAbort(args.at(1)=="audio_not_started"
+            ? tr("SDR TX audio is not started. Enable TCI audio in Settings; receiving continues.")
+            : tr("SDR TX audio timeout: transmission aborted. Receiving continues; enable Tx to retry."));
         }
         break;
       case Cmd_Trx:
@@ -1502,7 +1504,7 @@ void TCITransceiver::do_modulator_start (QString mode, unsigned symbolsLength, d
   if(mode=="FT4") delay_ms=300;                               //FT4
   snapshotActive_=mode=="REIST16" && toneSpacing==-4.0 && !m_tuning;
   if(snapshotActive_) {
-    if(pendingWave_.size()!=460800) throw error {tr("REIST16 TCI waveform is missing")};
+    if(pendingWave_.size()!=614400 && pendingWave_.size()!=460800) throw error {tr("REIST16 TCI waveform is missing")};
     activeWave_=pendingWave_;
     delay_ms=500;
   } else activeWave_.clear();

@@ -1,6 +1,6 @@
 #ifndef WSJTX_PLUTO_IIO_HPP
 #define WSJTX_PLUTO_IIO_HPP
-#include "Dsp.hpp"
+#include "Radio.hpp"
 #include <QString>
 #include <stdexcept>
 #include <cstddef>
@@ -59,7 +59,7 @@ public:
 #undef IIO_FN
   static void check(ptrdiff_t result,char const* operation);
 };
-class IioRadio {
+class IioRadio : public Radio {
   // Keep RX latency at 10 ms. TX uses fewer network/DMA submissions and
   // enough queued samples to absorb ordinary Windows/USB scheduling jitter.
   static constexpr int txBlocks=4;

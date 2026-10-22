@@ -1,0 +1,274 @@
+{
+  "threshold_snr2500": -20.5,
+  "sweep": [
+    {
+      "snr2500": -12,
+      "exact": 6,
+      "slots": 6,
+      "level": 0
+    },
+    {
+      "snr2500": -18,
+      "exact": 6,
+      "slots": 6,
+      "level": 1
+    },
+    {
+      "snr2500": -18.5,
+      "exact": 6,
+      "slots": 6,
+      "level": 2
+    },
+    {
+      "snr2500": -19,
+      "exact": 6,
+      "slots": 6,
+      "level": 3
+    },
+    {
+      "snr2500": -19.5,
+      "exact": 6,
+      "slots": 6,
+      "level": 4
+    },
+    {
+      "snr2500": -20,
+      "exact": 6,
+      "slots": 6,
+      "level": 5
+    },
+    {
+      "snr2500": -20.5,
+      "exact": 6,
+      "slots": 6,
+      "level": 6
+    },
+    {
+      "snr2500": -21,
+      "exact": 3,
+      "slots": 6,
+      "level": 7
+    },
+    {
+      "snr2500": -21.5,
+      "exact": 3,
+      "slots": 6,
+      "level": 8
+    },
+    {
+      "snr2500": -22,
+      "exact": 1,
+      "slots": 6,
+      "level": 9
+    },
+    {
+      "snr2500": -22.5,
+      "exact": 1,
+      "slots": 6,
+      "level": 10
+    }
+  ],
+  "slots": [
+    {
+      "file": "ft8_level0_slot1_000000.wav",
+      "level": 0,
+      "slot": 1,
+      "message": "CQ OE3SRO JN88",
+      "snr2500": -12,
+      "exact": true,
+      "other_decodes": [],
+      "variant": "reference",
+      "export": "reference_slot1_000000.wav"
+    },
+    {
+      "file": "ft8_level0_slot2_000000.wav",
+      "level": 0,
+      "slot": 2,
+      "message": "OE3SRO DL1ABC JO31",
+      "snr2500": -12,
+      "exact": true,
+      "other_decodes": [],
+      "variant": "reference",
+      "export": "reference_slot2_000000.wav"
+    },
+    {
+      "file": "ft8_level0_slot3_000000.wav",
+      "level": 0,
+      "slot": 3,
+      "message": "DL1ABC OE3SRO -12",
+      "snr2500": -12,
+      "exact": true,
+      "other_decodes": [],
+      "variant": "reference",
+      "export": "reference_slot3_000000.wav"
+    },
+    {
+      "file": "ft8_level0_slot4_000000.wav",
+      "level": 0,
+      "slot": 4,
+      "message": "OE3SRO DL1ABC R-10",
+      "snr2500": -12,
+      "exact": true,
+      "other_decodes": [],
+      "variant": "reference",
+      "export": "reference_slot4_000000.wav"
+    },
+    {
+      "file": "ft8_level0_slot5_000000.wav",
+      "level": 0,
+      "slot": 5,
+      "message": "DL1ABC OE3SRO RR73",
+      "snr2500": -12,
+      "exact": true,
+      "other_decodes": [],
+      "variant": "reference",
+      "export": "reference_slot5_000000.wav"
+    },
+    {
+      "file": "ft8_level0_slot6_000000.wav",
+      "level": 0,
+      "slot": 6,
+      "message": "OE3SRO DL1ABC 73",
+      "snr2500": -12,
+      "exact": true,
+      "other_decodes": [],
+      "variant": "reference",
+      "export": "reference_slot6_000000.wav"
+    },
+    {
+      "file": "ft8_level6_slot1_000000.wav",
+      "level": 6,
+      "slot": 1,
+      "message": "CQ OE3SRO JN88",
+      "snr2500": -20.5,
+      "exact": true,
+      "other_decodes": [],
+      "variant": "threshold",
+      "export": "threshold_slot1_000000.wav"
+    },
+    {
+      "file": "ft8_level6_slot2_000000.wav",
+      "level": 6,
+      "slot": 2,
+      "message": "OE3SRO DL1ABC JO31",
+      "snr2500": -20.5,
+      "exact": true,
+      "other_decodes": [],
+      "variant": "threshold",
+      "export": "threshold_slot2_000000.wav"
+    },
+    {
+      "file": "ft8_level6_slot3_000000.wav",
+      "level": 6,
+      "slot": 3,
+      "message": "DL1ABC OE3SRO -12",
+      "snr2500": -20.5,
+      "exact": true,
+      "other_decodes": [],
+      "variant": "threshold",
+      "export": "threshold_slot3_000000.wav"
+    },
+    {
+      "file": "ft8_level6_slot4_000000.wav",
+      "level": 6,
+      "slot": 4,
+      "message": "OE3SRO DL1ABC R-10",
+      "snr2500": -20.5,
+      "exact": true,
+      "other_decodes": [],
+      "variant": "threshold",
+      "export": "threshold_slot4_000000.wav"
+    },
+    {
+      "file": "ft8_level6_slot5_000000.wav",
+      "level": 6,
+      "slot": 5,
+      "message": "DL1ABC OE3SRO RR73",
+      "snr2500": -20.5,
+      "exact": true,
+      "other_decodes": [],
+      "variant": "threshold",
+      "export": "threshold_slot5_000000.wav"
+    },
+    {
+      "file": "ft8_level6_slot6_000000.wav",
+      "level": 6,
+      "slot": 6,
+      "message": "OE3SRO DL1ABC 73",
+      "snr2500": -20.5,
+      "exact": true,
+      "other_decodes": [],
+      "variant": "threshold",
+      "export": "threshold_slot6_000000.wav"
+    },
+    {
+      "file": "ft8_level10_slot1_000000.wav",
+      "level": 10,
+      "slot": 1,
+      "message": "CQ OE3SRO JN88",
+      "snr2500": -22.5,
+      "exact": true,
+      "other_decodes": [],
+      "variant": "below",
+      "export": "below_slot1_000000.wav"
+    },
+    {
+      "file": "ft8_level10_slot2_000000.wav",
+      "level": 10,
+      "slot": 2,
+      "message": "OE3SRO DL1ABC JO31",
+      "snr2500": -22.5,
+      "exact": false,
+      "other_decodes": [],
+      "variant": "below",
+      "export": "below_slot2_000000.wav"
+    },
+    {
+      "file": "ft8_level10_slot3_000000.wav",
+      "level": 10,
+      "slot": 3,
+      "message": "DL1ABC OE3SRO -12",
+      "snr2500": -22.5,
+      "exact": false,
+      "other_decodes": [],
+      "variant": "below",
+      "export": "below_slot3_000000.wav"
+    },
+    {
+      "file": "ft8_level10_slot4_000000.wav",
+      "level": 10,
+      "slot": 4,
+      "message": "OE3SRO DL1ABC R-10",
+      "snr2500": -22.5,
+      "exact": false,
+      "other_decodes": [],
+      "variant": "below",
+      "export": "below_slot4_000000.wav"
+    },
+    {
+      "file": "ft8_level10_slot5_000000.wav",
+      "level": 10,
+      "slot": 5,
+      "message": "DL1ABC OE3SRO RR73",
+      "snr2500": -22.5,
+      "exact": false,
+      "other_decodes": [],
+      "variant": "below",
+      "export": "below_slot5_000000.wav"
+    },
+    {
+      "file": "ft8_level10_slot6_000000.wav",
+      "level": 10,
+      "slot": 6,
+      "message": "OE3SRO DL1ABC 73",
+      "snr2500": -22.5,
+      "exact": false,
+      "other_decodes": [],
+      "variant": "below",
+      "export": "below_slot6_000000.wav"
+    }
+  ],
+  "seed": 2026102301,
+  "decoder": "jt9 -8 -d 3 -L 100 -H 4000",
+  "frequency": 1500.375
+}

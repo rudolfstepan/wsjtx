@@ -40,6 +40,7 @@ TransceiverFactory::TransceiverFactory ()
   HamlibTransceiver::register_transceivers (&logger_, &transceivers_);
   TCITransceiver::register_transceivers (&logger_, &transceivers_, TCI1Id, TCI2Id);
   transceivers_["PlutoSDR (TCI bridge)"] = Capabilities {TCI1Id, Capabilities::tci, true};
+  transceivers_["HackRF One (TCI bridge)"] = Capabilities {TCI1Id, Capabilities::tci, true};
   DXLabSuiteCommanderTransceiver::register_transceivers (&logger_, &transceivers_, CommanderId);
   HRDTransceiver::register_transceivers (&logger_, &transceivers_, HRDId);
   

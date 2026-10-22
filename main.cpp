@@ -114,7 +114,10 @@ int main(int argc, char *argv[])
   // QSettings decodes every custom QVariant while reading an INI. Register
   // ALL production types before the headless profile path reads and syncs it.
   for(int i=1;i<argc;++i)
+    {
     if(std::string(argv[i])=="--prepare-pluto-profile") return pluto::prepareProfileCommand(argc,argv);
+    if(std::string(argv[i])=="--prepare-hackrf-profile") return pluto::prepareProfileCommand(argc,argv,true);
+  }
 
   // Multiple instances communicate with jt9 via this
   QSharedMemory mem_jt9;

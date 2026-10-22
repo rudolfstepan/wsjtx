@@ -1,0 +1,5 @@
+PASS production SDR settings: HackRF/Pluto profile load, TCI audio, rig switch and dialog controls; no radio opened.
+PASS HackRF: 4655 ABI, half-duplex, IQ8, priming, cleanup, profile and production CLI checks; mock only
+PASS HackRF protocol: PTT without audio rejected without exit, late audio_start cannot rekey, single client, disconnect unkeys, watchdog abort preserves RX/CAT, late audio ignored, fresh TX succeeds, graceful shutdown; no hardware opened.
+USB IQ modem round trip: 3.21002 s for 12.9 s audio
+PASS Pluto: IIO formats, USB sideband rejection, modem round trip, TCI PCM snapshot, real driver CAT/PTT/RX against simulated bridge.

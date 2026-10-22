@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "wav_reads": 104,
+  "production_exact": {
+    "clean": 6,
+    "reference": 6,
+    "threshold": 6,
+    "below": 2
+  },
+  "sequence_samples": 1080000,
+  "float32_to_pcm16_gain": 0.0035481338923357532,
+  "hardware_used": false
+}

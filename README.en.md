@@ -48,14 +48,22 @@ The [fork change history](docs/CHANGES.md) records the custom additions and
 their implementation commits. The [FT2 documentation](docs/FT2.md) covers
 operation, implementation, sources, and the verified build baseline.
 
+## Separate HackRF One instance
+
+`start-hackrf.bat` launches the HackRF version with its own **WSJT-X - HackRF**
+profile, local CAT/audio port 40003 and UDP port 2239. USB audio uses TCI;
+REIST16-QSO/2 and the other WSJT-X modes share this radio path.
+[Launcher, device selection and validation](docs/HACKRF-WSJTX.txt).
+Software and mocked-device checks passed; RF acceptance is still pending.
+
 ## REIST16: new experimental mode
 
 The current source and upcoming CI artifacts add **REIST16**, a separate
-CQ/QSO protocol with fixed 15-second UTC slots, 16-FSK, K7 coding,
+CQ/QSO protocol with fixed 15-second UTC slots, QSO/2 16-GFSK, LDPC and 12.8 s frames,
 standard messages and Auto Seq. A user-operated Yaesu/Pluto test confirms
 decoding in both directions. This does not establish FT8-equivalent sensitivity.
 The stable release linked above predates REIST16; use a successful CI build
-of this source or build locally. See [REIST16](docs/REIST16.md),
+of this source or build locally. See [REIST16](docs/REIST16.md) / [QSO/2](docs/REIST16-QSO2.md),
 [the profile contract](docs/REIST16.txt) and [Pluto setup](docs/PLUTO-WSJTX.txt).
 
 ![Yaesu OE3SRO / Pluto OE3SRO/P REIST16 exchange](docs/images/REIST16_QSO.png)

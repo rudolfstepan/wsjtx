@@ -1,0 +1,62 @@
+HackRF One als eigene WSJT-X-Instanz
+build by OE3SRO
+
+Start: start-hackrf.bat (oder Start-HackRF.ps1).
+Repository-Paket: dist-custom/OE3SRO-reist16-hackrf.
+Eigenes Profil: WSJT-X - HackRF; lokaler TCI-Port 40003, UDP-Port 2239.
+Vorhandene Custom-/Yaesu- und Pluto-Profile bleiben getrennt.
+Nur beim ersten Anlegen werden Rufzeichen und Locator aus dem vorhandenen
+Pluto-Profil übernommen, sonst aus Custom. Keine Passwörter, CAT-/Audio-
+Einstellungen oder Logbücher werden importiert. Bestehende HackRF-Einstellungen
+bleiben erhalten. Der Starter verwendet den im Profil gespeicherten Port und
+Dialwert. Neue HackRF-Profile starten REIST16-QSO/2, Monitor an, Auto-TX aus,
+ungerade 15-s-Sendeslots. Die Aussendung wird weiterhin ausdrücklich in WSJT-X
+freigegeben. Systemzeit vor QSO/2-Betrieb synchronisieren.
+
+Die Bridge übernimmt Frequenz, CAT-PTT und Audio über TCI. Kein virtuelles
+Audiokabel. 48-kHz-Audio / 3,072-MS/s-IQ; USB/DIGU. HackRF One arbeitet
+halbduplex: RX wird vor TX gestoppt und nach PTT AUS wieder gestartet.
+Frequenzbereich der Bridge: 1 MHz bis 6 GHz. Startwert 432500000 Hz.
+
+Startparameter, beispielsweise:
+  .\Start-HackRF.ps1 -Serial 0123456789abcdef0123456789abcdef
+  .\Start-HackRF.ps1 -RxLna 16 -RxVga 20 -TxGain 0 -FrequencyHz 432500000
+  .\Start-HackRF.ps1 -Simulate
+  .\Start-HackRF.ps1 -PrepareOnly
+
+Ohne Seriennummer wird nur bei genau einem angeschlossenen HackRF automatisch
+gewählt. Bei mehreren Geräten -Serial verwenden. Eine optionale lokale Auswahl
+in .local/hackrf-settings.json wird nur im Repository genutzt und nicht in
+portable Pakete kopiert. Die vorhandene Senderauswahl dieses Arbeitsplatzes
+kann dort gespeichert werden.
+RX-LNA: 0..40 dB in 8-dB-Schritten, RX-VGA: 0..62 dB in 2-dB-Schritten.
+TX-VGA: 0..47 dB, Vorgabe 0; digitaler IQ-Pegel 0,5. RF-Verstärker und Bias-Tee
+bleiben AUS. Diese Werte sind keine kalibrierte Ausgangsleistung.
+
+TX verwendet verlustfreie, begrenzte Warteschlangen. Vor dem nativen TX-Start
+werden die vier libhackrf-Startpuffer vollständig vorbereitet. Beim PTT-Ende
+werden alte TX-Daten verworfen. Ausbleibende TCI-Audiodaten, USB-Fehler und
+Queue-Über-/Unterläufe stoppen die Aussendung. Reale Startlatenz, Frequenz-
+und Pegelkalibrierung dieser neuen Hardwarestrecke sind noch nicht abgenommen.
+Für eine direkte Yaesu-TX-zu-HackRF-Kabelstrecke die zur Sendeleistung passende
+Dämpfung verwenden; bei 5 W mindestens 60 dB mit ausreichender Belastbarkeit.
+
+Runtime: tools/Setup-HackrfBridge.ps1 kopiert den vorhandenen libhackrf-
+Windows-Runtime aus dem SDR-Projekt mit Abhängigkeiten und Lizenzen. Es werden
+keine Treiber installiert. --check-runtime prüft nur DLL-Exporte ohne USB-Init.
+Prüfung ohne Funk: tools/Test-HackrfBridge.ps1.
+SDK-Referenz (Great Scott Gadgets, v2026.01.3):
+https://github.com/greatscottgadgets/hackrf/blob/v2026.01.3/host/libhackrf/src/hackrf.h
+
+Korrektur vom 22. Oktober 2026: TCI-Audio und Sendestart
+-----------------------------------------------------
+Der HackRF-Eintrag wird in den Einstellungen jetzt über die registrierte
+TCI-Fähigkeit erkannt. Dadurch bleiben TCI-Audio und die zugehörigen
+Bedienelemente beim Start, Rig-Wechsel und Speichern wirksam. Der zuvor
+beobachtete sofortige Bridge-Abbruch mit "Start TCI audio before PTT" ist
+in diesem Ablauf korrigiert. Eine PTT-Anforderung ohne Audiostream wird
+zusätzlich ohne Beenden der Bridge zurückgewiesen. Ein später gestarteter
+Audiostream holt eine verworfene Aussendung nicht nach.
+Test-HackrfBridge.ps1 prüft dazu auch den echten Einstellungsdialog mit
+CAT-Test und empfangenen TCI-Audioblöcken gegen simulierte Funkgeräte.
+Die vorhandenen Stationsdaten und Frequenzen werden nicht zurückgesetzt.

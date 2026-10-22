@@ -12,7 +12,8 @@ import uuid
 
 root=Path(__file__).resolve().parents[1]
 executable=Path(sys.argv[1]) if len(sys.argv)>1 else root/'build-custom/wsjtx_pluto_bridge.exe'
-work=root/'.local/pluto-protocol-checks'
+hackrf='hackrf' in executable.name.lower()
+work=root/('build-custom/hackrf-checks/protocol' if hackrf else '.local/pluto-protocol-checks')
 work.mkdir(parents=True,exist_ok=True)
 
 def wait_until(test,seconds=5):
@@ -70,7 +71,7 @@ def run_test(graceful=False,invalid=False):
         probe.bind(('127.0.0.1',0))
         port=probe.getsockname()[1]
     log=open(work/f'{unique}.log','wb')
-    process=subprocess.Popen([str(executable),'--simulate','--uri','test:'+unique,'--port',str(port),
+    process=subprocess.Popen([str(executable),'--simulate',('--serial' if hackrf else '--uri'),'test:'+unique,'--port',str(port),
                               '--ready-file',str(ready),'--stop-file',str(stop)],stdout=log,stderr=log,
                              creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
     def state():
@@ -83,13 +84,32 @@ def run_test(graceful=False,invalid=False):
             assert process.wait(5)==0
             return
         client=Client(port)
-        assert client.frame()[0]==1
+        opcode,greeting=client.frame()
+        assert opcode==1
+        if hackrf:
+            assert b'device:HackRF One;' in greeting and b'vfo_limits:1000000,6000000000;' in greeting
         if invalid:
             client.send_payload(2,bytes(64))
             assert process.wait(5)==1
             assert not state()['ok'] and not state()['ptt']
             assert 'Invalid TCI' in state()['error']
             return
+        # Reproduce the reported crash: PTT with no TCI audio_start. The
+        # bridge must reject TX, stay online and accept a later normal stream.
+        client.send('trx:0,true;')
+        wait_until(lambda:state().get('txAborts')==1)
+        assert state()['ok'] and not state()['ptt'] and process.poll() is None
+        assert 'start TCI audio' in state()['lastTxWarning']
+        rejected=False
+        while not rejected:
+            opcode,payload=client.frame()
+            rejected=opcode==1 and b'tx_abort:0,audio_not_started;' in payload
+        client.send('audio_start:0;')
+        receiving=False
+        while not receiving:
+            opcode,payload=client.frame()
+            receiving=opcode==2 and struct.unpack_from('<I',payload,24)[0]==1
+        assert not state()['ptt'], 'late audio_start must not key the rejected TX'
         second=Client(port)
         assert second.frame()[0]==8, 'second client was not rejected'
         second.close()
@@ -104,7 +124,7 @@ def run_test(graceful=False,invalid=False):
         client.send('audio_start:0;trx:0,true;')
         wait_until(lambda:state().get('ptt'))
         # Missing audio must unkey and discard this frame, preserving RX/CAT.
-        wait_until(lambda:state().get('txAborts')==1)
+        wait_until(lambda:state().get('txAborts')==2)
         status=state()
         assert status['ptt'] is False and status['ok'] is True
         assert 'watchdog' in status['lastTxWarning'] and process.poll() is None
@@ -130,7 +150,7 @@ def run_test(graceful=False,invalid=False):
                 client.send_payload(2,audio);answered+=1
         client.send('trx:0,false;')
         wait_until(lambda:not state()['ptt'])
-        assert state()['txAborts']==1 and process.poll() is None, 'fresh TX must work after watchdog recovery'
+        assert state()['txAborts']==2 and process.poll() is None, 'fresh TX must work after watchdog recovery'
     finally:
         if client:
             client.close()
@@ -146,4 +166,4 @@ def run_test(graceful=False,invalid=False):
 run_test()
 run_test(graceful=True)
 run_test(invalid=True)
-print('PASS Pluto protocol: single client, disconnect unkeys, watchdog abort preserves RX/CAT, late audio ignored, fresh TX succeeds, graceful shutdown; no hardware opened.')
+print(('PASS HackRF protocol:' if hackrf else 'PASS Pluto protocol:')+' PTT without audio rejected without exit, late audio_start cannot rekey, single client, disconnect unkeys, watchdog abort preserves RX/CAT, late audio ignored, fresh TX succeeds, graceful shutdown; no hardware opened.')

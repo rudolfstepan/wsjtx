@@ -17,7 +17,13 @@ struct Options {
   quint16 port=40002;
   long long frequency=432500000;
   double rxGain=30,txGain=-40;
-  bool simulate=false;
+  bool simulate=false,hackrf=false;
+  QString serial;
+  int rxVga=20;
+  float amplitude=.5f;
+  QString deviceName() const {return hackrf?"HackRF One":"PlutoSDR";}
+  long long minimumFrequency() const {return hackrf?1000000:325000000;}
+  long long maximumFrequency() const {return hackrf?6000000000LL:3800000000LL;}
 };
 struct AudioHeader {
   quint32 receiver=0,rate=audio_rate,format=3,codec=0,crc=0,length=0,type=0;
@@ -69,6 +75,7 @@ class Bridge final : public QObject {
   void commands(QString const&);
   void fail(QString const&);
   void writeReady(bool,QString const& = {});
+  void reportTxAbort(QString const& reason,QString const& code);
 public:
   explicit Bridge(Options const&);
   ~Bridge() override;

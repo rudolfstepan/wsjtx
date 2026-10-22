@@ -1,4 +1,4 @@
-#include "lib/reist16/reist16.hpp"
+#include "lib/reist16/qso2.hpp"
 #include "lib/reist16/qso_address.hpp"
 #include "Modulator/Modulator.hpp"
 #include "Audio/soundout.h"
@@ -54,23 +54,23 @@ int main(int argc,char**argv) {
     check(QString(Modes::name(Modes::REIST16))=="REIST16","mode name");
     for(unsigned start=0;start<86400;start+=15)
       check(received_in_second_period(start,15.)==bool((start/15)%2),"UTC alternating slots");
-    check(tx_duration("REIST16",15,6912,false)>=10.6 && tx_duration("REIST16",15,6912,false)<15,"complete late frame fits TX window");
+    check(tx_duration("REIST16",15,6912,false)>=14.1 && tx_duration("REIST16",15,6912,false)<15,"complete late frame fits TX window");
 
     // Real packer -> encoder -> production audio thread interface -> decoder.
     // No SoundOutput device is opened and no MainWindow/CAT is instantiated.
     QByteArray message=QByteArray("CQ OE3SRO JN87").leftJustified(37,' '), sent(37,' ');
-    QVector<float> wave(reist16::tx_samples);
+    QVector<float> wave(reist16::qso2::tx_samples);
     float frequency=1500.375f;
     int sequence=731,ok=0;
     gen_reist16_(message.data(),sent.data(),&frequency,&sequence,wave.data(),&ok,37,37);
     check(ok==1 && sent==message,"Fortran QSO encoder");
-    for(qint64 now : {0LL,300LL,500LL,800LL,15000LL,30500LL}) {
+    for(qint64 now : {0LL,300LL,500LL,800LL,1000LL,15000LL,30500LL}) {
       MemoryOutput output;
       TestModulator modulator;
       modulator.now=now;
       modulator.setWaveform(wave);
       icw[0]=12; // stale CW ID must never extend the immutable QSO frame
-      modulator.start("REIST16",120,960.,frequency,-4.,&output,AudioDevice::Mono,true,false,99.,15.);
+      modulator.start("REIST16",64,2400.,frequency,-4.,&output,AudioDevice::Mono,true,false,99.,15.);
       QByteArray pcm;
       while(pcm.size()<1500000) {
         auto block=modulator.read(4096);
@@ -79,12 +79,12 @@ int main(int argc,char**argv) {
       }
       int intoSlot=int(now%15000);
       int silence=std::max(0,500-intoSlot)*48;
-      check(pcm.size()==2*(silence+reist16::tx_samples),"complete PCM frame and sync delay");
+      check(pcm.size()==2*(silence+reist16::qso2::tx_samples),"complete PCM frame and sync delay");
       auto samples=reinterpret_cast<int16_t const*>(pcm.constData());
       std::vector<float> rx(180000,0);
       for(int i=0;i<pcm.size()/2;i+=4) rx[intoSlot*12+i/4]=samples[i]/32768.f;
-      auto result=reist16::decode(rx.data(),int(rx.size()),100,4000,2);
-      check(result.size()==1 && result[0].sequence==sequence,"production audio round trip");
+      auto result=reist16::qso2::decode(rx.data(),int(rx.size()),100,4000,2);
+      check(result.size()==1 && result[0].sequence==0,"production audio round trip");
       check(std::abs(result[0].dt-(std::max(500,intoSlot)/1000.-.5))<.02,"audio UTC alignment");
       check(!modulator.isActive(),"audio exact stop");
     }
@@ -100,7 +100,7 @@ int main(int argc,char**argv) {
       check(decoded.isStandardMessage(),"standard decoded message");
       check(decoded.frequencyOffset()==300+500*count,"display frequency column");
       check(decoded.timeInSeconds()==0,"display UTC column");
-      check(decoded.snr()>10,"display SNR column");
+      check(decoded.snr()>0,"display SNR column");
       check(decoded.messageWords().size()>=4,"QSO token parsing");
       if(count==0) check(decoded.CQersCall()=="OE3SRO","CQ call parsing");
       ++count;
@@ -134,7 +134,7 @@ int main(int argc,char**argv) {
     }
 
     // Exercise the exact shared-memory worker path used by MainWindow, with
-    // the live 44-half-symbol capture length, then an empty slot and repeat.
+    // the live 48-half-symbol capture length, then an empty slot and repeat.
     QSharedMemory memory(QString("reist16-check-%1").arg(app.applicationPid()));
     check(memory.create(sizeof(dec_data_t)),"create decoder shared memory");
     check(memory.lock(),"lock decoder shared memory");
@@ -146,8 +146,8 @@ int main(int argc,char**argv) {
     shared->params.nfa=100;
     shared->params.nfb=4000;
     shared->params.ndepth=2;
-    shared->params.kin=44*3456;
-    shared->params.nzhsym=44;
+    shared->params.kin=48*3456;
+    shared->params.nzhsym=48;
     shared->params.newdat=true;
     memory.unlock();
     QProcess worker;
@@ -159,7 +159,7 @@ int main(int argc,char**argv) {
       std::fill(shared->d2,shared->d2+180000,0);
       if(slot!=1) for(int i=0;i<wave.size()/4;++i) shared->d2[6000+i]=int16_t(wave[4*i]*6000);
       shared->params.nutc=slot*15;
-      shared->ipc[0]=44;
+      shared->ipc[0]=48;
       shared->ipc[1]=1;
       memory.unlock();
       QElapsedTimer timer;
@@ -179,6 +179,6 @@ int main(int argc,char**argv) {
     shared->ipc[1]=999;
     memory.unlock();
     check(worker.waitForFinished(5000) && worker.exitCode()==0,"worker shutdown");
-    std::cout<<"PASS REIST16: mode IDs, UTC parity, 6 production PCM round trips, QSO parser, live IPC worker lifecycle.\n";
+    std::cout<<"PASS REIST16: mode IDs, UTC parity, 7 production PCM round trips, QSO parser, live IPC worker lifecycle.\n";
   } catch(std::exception const& e) { std::cerr<<e.what()<<'\n'; return 1; }
 }

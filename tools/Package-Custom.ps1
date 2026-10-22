@@ -9,7 +9,7 @@ $bin = Join-Path $package 'bin'
 $data = Join-Path $package 'share\wsjtx'
 $sdkBin = Join-Path $root '.tools\hamlib\hamlib-w64-4.7.2\bin'
 New-Item -ItemType Directory -Force -Path $bin, $data | Out-Null
-foreach ($name in @('wsjtx', 'jt9', 'wsprd', 'fmtave', 'fcal', 'fmeasure', 'wsjtx_app_version', 'wsjtx_pluto_bridge')) {
+foreach ($name in @('wsjtx', 'jt9', 'wsprd', 'fmtave', 'fcal', 'fmeasure', 'wsjtx_app_version', 'wsjtx_pluto_bridge', 'wsjtx_hackrf_bridge')) {
     $source = Join-Path $build "$name.exe"
     if (!(Test-Path -LiteralPath $source)) { throw "Missing build output: $source" }
     Copy-Item -LiteralPath $source -Destination $bin -Force
@@ -26,6 +26,9 @@ Copy-Item -LiteralPath (Join-Path $root 'COPYING') -Destination $package -Force
 Copy-Item -LiteralPath (Join-Path $root 'docs\REIST16.txt') -Destination $package -Force
 Copy-Item -LiteralPath (Join-Path $root 'docs\PLUTO-WSJTX.txt') -Destination $package -Force
 Copy-Item -LiteralPath (Join-Path $root 'Start-Pluto.ps1'),(Join-Path $root 'start-pluto.bat') -Destination $package -Force
+Copy-Item -LiteralPath (Join-Path $root 'Start-HackRF.ps1'),(Join-Path $root 'start-hackrf.bat'),(Join-Path $root 'docs/HACKRF-WSJTX.txt') -Destination $package -Force
+$hackrfRuntime=Join-Path $root '.tools/hackrf/runtime'
+if(Test-Path -LiteralPath (Join-Path $hackrfRuntime 'hackrf-0.dll')){New-Item -ItemType Directory -Force -Path (Join-Path $bin 'hackrf') | Out-Null;Get-ChildItem -LiteralPath $hackrfRuntime | Copy-Item -Destination (Join-Path $bin 'hackrf') -Recurse -Force}
 $plutoRuntime = Join-Path $root '.tools\pluto\runtime'
 if (Test-Path -LiteralPath (Join-Path $plutoRuntime 'libiio.dll')) {
     New-Item -ItemType Directory -Force -Path (Join-Path $bin 'pluto') | Out-Null

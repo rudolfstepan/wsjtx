@@ -39,7 +39,12 @@ try {
     while (!(Test-Path -LiteralPath $ready) -and !$service.HasExited -and [DateTime]::UtcNow -lt $deadline) { Start-Sleep -Milliseconds 100 }
     if (!(Test-Path -LiteralPath $ready)) { throw "Pluto bridge did not start. See $errorLog" }
     $status = Get-Content -LiteralPath $ready -Raw | ConvertFrom-Json
-    if (!$status.ok) { throw "Pluto bridge: $($status.error). See $errorLog" }
+    if (!$status.ok) {
+        if ($status.error -match 'IIO context') {
+            throw "PlutoSDR ist unter '$Uri' nicht erreichbar. Pluto anschliessen und die Adresse pruefen; eine andere Adresse mit Start-Pluto.ps1 -Uri angeben. Fuer HackRF One start-hackrf.bat verwenden. Details: $($status.error). Log: $errorLog"
+        }
+        throw "Pluto bridge: $($status.error). See $errorLog"
+    }
     Write-Output "Pluto bridge ready at 127.0.0.1:$Port; starting the separate Pluto profile."
     $appOut = Join-Path $runtime "$session-wsjtx-stdout.log"
     $appError = Join-Path $runtime "$session-wsjtx-stderr.log"

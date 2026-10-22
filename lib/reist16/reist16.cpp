@@ -2,12 +2,13 @@
 // convolutional code and interleaver follow SDR-suite's cfpm_packet.cpp /
 // cfpm_fec.h. This receiver operates directly on WSJT-X's 12-kHz slot audio.
 #include "reist16.hpp"
+#include "qso2.hpp"
 #include <fftw3.h>
 #include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <limits>
-#include <mutex>
+#include "planner_lock.hpp"
 #include <stdexcept>
 
 namespace reist16 {
@@ -108,19 +109,19 @@ std::vector<uint8_t> decode_block(float const* data, int bytes, double frequency
   return channel_decode(soft, bytes);
 }
 // Only plan creation/destruction is serialized. Plans and data are call-local.
-std::mutex planner_mutex;
+
 struct Spectrum {
   float* input;
   fftwf_complex* output;
   fftwf_plan plan;
   Spectrum() : input(fftwf_alloc_real(fft_size)), output(fftwf_alloc_complex(bins)), plan(nullptr) {
     if (!input || !output) { fftwf_free(input); fftwf_free(output); throw std::bad_alloc(); }
-    std::lock_guard<std::mutex> lock(planner_mutex);
+    std::lock_guard<std::mutex> lock(planner_mutex());
     plan = fftwf_plan_dft_r2c_1d(fft_size, input, output, FFTW_ESTIMATE);
     if (!plan) { fftwf_free(input); fftwf_free(output); throw std::bad_alloc(); }
   }
   ~Spectrum() {
-    std::lock_guard<std::mutex> lock(planner_mutex);
+    std::lock_guard<std::mutex> lock(planner_mutex());
     fftwf_destroy_plan(plan); fftwf_free(input); fftwf_free(output);
   }
   Spectrum(Spectrum const&) = delete;
@@ -285,7 +286,10 @@ extern "C" int reist16_decode(int16_t const* samples, int count, int low, int hi
   try {
     std::vector<float> data(count);
     for (int i = 0; i < count; ++i) data[i] = samples[i] / 32768.f;
-    auto found = reist16::decode(data.data(), count, low, high, depth);
+    auto found = reist16::qso2::decode(data.data(), count, low, high, depth);
+    auto legacy = reist16::decode(data.data(), count, low, high, depth);
+    found.insert(found.end(),legacy.begin(),legacy.end());
+    std::sort(found.begin(),found.end(),[](reist16::Decode const& a,reist16::Decode const& b){return a.frequency<b.frequency;});
     int n = std::min(int(found.size()), capacity);
     for (int i = 0; i < n; ++i) {
       std::copy(found[i].bits.begin(), found[i].bits.end(), bits+77*i);

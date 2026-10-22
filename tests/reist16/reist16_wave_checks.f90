@@ -4,7 +4,7 @@ program reist16_wave_checks
   integer :: i,j,ok,offset,seed_size
   integer, allocatable :: seed(:)
   integer*2 :: audio(180000)
-  real :: wave(460800),frequency,noise
+  real :: wave(614400),frequency,noise
   character(len=37) :: message,sent
   character(len=64) :: filename
   type(hdr) :: header
@@ -31,12 +31,12 @@ program reist16_wave_checks
     offset=3600+1200*j
     call gen_reist16(message,sent,frequency,j,wave,ok)
     if(ok.ne.1.or.sent.ne.message) stop 1
-    if(any(wave(453121:).ne.0)) stop 2
+    if(maxval(abs(wave)).lt.0.7.or.abs(wave(1)).gt.0.001) stop 2
     do i=1,180000
       call random_number(noise)
       noise=(noise-.5)*1200
       audio(i)=nint(noise)
-      if(i.gt.offset.and.i.le.offset+115200) audio(i)=nint(noise+5000*wave(4*(i-offset)-3))
+      if(i.gt.offset.and.i.le.offset+153600) audio(i)=nint(noise+5000*wave(4*(i-offset)-3))
     enddo
     write(filename,'(a,i1,a)') 'reist16_',j,'_000000.wav'
     header=default_header(12000,180000)

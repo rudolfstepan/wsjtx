@@ -4,6 +4,37 @@
 
 ## Deutsch
 
+### 2026-10-22 — HackRF-TX und Pluto-Verbindungsdiagnose
+
+- HackRF wird beim Laden, Auswählen und Speichern der Einstellungen anhand
+  der registrierten TCI-Fähigkeit erkannt. Der TCI-Audioweg bleibt aktiv.
+- PTT ohne gestarteten TCI-Audiostream wird abgelehnt, ohne die Bridge zu
+  beenden. Ein späteres audio_start startet keine verworfene Aussendung.
+- Pluto-Startfehler nennen den gewählten URI; der Starter erklärt Anschluss,
+  Adresswahl und die eigene HackRF-Startdatei.
+- Regression mit echtem Einstellungsdialog, CAT-Test und Audio gegen simulierte
+  Bridges sowie DLL-Mocks bestanden. Keine neue HF-Abnahme.
+
+### 2026-10-22 — Eigene HackRF-One-Instanz
+
+- `start-hackrf.bat` / `Start-HackRF.ps1`, eigenes Profil und TCI-/UDP-Port.
+- USB-IQ-Bridge mit Halbduplex-Umschaltung, begrenzten verlustfreien Queues,
+  vollständiger TX-Startpufferung sowie Fehler-/PTT-Cleanup.
+- Getrenntes portables Paket, DLL-/Profil-/TCI-/Mock-Prüfungen ohne HF.
+- [Bedienung und Grenzen](HACKRF-WSJTX.txt); neue reale Funkabnahme offen.
+
+### 2026-10-22 — REIST16-QSO/2
+
+- 12,8 s Signalzeit in 15-s-Slots, 16-GFSK mit 5 Hz Tonabstand,
+  CRC14 und LDPC(174,91). QSO/1 bleibt empfangbar; beide Sender aktualisieren.
+- Nichtkohärente und kohärente Demodulation mit begrenzter OSD-Nachsuche,
+  unabhängiger Synchronisations- und QSO-Typprüfung.
+- PCM/TCI-Puffer, Zeitfenster und Wasserfallmarker für das neue Format.
+- Unabhängiger Rauschvergleich: bei −22 dB SNR2500 QSO/2 20/32, FT8 15/32;
+  keine allgemeine FT8-Gleichwertigkeit oder neue RF-Abnahme behauptet.
+- [Profil und vollständige Messbedingungen](REIST16-QSO2.md).
+
+
 ### 2026-10-21 — REIST16 und PlutoSDR (experimentell)
 
 - Neue eigene Betriebsart REIST16: 15-s-UTC-Slots, 16-FSK, 77-Bit-
@@ -228,6 +259,17 @@ ergänzt. [8bf344fde](https://github.com/rudolfstepan/wsjtx/commit/8bf344fde)
 speichert den FT2-Fortsetzungspunkt; dieser Commit ändert keine Programmfunktion.
 
 ## English
+
+### 2026-10-22 — REIST16-QSO/2
+
+- 12.8 s frames in 15-second slots, 16-GFSK with 5 Hz spacing,
+  CRC14 and LDPC(174,91). RX also accepts QSO/1; update both endpoints.
+- Noncoherent/coherent metrics, bounded OSD, independent sync/type checks,
+  updated PCM/TCI timing and waterfall span.
+- Independent AWGN comparison at −22 dB SNR2500: QSO/2 20/32, FT8 15/32.
+  No general FT8-equivalence or new RF validation claimed.
+- [Protocol and measurement conditions](REIST16-QSO2.md).
+
 
 ### 2026-10-21 — REIST16 and PlutoSDR (experimental)
 

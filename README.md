@@ -49,16 +49,24 @@ Die [Änderungshistorie des Forks](docs/CHANGES.md) dokumentiert die Custom-
 Erweiterungen und ihre Implementierungscommits. Die [FT2-Dokumentation](docs/FT2.md)
 enthält Bedienung, technische Umsetzung, Quellen und den geprüften Buildstand.
 
+## HackRF One als eigene Instanz
+
+`start-hackrf.bat` startet die HackRF-Variante mit eigenem Profil
+**WSJT-X - HackRF**, lokalem CAT-/Audio-Port 40003 und UDP-Port 2239.
+REIST16-QSO/2 und die übrigen WSJT-X-Modi nutzen USB-Audio über TCI.
+[Start, Geräteauswahl und Prüfstand](docs/HACKRF-WSJTX.txt).
+Software- und Mock-Prüfungen bestanden; reale HF-Abnahme dieser Bridge steht aus.
+
 ## REIST16: neue experimentelle Betriebsart
 
 Der aktuelle Quellstand und die daraus erzeugten CI-Pakete ergänzen
 **REIST16**: ein eigenständiges CQ-/QSO-Protokoll mit festen 15-Sekunden-UTC-Slots,
-16-FSK, K7-Fehlerschutz, Standardnachrichten und Auto Seq. Ein vom Benutzer
+QSO/2 mit 16-GFSK, LDPC, 12,8 s Signalzeit, Standardnachrichten und Auto Seq. Ein vom Benutzer
 ausgeführter Yaesu-/Pluto-Versuch belegt Dekodierung in beiden Richtungen.
 Eine FT8-gleiche Empfangsempfindlichkeit ist damit nicht nachgewiesen.
 Das oben verlinkte stabile Release enthält REIST16 noch nicht; dafür einen
 erfolgreichen CI-Build dieses Quellstands verwenden oder lokal bauen.
-Siehe [REIST16](docs/REIST16.md), [Profilvertrag](docs/REIST16.txt) und
+Siehe [REIST16](docs/REIST16.md) / [QSO/2](docs/REIST16-QSO2.md), [Profilvertrag](docs/REIST16.txt) und
 [Pluto-Einrichtung](docs/PLUTO-WSJTX.txt).
 
 ![REIST16-QSO zwischen Yaesu OE3SRO und Pluto OE3SRO/P](docs/images/REIST16_QSO.png)

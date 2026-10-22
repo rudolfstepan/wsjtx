@@ -1,0 +1,1 @@
+PASS Pluto protocol: PTT without audio rejected without exit, late audio_start cannot rekey, single client, disconnect unkeys, watchdog abort preserves RX/CAT, late audio ignored, fresh TX succeeds, graceful shutdown; no hardware opened.

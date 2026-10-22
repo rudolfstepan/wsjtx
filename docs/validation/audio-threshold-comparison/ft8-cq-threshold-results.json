@@ -1,0 +1,141 @@
+{
+  "message": "CQ OE3SRO JN88",
+  "threshold": {
+    "level": 10,
+    "snr2500": -22.5,
+    "file": "ft8_level10_slot1_000000.wav",
+    "exact": true,
+    "log": "ft8_level10_slot1_000000.decode.txt"
+  },
+  "below": {
+    "level": 11,
+    "snr2500": -23.0,
+    "file": "ft8_level11_slot1_000000.wav",
+    "exact": false,
+    "log": "ft8_level11_slot1_000000.decode.txt"
+  },
+  "sweep": [
+    {
+      "level": 1,
+      "snr2500": -18.0,
+      "file": "ft8_level1_slot1_000000.wav",
+      "exact": true,
+      "log": "ft8_level1_slot1_000000.decode.txt"
+    },
+    {
+      "level": 2,
+      "snr2500": -18.5,
+      "file": "ft8_level2_slot1_000000.wav",
+      "exact": true,
+      "log": "ft8_level2_slot1_000000.decode.txt"
+    },
+    {
+      "level": 3,
+      "snr2500": -19.0,
+      "file": "ft8_level3_slot1_000000.wav",
+      "exact": true,
+      "log": "ft8_level3_slot1_000000.decode.txt"
+    },
+    {
+      "level": 4,
+      "snr2500": -19.5,
+      "file": "ft8_level4_slot1_000000.wav",
+      "exact": true,
+      "log": "ft8_level4_slot1_000000.decode.txt"
+    },
+    {
+      "level": 5,
+      "snr2500": -20.0,
+      "file": "ft8_level5_slot1_000000.wav",
+      "exact": true,
+      "log": "ft8_level5_slot1_000000.decode.txt"
+    },
+    {
+      "level": 6,
+      "snr2500": -20.5,
+      "file": "ft8_level6_slot1_000000.wav",
+      "exact": true,
+      "log": "ft8_level6_slot1_000000.decode.txt"
+    },
+    {
+      "level": 7,
+      "snr2500": -21.0,
+      "file": "ft8_level7_slot1_000000.wav",
+      "exact": true,
+      "log": "ft8_level7_slot1_000000.decode.txt"
+    },
+    {
+      "level": 8,
+      "snr2500": -21.5,
+      "file": "ft8_level8_slot1_000000.wav",
+      "exact": true,
+      "log": "ft8_level8_slot1_000000.decode.txt"
+    },
+    {
+      "level": 9,
+      "snr2500": -22.0,
+      "file": "ft8_level9_slot1_000000.wav",
+      "exact": true,
+      "log": "ft8_level9_slot1_000000.decode.txt"
+    },
+    {
+      "level": 10,
+      "snr2500": -22.5,
+      "file": "ft8_level10_slot1_000000.wav",
+      "exact": true,
+      "log": "ft8_level10_slot1_000000.decode.txt"
+    },
+    {
+      "level": 11,
+      "snr2500": -23.0,
+      "file": "ft8_level11_slot1_000000.wav",
+      "exact": false,
+      "log": "ft8_level11_slot1_000000.decode.txt"
+    },
+    {
+      "level": 12,
+      "snr2500": -23.5,
+      "file": "ft8_level12_slot1_000000.wav",
+      "exact": false,
+      "log": "ft8_level12_slot1_000000.decode.txt"
+    },
+    {
+      "level": 13,
+      "snr2500": -24.0,
+      "file": "ft8_level13_slot1_000000.wav",
+      "exact": false,
+      "log": "ft8_level13_slot1_000000.decode.txt"
+    },
+    {
+      "level": 14,
+      "snr2500": -24.5,
+      "file": "ft8_level14_slot1_000000.wav",
+      "exact": false,
+      "log": "ft8_level14_slot1_000000.decode.txt"
+    },
+    {
+      "level": 15,
+      "snr2500": -25.0,
+      "file": "ft8_level15_slot1_000000.wav",
+      "exact": false,
+      "log": "ft8_level15_slot1_000000.decode.txt"
+    },
+    {
+      "level": 16,
+      "snr2500": -25.5,
+      "file": "ft8_level16_slot1_000000.wav",
+      "exact": false,
+      "log": "ft8_level16_slot1_000000.decode.txt"
+    },
+    {
+      "level": 17,
+      "snr2500": -26.0,
+      "file": "ft8_level17_slot1_000000.wav",
+      "exact": false,
+      "log": "ft8_level17_slot1_000000.decode.txt"
+    }
+  ],
+  "decoder": "jt9 -8 -d 3 -L 100 -H 4000",
+  "normal_ap_enabled": true,
+  "payload_hints_supplied": false
+}

@@ -1,0 +1,2 @@
+Packaged Qt runtime and OpenSSL verified.
+Portable runtime verified without an installed WSJT-X or personal configuration.

@@ -42,17 +42,19 @@ struct Graph
 };
 
 void bp (Graph const& graph, float const *llr, std::int8_t const *mask, int maximum,
-         std::int8_t *message, std::int8_t *cw, int& hard, int& iteration, int& ncheck)
+         std::int8_t *message, std::int8_t *cw, int& hard, int& iteration, int& ncheck, float* reliability = nullptr)
 {
   // Every invocation owns its messages: safe across SMP workers, no SAVE state.
   float toVariable[174][3] = {}, toCheck[83][7] = {}, hyperbolic[83][7] = {}, zn[174];
   int stalled = 0, lastChecks = 0;
+  float summed[174] = {};
   hard = -1;
   for (iteration = 0; iteration <= maximum; ++iteration) {
     for (int bit = 0; bit < 174; ++bit) {
       float sum = (toVariable[bit][0] + toVariable[bit][1]) + toVariable[bit][2];
       zn[bit] = mask[bit] == 1 ? llr[bit] : llr[bit] + sum;
       cw[bit] = zn[bit] > 0.f ? 1 : 0;
+      if(reliability && iteration<=3) { summed[bit]+=zn[bit]; reliability[bit]=summed[bit]; }
     }
     ncheck = 0;
     for (int check = 0; check < 83; ++check) {
@@ -94,6 +96,15 @@ void bp (Graph const& graph, float const *llr, std::int8_t const *mask, int maxi
 }
 }
 
+bool decodeReliability(float const* llr, std::int8_t* message, std::int8_t* cw,
+                       float* reliability, int& hard)
+{
+  std::int8_t mask[174]={};int iteration=0,checks=83;
+  bp({tables::Mn_standard,tables::Nm_standard,tables::nrw_standard},llr,mask,60,
+     message,cw,hard,iteration,checks,reliability);
+  return hard>=0 && checks==0;
+}
+
 bool validCrc (std::int8_t const *cw)
 {
   unsigned received = 0;
@@ -112,24 +123,12 @@ void encode (std::int8_t const *bits, std::int8_t *cw)
 }
 }
 
-extern "C" void encode174_91_ (std::int8_t const *message, std::int8_t *cw)
+namespace ft8_native {
+void decode(float const* llr,std::int8_t const* mask,int maximum,std::int8_t* message,
+            std::int8_t* cw,int& hard,int& iteration,int& checks,bool parallel)
 {
-  ft8_native::encode (message, cw);
+  Graph graph=parallel?Graph{tables::Mn_parallel,tables::Nm_parallel,tables::nrw_parallel}
+                      :Graph{tables::Mn_standard,tables::Nm_standard,tables::nrw_standard};
+  bp(graph,llr,mask,maximum,message,cw,hard,iteration,checks);
 }
-extern "C" void encode174_91var_ (std::int8_t const *message, std::int8_t *cw)
-{
-  ft8_native::encode (message, cw);
-}
-extern "C" void bpdecode174_91_ (float const *llr, std::int8_t const *mask, int const *maximum,
-  std::int8_t *message, std::int8_t *cw, int *hard, int *iteration, int *checks)
-{
-  ft8_native::bp ({ft8_native::tables::Mn_standard, ft8_native::tables::Nm_standard,
-    ft8_native::tables::nrw_standard}, llr, mask, *maximum, message, cw, *hard, *iteration, *checks);
-}
-extern "C" void bpdecode174_91var_ (float const *llr, std::int8_t const *mask, int const *maximum,
-  std::int8_t *message, std::int8_t *cw, int *hard, int *iteration)
-{
-  int checks = 0;
-  ft8_native::bp ({ft8_native::tables::Mn_parallel, ft8_native::tables::Nm_parallel,
-    ft8_native::tables::nrw_parallel}, llr, mask, *maximum, message, cw, *hard, *iteration, checks);
 }

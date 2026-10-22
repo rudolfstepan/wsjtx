@@ -84,6 +84,7 @@
 #include "logqso.h"
 #include "Decoder/decodedtext.h"
 #include "lib/reist16/qso_address.hpp"
+#include "lib/reist16/qso2.hpp"
 #include "Radio.hpp"
 #include "models/Bands.hpp"
 #include "Transceiver/TransceiverFactory.hpp"
@@ -2330,7 +2331,7 @@ void MainWindow::fixStop()
       m_earlyDecode2=47;
     }
   } else if (m_mode=="REIST16") {
-    m_hsymStop=44;
+    m_hsymStop=48;
   } else if (isFT4Family()) {
   m_hsymStop=m_mode=="FT2" ? 23 : 21;
   } else if(m_mode=="FST4" or m_mode=="FST4W") {
@@ -8071,7 +8072,7 @@ void MainWindow::guiUpdate()
             showStatusMessage(tr("REIST16 requires a standard CQ/QSO message and a lowest audio tone of 100–4000 Hz."));
             return;
           }
-          Q_EMIT transmitWaveform(QVector<float>(foxcom_.wave,foxcom_.wave+460800));
+          Q_EMIT transmitWaveform(QVector<float>(foxcom_.wave,foxcom_.wave+reist16::qso2::tx_samples));
         }
         if(m_mode=="FT8") {
           if(SpecOp::FOX==m_specOp and ui->tabWidget->currentIndex()==1) {
@@ -11077,9 +11078,9 @@ void MainWindow::on_actionREIST16_triggered()
   m_FFTSize = m_nsps/2;
   if (m_tci_audio) Q_EMIT m_config.transceiver_blocksize (m_FFTSize);
   else Q_EMIT FFTSize (m_FFTSize);
-  m_hsymStop=44;
+  m_hsymStop=48;
   setup_status_bar (bVHF);
-  m_toneSpacing=25.0;
+  m_toneSpacing=reist16::qso2::tone_spacing;
   ui->actionREIST16->setChecked(true);
   m_wideGraph->setMode(m_mode);
   m_send_RR73=true;
@@ -12970,10 +12971,10 @@ void MainWindow::transmit (double snr)
       return;
     }
     if(m_tci_audio)
-      Q_EMIT m_config.transceiver_modulator_start(m_mode,120,960.0,ui->TxFreqSpinBox->value()-m_XIT,
+      Q_EMIT m_config.transceiver_modulator_start(m_mode,reist16::qso2::symbols,double(reist16::qso2::symbol_samples),ui->TxFreqSpinBox->value()-m_XIT,
                                                  -4.0,true,false,snr,15.0);
     else
-      Q_EMIT sendMessage(m_mode,120,960.0,ui->TxFreqSpinBox->value()-m_XIT,
+      Q_EMIT sendMessage(m_mode,reist16::qso2::symbols,double(reist16::qso2::symbol_samples),ui->TxFreqSpinBox->value()-m_XIT,
                          -4.0,m_soundOutput,m_config.audio_output_channel(),true,false,snr,15.0);
   }
   if (isFT4Family()) {

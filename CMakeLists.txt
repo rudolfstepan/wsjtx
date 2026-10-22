@@ -363,7 +363,9 @@ set (wsjt_CXXSRCS
   lib/crc13.cpp
   lib/crc14.cpp
   lib/ft8/native/ft8_wave.cpp
+  lib/ft8/native/ft8_wave_abi.cpp
   lib/ft8/native/ft8_ldpc.cpp
+  lib/ft8/native/ft8_ldpc_abi.cpp
   lib/ft4/native/ft4_sync.cpp
   ${wsjt_fox_CXXSRCS}
   )
@@ -1303,7 +1305,7 @@ if (WSJT_BUILD_TESTS AND EXISTS ${CMAKE_SOURCE_DIR}/tests AND IS_DIRECTORY ${CMA
 endif ()
 
 # build a library of package functionality (without and optionally with OpenMP support)
-list (APPEND wsjt_CXXSRCS lib/reist16/reist16.cpp)
+list (APPEND wsjt_CXXSRCS lib/reist16/reist16.cpp lib/reist16/qso2.cpp)
 list (APPEND wsjt_FSRCS lib/reist16/reist16.f90)
 add_library (wsjt_cxx STATIC ${wsjt_CSRCS} ${wsjt_CXXSRCS})
 target_include_directories (wsjt_cxx PRIVATE ${FFTW3_INCLUDE_DIRS})
@@ -1311,15 +1313,27 @@ target_link_libraries (wsjt_cxx ${LIBM_LIBRARIES} Boost::log_setup ${LIBM_LIBRAR
 
 add_executable (reist16_checks EXCLUDE_FROM_ALL tests/reist16/reist16_checks.cpp)
 target_link_libraries (reist16_checks wsjt_cxx)
-add_executable (wsjtx_pluto_bridge PlutoBridge/main.cpp PlutoBridge/Bridge.cpp PlutoBridge/Iio.cpp)
+add_executable (wsjtx_pluto_bridge PlutoBridge/main.cpp PlutoBridge/Bridge.cpp PlutoBridge/Iio.cpp HackrfBridge/Hackrf.cpp)
 set_target_properties (wsjtx_pluto_bridge PROPERTIES AUTOMOC ON)
 target_link_libraries (wsjtx_pluto_bridge Qt5::Core Qt5::WebSockets)
-add_executable (pluto_bridge_checks EXCLUDE_FROM_ALL tests/pluto/pluto_bridge_checks.cpp PlutoBridge/Bridge.cpp PlutoBridge/Iio.cpp)
+add_executable (wsjtx_hackrf_bridge HackrfBridge/main.cpp PlutoBridge/Bridge.cpp PlutoBridge/Iio.cpp HackrfBridge/Hackrf.cpp)
+set_target_properties (wsjtx_hackrf_bridge PROPERTIES AUTOMOC ON)
+target_link_libraries (wsjtx_hackrf_bridge Qt5::Core Qt5::WebSockets)
+add_executable (pluto_bridge_checks EXCLUDE_FROM_ALL tests/pluto/pluto_bridge_checks.cpp PlutoBridge/Bridge.cpp PlutoBridge/Iio.cpp HackrfBridge/Hackrf.cpp)
 set_target_properties (pluto_bridge_checks PROPERTIES AUTOMOC ON)
 target_link_libraries (pluto_bridge_checks wsjt_qt wsjt_fort wsjt_cxx Qt5::WebSockets)
 if (WIN32)
   add_library (pluto_fake_iio SHARED EXCLUDE_FROM_ALL tests/pluto/fake_iio.cpp)
   add_dependencies (pluto_bridge_checks pluto_fake_iio)
+  add_library (hackrf_fake SHARED EXCLUDE_FROM_ALL tests/hackrf/fake_hackrf.cpp)
+  add_executable (hackrf_bridge_checks EXCLUDE_FROM_ALL tests/hackrf/hackrf_bridge_checks.cpp HackrfBridge/Hackrf.cpp)
+  target_link_libraries (hackrf_bridge_checks wsjt_qt wsjt_fort wsjt_cxx Qt5::WebSockets)
+  add_dependencies (hackrf_bridge_checks hackrf_fake)
+  add_executable (sdr_configuration_checks EXCLUDE_FROM_ALL tests/hackrf/configuration_checks.cpp
+    Configuration.cpp logbook/logbook.cpp PlutoBridge/Bridge.cpp PlutoBridge/Iio.cpp HackrfBridge/Hackrf.cpp)
+  set_target_properties (sdr_configuration_checks PROPERTIES AUTOMOC ON)
+  target_link_libraries (sdr_configuration_checks wsjt_qt wsjt_fort wsjt_cxx Qt5::Multimedia Qt5::SerialPort)
+
 endif ()
 
 # build an OpenMP variant of the Fortran library routines
@@ -1327,6 +1341,10 @@ add_library (wsjt_fort STATIC ${wsjt_FSRCS})
 target_link_libraries (wsjt_fort  ${FFTW3_LIBRARIES})
 add_executable (reist16_wave_checks EXCLUDE_FROM_ALL tests/reist16/reist16_wave_checks.f90)
 target_link_libraries (reist16_wave_checks wsjt_fort wsjt_cxx)
+add_executable (reist16_qso2_checks EXCLUDE_FROM_ALL tests/reist16/qso2_checks.cpp)
+target_link_libraries (reist16_qso2_checks wsjt_fort wsjt_cxx)
+add_executable (reist16_qso2_channel_checks EXCLUDE_FROM_ALL tests/reist16/qso2_channel_checks.cpp)
+target_link_libraries (reist16_qso2_channel_checks wsjt_cxx)
 if (${OPENMP_FOUND} OR APPLE)
   add_library (wsjt_fort_omp STATIC ${wsjt_FSRCS})
   target_link_libraries (wsjt_fort_omp  ${FFTW3_LIBRARIES})

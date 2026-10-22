@@ -21,6 +21,13 @@ Der voreingestellte Pluto-Zugang ist ip:192.168.2.1. Für eine andere Adresse:
 
   .\Start-Pluto.ps1 -Uri 'ip:192.168.3.1'
 
+Wenn "IIO context" beim Start fehlschlägt, ist noch keine Funkverbindung
+aufgebaut. Den Pluto-Anschluss und die gewählte IP-/USB-Adresse prüfen;
+gegebenenfalls andere SDR-Programme beenden, die dieses Gerät belegen.
+Ein angeschlossener HackRF wird von diesem Starter nicht als Pluto benutzt:
+dafür start-hackrf.bat starten. Der USB-Scan kann ohne Funkkonfiguration
+mit bin/pluto/iio_info.exe -S usb im jeweiligen Paket ausgeführt werden.
+
 Auch ein vollständiger libiio-USB-URI kann mit -Uri übergeben werden.
 Die Anfangs-Dialfrequenz ist 432500000 Hz. Sie ist ein Startwert, keine
 aus einem Bandplan abgeleitete Betriebsfrequenz. Vor einem Funkversuch

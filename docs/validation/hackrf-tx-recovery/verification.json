@@ -1,0 +1,48 @@
+{
+  "verifiedUtc": "2026-10-22T18:55:04.698065+00:00",
+  "reportedFailure": "HackRF bridge exits on first PTT with Start TCI audio before PTT",
+  "rootCause": "Configuration.cpp used rig-name special cases at load, selection and acceptance, excluding the new HackRF alias. The production settings path did not enable TCI audio correctly.",
+  "reproducedBeforeFix": "sdr_configuration_checks failed: SDR alias must be recognized as TCI when loading the profile",
+  "change": "Use registered CAT port capability for TCI recognition; reject PTT without audio nonfatally without retaining a pending transmit; report selected Pluto URI on connection failure.",
+  "tests": {
+    "production_settings": "passed",
+    "hackrf_driver_and_protocol": "passed",
+    "pluto_native": "passed",
+    "pluto_protocol": "passed",
+    "portable_dependencies": "passed",
+    "packaged_hackrf_protocol": "passed"
+  },
+  "mockChecks": 4655,
+  "productionSettings": "Real Configuration.cpp, Qt settings dialog, HackRF and Pluto rig switch, CAT test receives TCI audio, accept settings against simulated bridges.",
+  "plutoDiagnosis": {
+    "usbScan": "No IIO context found",
+    "windowsDevices": "HackRF One present; no Pluto or RNDIS interface",
+    "tcp": "192.168.2.1:30431 unreachable within 1500 ms"
+  },
+  "rfTransmissionTested": false,
+  "personalProfilesModifiedByAgent": false,
+  "hackrfPackage": "dist-custom\\OE3SRO-reist16-hackrf",
+  "hackrfVersion": "3.0.2-oe3sro-reist16-hackrf.2",
+  "plutoUpdate": "Existing Pluto package: bridge executable, starter and Pluto instructions only; existing WSJT-X application preserved.",
+  "sourceSha256": {
+    "Configuration.cpp": "1b0b8bd84463f59280608c6040c41ffd77c1567a8328ddf0947b77e6d4310b85",
+    "PlutoBridge/Bridge.cpp": "682ae2932f97af5d76c39fe1b8d17115b0e8f06d651917be4e6ab2be44bb6f28",
+    "PlutoBridge/Bridge.hpp": "18071ade7e5370d0c9c6f3a5673d563b2829bac36f7ecc699c5da6a80e19f1be",
+    "PlutoBridge/Iio.cpp": "5ee82ee78a5e2ec249c882f4a7919f2684aac492b224bde9112500a221a8fa37",
+    "Transceiver/TCITransceiver.cpp": "c4e82adabcdf58651b77ae0721070d6347daf933aa6aa6da60ff6c73003566d6",
+    "Start-Pluto.ps1": "c743639c2233d1bfdc7e84ef0b8354ec4a3afb8e65c57a1b62363ba4dc88ec67",
+    "tests/hackrf/configuration_checks.cpp": "064c9151690c601c04884c064b0a2626a97eaa400c4a744332060237b99ea773",
+    "tests/pluto/pluto_bridge_checks.cpp": "e01d296838300a5fe6dcd5acdb32904479b46511fef8b6f0bb40af154e5104f1",
+    "tests/pluto/fake_iio.cpp": "d2d200b9b791e83f1b849655ecfa046e79ca61b2d789f99eead37663596dc180",
+    "tools/Test-PlutoBridgeProtocol.py": "4df3b5144195076b99cb6f3efa08fd0d4b1795f07d5eb87f77dee17e6c43a0f4",
+    "tools/Test-HackrfBridge.ps1": "4d38a7d95b721ceaead08f62afc29f64ed93a31fd5a5dd5bc951403a88411593",
+    "CMakeLists.txt": "e0b6001e6450b756fdb7eb50a50abd7f6ce41ee6736c447f86861253622a0154"
+  },
+  "packageSha256": {
+    "bin/wsjtx.exe": "2a2a9fbb96d01e0b563795fc95bce119f8f16543668ae3e53158e4410ed79c8c",
+    "bin/wsjtx_hackrf_bridge.exe": "b7a79b01df07f4dfc592696cb5f5a1e21c831d017925c893313a0df9748a14e4",
+    "bin/wsjtx_pluto_bridge.exe": "90731afd720b355939776bbc9ba8d74a0ad71bf87c17565371db2ec3628371ce",
+    "Start-Pluto.ps1": "c743639c2233d1bfdc7e84ef0b8354ec4a3afb8e65c57a1b62363ba4dc88ec67",
+    "Start-HackRF.ps1": "546a4229e536a36b2a9ca6c423572d0af61ee048c2eb4835bfb059b7e32997e3"
+  }
+}

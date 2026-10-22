@@ -47,7 +47,7 @@ private Q_SLOTS:
     QTest::newRow ("FT8") << QString ("FT8") << 79 << 1920 << -3. << 15. << qint64 (500);
     QTest::newRow ("FT4") << QString ("FT4") << 105 << 576 << -2. << 7.5 << qint64 (300);
     QTest::newRow ("FT2") << QString ("FT2") << 105 << 288 << -2. << 3.75 << qint64 (150);
-    QTest::newRow ("REIST16") << QString ("REIST16") << 120 << 960 << -4. << 15. << qint64 (500);
+    QTest::newRow ("REIST16") << QString ("REIST16") << 64 << 2400 << -4. << 15. << qint64 (500);
   }
   void waveformSnapshotAndExactEnd ()
   {

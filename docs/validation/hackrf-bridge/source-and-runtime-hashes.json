@@ -1,0 +1,158 @@
+[
+  {
+    "file": "Start-HackRF.ps1",
+    "sha256": "546a4229e536a36b2a9ca6c423572d0af61ee048c2eb4835bfb059b7e32997e3"
+  },
+  {
+    "file": "start-hackrf.bat",
+    "sha256": "979e0e25d201ace869e71343c0d2b3cd95ad5041a018a20454ff553b20b2b7ba"
+  },
+  {
+    "file": "HackrfBridge/Hackrf.hpp",
+    "sha256": "292cc0a304790def69781a005d80d144e46e88c1067100ac2289dac05105f8f3"
+  },
+  {
+    "file": "HackrfBridge/Hackrf.cpp",
+    "sha256": "819cb06a0bc5ee5317eb1838d3e10ae600e1779c5116f94a9d52e22cb65ef635"
+  },
+  {
+    "file": "HackrfBridge/main.cpp",
+    "sha256": "bd0968d449bceb5e6d12e671783169ee13aa43d9e26047ba3412886f148a7680"
+  },
+  {
+    "file": "PlutoBridge/Radio.hpp",
+    "sha256": "7cdce5913a0321ad1b24ab8e94ad2b9db2d2d364ba32afa020524b5dc4714f46"
+  },
+  {
+    "file": "PlutoBridge/Bridge.hpp",
+    "sha256": "0937e9eb160d555bf7244de54eb167380255dde1569fddc1489bfc85235e22da"
+  },
+  {
+    "file": "PlutoBridge/Bridge.cpp",
+    "sha256": "3b8540031d7d4b01853020e5449f3b8426911078555b12c0b555037b1768271f"
+  },
+  {
+    "file": "PlutoBridge/Iio.hpp",
+    "sha256": "e2b59fc3b59213be0dccc34dcec746485cc3ad75842a90782d4602278b3cbd65"
+  },
+  {
+    "file": "PlutoBridge/Profile.hpp",
+    "sha256": "542a2d579ec05fa07fb67b6b060fdd58f4392804af5bd26e08c28a5d1c3a6136"
+  },
+  {
+    "file": "main.cpp",
+    "sha256": "8bae5eede44dcefc422bce8d87600047418338c1ac7f6613695ecf49de44ed00"
+  },
+  {
+    "file": "Transceiver/TransceiverFactory.cpp",
+    "sha256": "2019ac972180ed68da364f9c06d7cfdca0fea00ae28332b0f3ebfc9bca30fe79"
+  },
+  {
+    "file": "CMakeLists.txt",
+    "sha256": "5b7fb6639cacf61bb0f7a0d1c1193c184d83ca02099f025159025980b39ddb64"
+  },
+  {
+    "file": "tools/Build-Custom.ps1",
+    "sha256": "6f85bc1a01d48a88f405949e691b4bf20da8b287a375afce177e99243a0b33e2"
+  },
+  {
+    "file": "tools/Setup-HackrfBridge.ps1",
+    "sha256": "a757242be3ed09db3b89674ad18b9df1fb363dfc5fd9c617c517ca930285154b"
+  },
+  {
+    "file": "tools/Test-HackrfBridge.ps1",
+    "sha256": "32e3b8b7c87bb575ae620a175cb5026600287a31803e5dd3b48f6f1315b795f6"
+  },
+  {
+    "file": "tools/Test-PlutoBridgeProtocol.py",
+    "sha256": "a4a76509622c0de9b1ba825bf40afdfe69374e091a9cffacb4e4bc3fa8b5018a"
+  },
+  {
+    "file": "tools/Package-Custom.ps1",
+    "sha256": "f665baf1f9dfa58cf7e1c7c8f93098c144c0e17a5bb421f82b76b6ce7c3e834f"
+  },
+  {
+    "file": "tools/New-WindowsArtifact.ps1",
+    "sha256": "52abe428c87515e98aad9319937e2de43e53e79a2c708526478daee265a77910"
+  },
+  {
+    "file": "tests/hackrf/FakeState.hpp",
+    "sha256": "45cf3c43e0505914eb8bdcd9b3e74b925679e56d278122b9e5ad268f40a79459"
+  },
+  {
+    "file": "tests/hackrf/fake_hackrf.cpp",
+    "sha256": "85343b222f64c574e6b71c609d9d7059d0d3e9eb3e48764e717905ad22f216c0"
+  },
+  {
+    "file": "tests/hackrf/hackrf_bridge_checks.cpp",
+    "sha256": "0b296e67481fd62ffbb92547495d6d50aeb9abcd1ee5492cb40845f368d75f14"
+  },
+  {
+    "file": "tests/pluto/pluto_bridge_checks.cpp",
+    "sha256": "f7b54846dcc9d2681948963a5f39ab5917155224a9e27affa3e824f5e3093683"
+  },
+  {
+    "file": "docs/HACKRF-WSJTX.txt",
+    "sha256": "28ca2e984e887e674f738175e1e63d5ed0654a71e1c0f561f70c7c2860a8b39f"
+  },
+  {
+    "file": "dist-custom/OE3SRO-reist16-hackrf/bin/wsjtx.exe",
+    "sha256": "655ff8b82a4fc37271219f443a95a69f45f748dc03f7caa5a7cbc426f6334ceb"
+  },
+  {
+    "file": "dist-custom/OE3SRO-reist16-hackrf/bin/wsjtx_app_version.exe",
+    "sha256": "5682b3643267214c02b6838a09c179b0102b948a4c6502e83a389075b3c069a7"
+  },
+  {
+    "file": "dist-custom/OE3SRO-reist16-hackrf/bin/wsjtx_hackrf_bridge.exe",
+    "sha256": "2e07403facdeb3c93ca6dafd808edee31f13fc954b84837763b1ec288dd60c6e"
+  },
+  {
+    "file": "dist-custom/OE3SRO-reist16-hackrf/bin/wsjtx_pluto_bridge.exe",
+    "sha256": "786a3771d942fab166925f09bfdd03f27d9a8c25df23f24cafccb84ee1d3584c"
+  },
+  {
+    "file": "dist-custom/OE3SRO-reist16-hackrf/bin/hackrf/hackrf-0.dll",
+    "sha256": "f38ab7b7071f872f8eb492ef543e07467fe0c7f238acbd04b89abb0571cf39bf"
+  },
+  {
+    "file": "dist-custom/OE3SRO-reist16-hackrf/bin/hackrf/libusb-1.0.dll",
+    "sha256": "2b2ede229c31be180a849c710f06bcfffc22814694a6dc01a92a5533de27f350"
+  },
+  {
+    "file": "dist-custom/OE3SRO-reist16-hackrf/bin/hackrf/libwinpthread-1.dll",
+    "sha256": "9e00ba6d980626b752b698f690709c321a5eab6eb442f352bb8ab90e385f2bf5"
+  },
+  {
+    "file": "dist-custom/OE3SRO-reist16-hackrf/bin/hackrf/msvcp140.dll",
+    "sha256": "7c26614e1d733892c2deac7e245ce115504b1d80592dd0a01b08e3e5a55f89ca"
+  },
+  {
+    "file": "dist-custom/OE3SRO-reist16-hackrf/bin/hackrf/runtime-sources.json",
+    "sha256": "97daa9b9b274032c97137d50c07a4a6af1cc5fbf531bbe25e89d25efbfa1ae46"
+  },
+  {
+    "file": "dist-custom/OE3SRO-reist16-hackrf/bin/hackrf/vcruntime140.dll",
+    "sha256": "d1f4225df2cd877dbf130d5668a021dce3f94118455ff5ec952061c30afc9ce7"
+  },
+  {
+    "file": "dist-custom/OE3SRO-reist16-hackrf/bin/hackrf/vcruntime140_1.dll",
+    "sha256": "a7146c08f89fe5b04541ab507cdb59ff7b44534d4ba3c668a426c6450a03434e"
+  },
+  {
+    "file": "dist-custom/OE3SRO-reist16-hackrf/bin/hackrf/licenses/libhackrf0-2026.01.3-hfd05255_0/COPYING",
+    "sha256": "49b60a6288f90f49074228cc1fae0fb16871ba36b756013abdf7c2fc92f01fad"
+  },
+  {
+    "file": "dist-custom/OE3SRO-reist16-hackrf/bin/hackrf/licenses/libusb-1.0.30-h6a83c73_0/COPYING",
+    "sha256": "5df07007198989c622f5d41de8d703e7bef3d0e79d62e24332ee739a452af62a"
+  },
+  {
+    "file": "dist-custom/OE3SRO-reist16-hackrf/bin/hackrf/licenses/libwinpthread-12.0.0.r4.gg4f2fc60ca-h57928b3_10/COPYING.MinGW-w64/COPYING.MinGW-w64.txt",
+    "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+  },
+  {
+    "file": "dist-custom/OE3SRO-reist16-hackrf/bin/hackrf/licenses/libwinpthread-12.0.0.r4.gg4f2fc60ca-h57928b3_10/mingw-w64-libraries/winpthreads/COPYING",
+    "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+  }
+]

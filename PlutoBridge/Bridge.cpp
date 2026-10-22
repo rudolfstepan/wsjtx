@@ -1,5 +1,6 @@
 #include "Bridge.hpp"
 #include "Iio.hpp"
+#include "HackrfBridge/Hackrf.hpp"
 #include "qt_helpers.hpp"
 #include <QCoreApplication>
 #include <QFile>
@@ -58,8 +59,11 @@ bool RadioWorker::submit(std::vector<float> const& samples) {
 }
 void RadioWorker::run() {
   try {
-    std::unique_ptr<IioRadio> hardware;
-    if(!options.simulate) hardware.reset(new IioRadio(options.library,options.uri,options.frequency,options.rxGain,options.txGain));
+    std::unique_ptr<Radio> hardware;
+    if(!options.simulate) {
+      if(options.hackrf)hardware.reset(new HackrfRadio(options.library,options.serial,options.frequency,int(options.rxGain),options.rxVga,int(options.txGain),options.amplitude));
+      else hardware.reset(new IioRadio(options.library,options.uri,options.frequency,options.rxGain,options.txGain));
+    }
     UsbModulator modulator;
     UsbDemodulator demodulator;
     bool active=false;
@@ -84,7 +88,7 @@ void RadioWorker::run() {
       if(active && !on) changePtt(false);
       auto newRx=rxFrequency.load(),newTx=txFrequency.load();
       if(newRx!=rx || newTx!=tx) {
-        if(active) throw std::runtime_error("Frequency changed during Pluto TX; frame aborted");
+        if(active) throw std::runtime_error("Frequency changed during SDR TX; frame aborted");
         if(hardware) hardware->tune(newRx,newTx);
         rx=newRx; tx=newTx;
         emit frequencyReady(rx,tx);
@@ -106,7 +110,7 @@ void RadioWorker::run() {
           // recoverable; IIO failures during unkey still take the fatal path.
           auto elapsed=std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-txStarted).count();
           changePtt(false);
-          emit txAborted(QString("Pluto TX audio watchdog: no complete block for 250 ms (block %1, %2 ms since PTT); TX aborted, receiving")
+          emit txAborted(QString("SDR TX audio watchdog: no complete block for 250 ms (block %1, %2 ms since PTT); TX aborted, receiving")
                          .arg(txBlocks).arg(qlonglong(elapsed)));
           continue;
         }
@@ -139,20 +143,17 @@ void RadioWorker::run() {
     emit fault(QString::fromUtf8(e.what()));
   }
 }
-Bridge::Bridge(Options const& o) : options(o),server("WSJT-X PlutoSDR",QWebSocketServer::NonSecureMode,this),
+Bridge::Bridge(Options const& o) : options(o),server("WSJT-X "+o.deviceName(),QWebSocketServer::NonSecureMode,this),
   radio(o),rxFrequency(o.frequency),txFrequency(o.frequency) {
   connect(&radio,&RadioWorker::ready,this,[this]{
     available=true;
     writeReady(true);
-    qInfo().noquote()<<QString("Pluto bridge ready: ws://127.0.0.1:%1 | %2 | %3 Hz | USB | RX %4 dB, TX %5 dB")
-       .arg(options.port).arg(options.simulate?"SIMULATION":options.uri).arg(rxFrequency).arg(options.rxGain).arg(options.txGain);
+    qInfo().noquote()<<options.deviceName()<<QString(" bridge ready: ws://127.0.0.1:%1 | %2 | %3 Hz | USB | RX %4 dB, TX %5 dB")
+       .arg(options.port).arg(options.simulate?"SIMULATION":options.hackrf?options.serial:options.uri).arg(rxFrequency).arg(options.rxGain).arg(options.txGain);
   });
   connect(&radio,&RadioWorker::fault,this,&Bridge::fail);
   connect(&radio,&RadioWorker::txAborted,this,[this](QString reason){
-    lastTxWarning=reason;++txAbortCount;
-    qWarning().noquote()<<reason;
-    writeReady(available);
-    send("tx_abort:0,audio_timeout;");
+    reportTxAbort(reason,"audio_timeout");
   });
   connect(&radio,&RadioWorker::audio,this,[this](QByteArray packet){
     if(client && streaming) {
@@ -175,7 +176,7 @@ Bridge::Bridge(Options const& o) : options(o),server("WSJT-X PlutoSDR",QWebSocke
   connect(&server,&QWebSocketServer::newConnection,this,[this]{
     auto socket=server.nextPendingConnection();
     if(!available) {socket->close();socket->deleteLater();return;}
-    if(client) {socket->close(QWebSocketProtocol::CloseCodePolicyViolated,"Pluto already has a WSJT-X client");socket->deleteLater();return;}
+    if(client) {socket->close(QWebSocketProtocol::CloseCodePolicyViolated,"SDR already has a WSJT-X client");socket->deleteLater();return;}
     client=socket;
     connect(socket,&QWebSocket::disconnected,this,[this,socket]{
       radio.ptt(false);keyed=false;streaming=false;split=false;
@@ -190,10 +191,10 @@ Bridge::Bridge(Options const& o) : options(o),server("WSJT-X PlutoSDR",QWebSocke
       if(!readAudioPacket(packet,audio)) {fail("Invalid TCI transmit audio packet");return;}
       if(keyed) radio.submit(audio);
     });
-    send(QString("protocol:1.9;device:PlutoSDR;version:WSJTX-PlutoBridge,1.0;receive_only:false;trx_count:1;channels_count:2;"
-                 "vfo_limits:325000000,3800000000;if_limits:-24000,24000;modulations_list:usb;"
+    send(QString("protocol:1.9;device:%3;version:WSJTX-SDRBridge,1.1;receive_only:false;trx_count:1;channels_count:2;"
+                 "vfo_limits:%4,%5;if_limits:-24000,24000;modulations_list:usb;"
                  "modulation:0,usb;vfo:0,0,%1;vfo:0,1,%2;split_enable:0,false;trx:0,false;"
-                 "audio_samplerate:48000;start;ready;").arg(rxFrequency).arg(txFrequency));
+                 "audio_samplerate:48000;start;ready;").arg(rxFrequency).arg(txFrequency).arg(options.deviceName()).arg(options.minimumFrequency()).arg(options.maximumFrequency()));
   });
 }
 void Bridge::start() {
@@ -209,12 +210,18 @@ void Bridge::writeReady(bool ok,QString const& reason) {
   if(options.readyFile.isEmpty()) return;
   QSaveFile file(options.readyFile);
   if(file.open(QIODevice::WriteOnly|QIODevice::Truncate)) {
-    file.write(QJsonDocument(QJsonObject{{"ok",ok},{"error",reason.isEmpty()?lastError:reason},{"simulate",options.simulate},{"port",options.port},{"ptt",keyed},
+    file.write(QJsonDocument(QJsonObject{{"device",options.deviceName()},{"serial",options.serial},{"sampleRate",rf_rate},{"ok",ok},{"error",reason.isEmpty()?lastError:reason},{"simulate",options.simulate},{"port",options.port},{"ptt",keyed},
                {"rxFrequency",double(rxFrequency)},{"txFrequency",double(txFrequency)},
                {"pid",double(QCoreApplication::applicationPid())},
                {"txAborts",int(txAbortCount)},{"lastTxWarning",lastTxWarning}}).toJson());
     file.commit();
   }
+}
+void Bridge::reportTxAbort(QString const& reason,QString const& code) {
+  lastTxWarning=reason;++txAbortCount;
+  qWarning().noquote()<<reason;
+  writeReady(available);
+  send(QString("tx_abort:0,%1;").arg(code));
 }
 void Bridge::fail(QString const& reason) {
   lastError=reason;
@@ -236,19 +243,26 @@ void Bridge::commands(QString const& messages) {
     auto args=(colon<0?QString():command.mid(colon+1)).split(',');
     if(name=="trx" && args.size()>=2 && args[0]=="0") {
       bool on=args[1]=="true";
-      if(on && (!available || !streaming)) {fail("Start TCI audio before PTT");return;}
+      if(on && (!available || !streaming)) {
+        // A CAT/PTT test or late audio_start must not destroy the RX service.
+        // Refuse this TX request; a later audio_start never keys by itself.
+        radio.ptt(false);
+        send("trx:0,false;");
+        reportTxAbort("SDR TX rejected: start TCI audio before PTT; receiving continues","audio_not_started");
+        continue;
+      }
       radio.ptt(on);
       if(!on && !keyed) send("trx:0,false;");
     } else if(name=="vfo" && args.size()>=3 && args[0]=="0") {
       bool ok=false;
       auto f=args[2].toLongLong(&ok);
-      if(!ok || f<325000000 || f>3800000000LL || keyed) {fail("Invalid Pluto frequency or retune during TX");return;}
+      if(!ok || f<options.minimumFrequency() || f>options.maximumFrequency() || keyed) {fail("Invalid SDR frequency or retune during TX");return;}
       auto rx=args[1]=="0"?f:rxFrequency;
       auto tx=args[1]=="1"?f:(split?txFrequency:f);
       if(rx==rxFrequency && tx==txFrequency) send(QString("vfo:0,0,%1;vfo:0,1,%2;").arg(rx).arg(tx));
       else radio.tune(rx,tx);
     } else if(name=="modulation" && args.size()>=2) {
-      if(args.last().toLower()!="usb" && args.last().toLower()!="digu") {fail("Pluto bridge supports USB/DIGU");return;}
+      if(args.last().toLower()!="usb" && args.last().toLower()!="digu") {fail("SDR bridge supports USB/DIGU");return;}
       send("modulation:0,usb;");
     } else if(name=="split_enable" && !args.isEmpty()) {
       split=args.last()=="true";

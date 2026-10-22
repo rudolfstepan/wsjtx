@@ -9,8 +9,8 @@ bool received_in_second_period(unsigned utcSeconds, double trPeriod)
 double tx_duration(QString mode, double trPeriod, int nsps, bool bFast9)
 {
   double txt=0.0;
-  // Nominal end 10.1 s; leave 0.9 s for CAT/audio startup and draining.
-  if(mode=="REIST16") txt=0.5 + 120*960/12000.0 + 0.9;
+  // Nominal QSO/2 end 13.3 s; leave 0.9 s for CAT/audio startup and draining.
+  if(mode=="REIST16") txt=0.5 + 64*2400/12000.0 + 0.9;
   if(mode=="FT2")  txt=0.5 + 105*288/12000.0;      // FT2
   if(mode=="FT4")  txt=1.0 + 105*576/12000.0;      // FT4
   if(mode=="FT8")  txt=1.0 + 79*1920/12000.0;      // FT8

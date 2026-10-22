@@ -1,0 +1,17 @@
+{
+  "native_cases": 128,
+  "final_binary_outcomes_identical": true,
+  "confirmation_seed": 2026102211,
+  "negative_slots": 128,
+  "negative_false_decodes": 0,
+  "channel_without_fading": "4/4",
+  "channel_with_fading": "1/4",
+  "mixed_profile_stations": 3,
+  "production_pcm_roundtrips": 7,
+  "standard_qso_messages": 6,
+  "hardware_opened": false,
+  "rf": false,
+  "ft8_regression_log": "build-custom/reist16-weak/tx-quality-final.log",
+  "production_log": "build-custom/reist16-weak/production-final.log",
+  "pluto_log": "build-custom/reist16-weak/pluto-final.log"
+}

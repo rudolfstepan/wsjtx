@@ -1,0 +1,6 @@
+000000 -22  0.0  761 %  CQ DL2WAB JO31                       
+<DecodeFinished>   0   1        0
+000000 -24  0.0 1846 %  CQ DL6XWB JO31                       
+<DecodeFinished>   0   1        0
+000000 -21 -0.1 1155 %  CQ DL9UWX JO31                       
+<DecodeFinished>   0   1        0

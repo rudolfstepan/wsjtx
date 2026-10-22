@@ -1,0 +1,31 @@
+{
+  "version": "3.0.2-oe3sro-reist16-hackrf.1",
+  "branding": "build by OE3SRO",
+  "launcher": "start-hackrf.bat",
+  "package": "dist-custom/OE3SRO-reist16-hackrf",
+  "profile": "WSJT-X - HackRF",
+  "tci_port": 40003,
+  "udp_port": 2239,
+  "initial_frequency_hz": 432500000,
+  "minimum_hz": 1000000,
+  "maximum_hz": 6000000000,
+  "sample_rate": 3072000,
+  "audio_rate": 48000,
+  "half_duplex": true,
+  "auto_tx_initial": false,
+  "default_tx_gain": 0,
+  "rf_amp": false,
+  "bias_tee": false,
+  "mock_checks": 4655,
+  "protocol": "single client / disconnect / watchdog / late audio / fresh TX / graceful stop passed",
+  "production_tci": "CAT thread, RX audio, PTT, immutable QSO/2 waveform and software USB IQ roundtrip passed against simulated HackRF bridge",
+  "pluto_regression": "passed",
+  "portable_runtime": "Qt/OpenSSL and HackRF exports verified without developer PATH",
+  "launcher_prepare_only": "passed with temporary LOCALAPPDATA; no real user profile written",
+  "hardware_opened": false,
+  "rf_transmitted": false,
+  "limitations": [
+    "Real HackRF USB streaming / frequency / power / end-to-end timing not accepted over RF yet."
+  ],
+  "sdk_source": "https://github.com/greatscottgadgets/hackrf/blob/v2026.01.3/host/libhackrf/src/hackrf.h"
+}

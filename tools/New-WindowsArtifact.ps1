@@ -24,6 +24,7 @@ build by OE3SRO
 
 Extract the entire ZIP, then double-click Start-WSJT-X.bat.
 Keep bin and share together; the EXE requires the bundled DLLs and data.
+For the separate HackRF One profile, use start-hackrf.bat; see HACKRF-WSJTX.txt.
 On first launch, configure your station and radio in Settings.
 Existing WSJT-X - Custom profiles are reused without importing other profiles.
 
@@ -39,8 +40,9 @@ $manifest = [ordered]@{
     platform = 'windows-x64'
     commit = $commit
     sourceDirty = [bool](& git -C $root status --porcelain --untracked-files=normal)
-    experimentalMode = 'REIST16-QSO/1'
+    experimentalMode = 'REIST16-QSO/2'
     plutoBridge = (Test-Path -LiteralPath (Join-Path $package 'bin\pluto\libiio.dll'))
+    hackrfBridge = (Test-Path -LiteralPath (Join-Path $package 'bin\hackrf\hackrf-0.dll'))
     run = $env:GITHUB_RUN_ID
     exe = 'bin/wsjtx.exe'
     exeSha256 = (Get-FileHash -LiteralPath $exe).Hash.ToLowerInvariant()
@@ -50,11 +52,12 @@ $docs = Join-Path $package 'docs'
 New-Item -ItemType Directory -Force -Path $docs | Out-Null
 Copy-Item -LiteralPath "$root\docs\REIST16.txt" -Destination $docs -Force
 Copy-Item -LiteralPath "$root\docs\PLUTO-WSJTX.txt" -Destination $docs -Force
+Copy-Item -LiteralPath "$root\docs\HACKRF-WSJTX.txt" -Destination $docs -Force
 Copy-Item -LiteralPath "$root\docs\WINDOWS-QUICKSTART.html" -Destination "$docs\index.html" -Force
 New-Item -ItemType Directory -Force -Path "$docs\images" | Out-Null
 Copy-Item -LiteralPath "$root\docs\images\ft2-qso-oe3sro-og5o-2026-10-16.png" -Destination "$docs\images" -Force
 Copy-Item -LiteralPath "$root\docs\images\REIST16_QSO.png" -Destination "$docs\images" -Force
-foreach ($document in @('FT2.md', 'FT8.md', 'REIST16.md', 'CHANGES.md')) {
+foreach ($document in @('FT2.md', 'FT8.md', 'REIST16.md', 'REIST16-QSO2.md', 'CHANGES.md')) {
     $content = [IO.File]::ReadAllText("$root\docs\$document")
     # Repository source links should also work from an extracted binary package.
     $content = [regex]::Replace($content, '\]\(\.\./([^)]+)\)', [Text.RegularExpressions.MatchEvaluator]{ param($match)

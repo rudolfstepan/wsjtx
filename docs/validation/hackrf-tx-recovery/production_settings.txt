@@ -1,0 +1,1 @@
+PASS production SDR settings: HackRF/Pluto profile load, TCI audio, rig switch, CAT test receives audio, settings acceptance; simulated radio only.

@@ -75,7 +75,9 @@ void IioRadio::state(char const* mode) {
 IioRadio::IioRadio(QString const& library,QString const& uri,long long frequency,double rxGain,double txGain)
   : api(library) {
   try {
-    context=required(api.iio_create_context_from_uri(uri.toUtf8().constData()),"IIO context (check URI and exclusive device access)");
+    context=api.iio_create_context_from_uri(uri.toUtf8().constData());
+    if(!context) throw std::runtime_error(QString("Pluto IIO context unavailable at '%1'. Check the connected Pluto, its URI/network address and other SDR applications using it.")
+                                        .arg(uri).toStdString());
     api.check(api.iio_context_set_timeout(context,500),"timeout");
     phy=required(api.iio_context_find_device(context,"ad9361-phy"),"ad9361-phy");
     rxLo=required(api.iio_device_find_channel(phy,"altvoltage0",true),"RX LO");

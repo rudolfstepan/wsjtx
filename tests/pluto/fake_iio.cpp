@@ -18,7 +18,7 @@ static Channel rxLo{10,true,{}},txLo{11,true,{}},rfRx{20,false,{}},rfTx{21,true,
 API State* fake_iio_state() {return &state;}
 API int fake_iio_tx_sample(unsigned index) {return index<lastTx.size()?lastTx[index]:99999;}
 API void iio_library_get_version(unsigned* major,unsigned* minor,char* tag) {*major=0;*minor=26;std::strcpy(tag,"test");}
-API void* iio_create_context_from_uri(char const*) {++state.contexts;return &state;}
+API void* iio_create_context_from_uri(char const* uri) {if(!std::strcmp(uri,"missing:"))return nullptr;++state.contexts;return &state;}
 API void iio_context_destroy(void*) {--state.contexts;}
 API int iio_context_set_timeout(void*,unsigned) {return 0;}
 API void* iio_context_find_device(void*,char const* name) {

@@ -1,0 +1,6 @@
+{
+  "build-custom/wsjtx.exe": "ed0402a45477f9410d70a48a199b119934dfc7c6ce6cb51e82f566eeee97b457",
+  "build-custom/jt9.exe": "2642fd069c922411776970112ec5c5b9e155db2476b0b2087f267ded81e7ef47",
+  "dist-custom/OE3SRO-reist16-pluto-timing/bin/wsjtx.exe": "ed0402a45477f9410d70a48a199b119934dfc7c6ce6cb51e82f566eeee97b457",
+  "dist-custom/OE3SRO-reist16-pluto-timing/bin/jt9.exe": "2642fd069c922411776970112ec5c5b9e155db2476b0b2087f267ded81e7ef47"
+}

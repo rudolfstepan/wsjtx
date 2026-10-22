@@ -5397,7 +5397,7 @@ QPushButton[state=&quot;ok&quot;] {
   <action name="actionREIST16">
    <property name="checkable"><bool>true</bool></property>
    <property name="text"><string>REIST16</string></property>
-   <property name="toolTip"><string>Experimental REIST16 CQ/QSO, 15-second UTC slots</string></property>
+   <property name="toolTip"><string>REIST16-QSO/2 weak-signal CQ/QSO: 12.8 s, LDPC, 75 Hz tone span, 15-second UTC slots; RX also QSO/1</string></property>
   </action>
   <action name="actionFT2">
    <property name="checkable"><bool>true</bool></property>

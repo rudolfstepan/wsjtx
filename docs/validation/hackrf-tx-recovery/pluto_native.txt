@@ -1,0 +1,2 @@
+USB IQ modem round trip: 3.22423 s for 12.9 s audio
+PASS Pluto: IIO formats, USB sideband rejection, modem round trip, TCI PCM snapshot, real driver CAT/PTT/RX against simulated bridge.

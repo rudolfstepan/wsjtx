@@ -4,7 +4,21 @@
 
 [Deutsch](../README.md) · [English](../README.en.md) · [Profilvertrag / protocol](REIST16.txt) · [Pluto](PLUTO-WSJTX.txt)
 
-## Deutsch
+## Aktueller Stand: QSO/2 — 22. Oktober 2026
+
+Dieser Build sendet **QSO/2**: 12,8 s Signalzeit, 15-s-UTC-Slots, 16-GFSK,
+5 Hz Tonabstand, 77 Informationsbits und LDPC(174,91) mit CRC14.
+Beide Gegenstellen benötigen das Update. Der neue Empfänger erkennt auch
+QSO/1. [Neuer Profilvertrag, Messbedingungen und Grenzen](REIST16-QSO2.md).
+
+This build transmits **QSO/2**, a 12.8 s LDPC-protected message within the
+existing 15-second mode. Both endpoints need the update; the new receiver
+also accepts QSO/1. [Protocol and measurement notes](REIST16-QSO2.md).
+
+Die folgenden Angaben und das QSO-Bild dokumentieren QSO/1 vom 21. Oktober.
+The following specification and RF screenshot document the earlier QSO/1.
+
+## Deutsch — QSO/1 (historisch)
 
 REIST16 ist eine neue, experimentelle CQ-/QSO-Betriebsart dieses WSJT-X-Forks.
 Sie verwendet feste 15-Sekunden-UTC-Slots und den vertrauten Ablauf mit CQ,
