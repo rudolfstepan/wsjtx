@@ -61,6 +61,33 @@ static void unit_tests() {
  audio[0]=std::numeric_limits<float>::infinity();
  check(reist16::qso2::decode(audio.data(),180000,100,4000,3).empty(),"nonfinite input");
  check(reist16::qso2::decode(audio.data(),180001,100,4000,3).empty(),"bounded input");
+ // Independent noisy waveform: preserve the final synchronization symbols
+ // when browser/network delay moves a complete frame past the old cutoff.
+ std::string message="CQ TEST OE3SRO JN88";message.resize(37,' ');
+ char sent[37],packed[77];int packedTones[79],i3=0,n3=0;
+ genft8_(&message[0],&i3,&n3,sent,packed,packedTones,37,37);
+ reist16::Bits delayedBits;for(int i=0;i<77;++i)delayedBits[i]=packed[i];
+ auto tones=reist16::qso2::encode_tones(delayedBits);
+ std::vector<std::complex<float>> independent(153600);
+ ft8_native::waveform(tones.data(),64,2400,4,12000,1500.375f,independent.data(),nullptr,true,int(independent.size()));
+ int delayedExact=0,oldExact=0;
+ for(int start:{13200,15600,18000})for(int repeat=0;repeat<2;++repeat) {
+   std::mt19937 noiseRng(2026102340+repeat);std::normal_distribution<float> normal;
+   double phase=6.283185307179586*(noiseRng()/double(noiseRng.max()));
+   std::vector<float> signal(independent.size());double power=0;
+   for(size_t i=0;i<signal.size();++i){signal[i]=.8*std::imag(std::complex<double>(independent[i])*std::polar(1.,phase));power+=signal[i]*signal[i];}
+   power/=signal.size();
+   double sigma=std::sqrt(power*.0001*6000/2500/std::pow(10.,-18./10));
+   std::vector<float> rx(180000);for(auto& v:rx)v=sigma*normal(noiseRng);
+   for(size_t i=0;i<signal.size();++i)rx[start+i]+=.01f*signal[i];
+   auto old=reist16::qso2::decode(rx.data(),48*3456,100,4000,3);
+   auto extended=reist16::qso2::decode(rx.data(),reist16::qso2::monitor_capture_samples,100,4000,3);
+   for(auto const& d:old)if(d.bits==delayedBits)++oldExact;
+   check(extended.size()==1&&extended[0].bits==delayedBits,"delayed noisy frame fits extended capture");
+   ++delayedExact;
+ }
+ check(delayedExact>oldExact,"longer capture recovers delayed noisy frames");
+ std::cout<<"PASS delayed noisy frames: old "<<oldExact<<"/6, extended "<<delayedExact<<"/6"<<std::endl;
  std::cout<<"PASS QSO/2 wire mapping, 12 clean edge/start round trips, 12/48 kHz, ABI and bounds"<<std::endl;
 }
 

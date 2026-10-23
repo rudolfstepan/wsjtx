@@ -10,6 +10,7 @@
 #include <QDebug>
 
 #include "Logger.hpp"
+#include "LoopbackInput.hpp"
 
 #include "moc_soundin.cpp"
 
@@ -54,6 +55,32 @@ void SoundInput::start(QAudioDeviceInfo const& device, int framesPerBuffer, Audi
   stop ();
 
   m_sink = sink;
+
+  if (!loopbackInputName ().isEmpty ())
+    {
+      try {
+        if (!m_sink->initialize (QIODevice::WriteOnly, AudioDevice::Mono))
+          throw std::runtime_error ("Failed to initialize loopback audio sink");
+        m_loopback.reset (new WasapiLoopback (loopbackInputName (), 12000 * downSampleFactor));
+        m_loopback_timer.reset (new QTimer);
+        m_loopback_timer->setTimerType (Qt::PreciseTimer);
+        connect (m_loopback_timer.data (), &QTimer::timeout, this, [this] {
+          try {
+            auto pcm = m_loopback->read ();
+            if (m_sink && !pcm.isEmpty ()) m_sink->write (pcm);
+          } catch (std::exception const& e) {
+            stop ();
+            Q_EMIT error (QString::fromLocal8Bit (e.what ()));
+          }
+        });
+        m_loopback_timer->start (10);
+        Q_EMIT status (tr ("Receiving Windows output (WASAPI)"));
+      } catch (std::exception const& e) {
+        stop ();
+        Q_EMIT error (QString::fromLocal8Bit (e.what ()));
+      }
+      return;
+    }
 
   QAudioFormat format (device.preferredFormat());
 //  qDebug () << "Preferred audio input format:" << format;
@@ -107,6 +134,11 @@ void SoundInput::start(QAudioDeviceInfo const& device, int framesPerBuffer, Audi
 
 void SoundInput::suspend ()
 {
+  if (m_loopback) {
+    m_loopback_timer->stop ();
+    try { m_loopback->suspend (); }
+    catch (std::exception const& e) { stop (); Q_EMIT error (QString::fromLocal8Bit (e.what ())); }
+  }
   if (m_stream)
     {
 //      m_stream->suspend ();
@@ -129,6 +161,10 @@ void SoundInput::resume ()
       m_stream->start (m_sink);  // better stop and restart audio (fixes issues on Linux and macOS)
       checkStream ();
     }
+  if (m_loopback) {
+    try { m_loopback->resume (); m_loopback_timer->start (10); }
+    catch (std::exception const& e) { stop (); Q_EMIT error (QString::fromLocal8Bit (e.what ())); }
+  }
 }
 
 void SoundInput::handleStateChanged (QAudio::State newState)
@@ -203,6 +239,10 @@ void SoundInput::reset (bool report_dropped_frames)
 
 void SoundInput::stop()
 {
+  if (m_loopback_timer) m_loopback_timer->stop ();
+  // A timer callback may call stop(); delete the sender after its signal ends.
+  if (m_loopback_timer) m_loopback_timer.take ()->deleteLater ();
+  m_loopback.reset ();
   if (m_stream)
     {
       m_stream->stop ();

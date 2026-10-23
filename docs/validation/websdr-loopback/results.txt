@@ -1,0 +1,98 @@
+WebSDR WASAPI loopback validation - 2026-10-23
+============================================
+Production build: tools/Build-Custom.ps1 / CMake wsjtx target succeeded.
+New separate package: dist-custom/OE3SRO-reist16-websdr.
+Branding: build by OE3SRO. Existing radio packages/profiles retained.
+
+Native wasapi_loopback_checks on active Realtek Digital Output:
+48000 Hz pass0: 143520 samples, RMS0.233724, peak0.697388
+48000 Hz pass1: 143520 samples, RMS0.239159, peak0.653320
+12000 Hz pass0: 35849 samples, RMS0.224798, peak0.613007
+12000 Hz pass1: 36000 samples, RMS0.179219, peak0.570618
+Each pass approx3s; suspend100ms, no data while suspended, resume passed.
+Nonexistent output rejected (no microphone/default output fallback).
+
+Live production receiver launched with --rig-name WebSDR --wasapi-loopback
+"Realtek Digital Output (Realtek USB Audio)". Browser Enschede USB18100kHz.
+Actual ALL.TXT contains multiple FT8 decodes at UTC083315 and083330,
+including CQ UN7IV LO80 and CQ E74K JN95. This verifies the complete
+browser -> Windows output -> WASAPI -> production detector -> FT8 decoder.
+No REIST16 RF test or automatic remote-RX/local-TX QSO demonstrated.
+
+REIST16 regression tools/Test-Reist16.ps1 -SkipBuild passed: native/QSO2,
+6 QSO waveforms,7 production PCM round trips, parser and IPC lifecycle.
+No PTT/HF transmission triggered. Separate Yaesu profile readback:
+Rig Yaesu FT-991, USB Audio CODEC input/output, REIST16,18104000Hz.
+Common project launcher Start-Yaesu-WebSDR.ps1 opens only missing instances.
+WebSDR reception does not automatically drive Yaesu QSO sequencing.
+
+API contract reference:
+https://learn.microsoft.com/en-us/windows/win32/coreaudio/audclnt-streamflags-xxx-constants
+WASAPI shared loopback with AUTOCONVERTPCM and SRC_DEFAULT_QUALITY yields
+PCM16 mono at the detector's required sample rate.
+
+Superseding implementation: ONE INSTANCE Yaesu TX + WebSDR RX
+----------------------------------------------------------
+User clarified that received stations must be answered by the same decoder/
+AutoSeq instance. Start-Yaesu-WebSDR.ps1 now launches one Custom profile with
+--wasapi-loopback and the new binary, retaining Yaesu rig and USB TX audio.
+It no longer launches two instances. --receive-only is an independent CLI
+flag used solely by the optional standalone WebSDR receiver starter.
+Loopback reception alone no longer disables transmission or Tune.
+
+Production build and package updated. Extended sdr_configuration_checks
+passed: loopback RX mono, Yaesu FT-991 rig, independent active TX output,
+original microphone saved unchanged and CAT port retained. Constructor-only
+Yaesu test uses nonexistent COM987; no real rig opened. Existing simulated
+HackRF/Pluto configuration/CAT/TCI/settings tests also passed.
+
+Live launcher verification: exactly one wsjtx.exe, PID25960 at verification,
+--rig-name Custom --wasapi-loopback "Realtek Digital Output (Realtek USB Audio)".
+Existing profile retains Rig=Yaesu FT-991 and SoundOutName=Speakers
+(USB Audio CODEC ). At this launch Mode=FT8 and DialFreq=18100000.
+No Enable TX/Tune/PTT triggered. A real Yaesu transmission/QSO remains untested.
+Browser frequency still requires manual matching to the Yaesu CAT dial.
+
+Additional REIST16 self-CQ test option - 2026-10-23
+-------------------------------------------------
+Start-Reist16-Selftest.ps1 / start-reist16-selftest.bat creates isolated
+REIST16-Selftest-TX and RX profiles. TX initially derives from existing
+Custom Yaesu configuration; source profile is never written. REIST16,
+18104000Hz VFO and1500Hz audio set in both; UDP2241/2242, separate save dirs.
+RX launched with receive-only and WASAPI; TX uses normal Yaesu audio/CAT.
+No EnableTX or Tune activation.
+
+Test-Reist16Selftest.ps1 passed with mocked process APIs: preserved source
+hash/Qt serialization/CAT/TX audio; correct test-profile mode/frequency;
+existing test settings retained; exactly two intended launches; readonly
+loopback only for RX; active Custom/running test profile protection.
+No actual hardware or GUI used in that test.
+
+Actual launch verified: PID30172 RX and PID24268 TX, both corresponding
+window titles visible via process metadata. On-disk profiles confirmed
+REIST16/18104000/1500, RX Rig=None, TX Rig=Yaesu FT-991 and USB Audio CODEC.
+The user must tune the browser to18104kHz USB and initiate CQ in TX window.
+No own HF CQ or remote CQ decode was initiated or claimed.
+
+REIST16 message limit / TX indication regression - 2026-10-23
+------------------------------------------------------------
+User reports green transmit progress/status after changing from CQ to
+CQ TEST OE3SRO JN88. The actual encoder accepts this exact message unchanged.
+No general arbitrary-text support was added. Fields Tx1..Tx6 (including the
+editable Tx5 combo) now enforce37characters in REIST16, restoring previous
+limits on mode change. Shared pack77 round-trip preflight accepts only
+exact type1/2 standard messages before PTT is asserted. Unsupported text
+cannot enter the late-encoder rejection path with PTT already keyed.
+Late encoding failures also cancel pending audio/PTT state explicitly.
+TX presentation now remains active for software TX, pending/requested PTT
+or a rig-reported PTT state. This covers delayed release feedback; the
+original on-air/CAT-dependent CQ TEST indicator symptom was not reproduced
+with live HF during this change.
+
+New native Qt regression passed: exact CQ TEST/CQ DX and six QSO stages,
+unsupported/oversized text rejection, real QLineEdit/QComboBox insertion
+limits, mode restoration, PTT-aware indicator states. Extended production
+modulator tests passed for CQ TEST, CQ DX, report and RR73, all with the
+same614400-sample waveform and successful native decode. Full existing
+REIST16 waveform/native/PCM/IPC suite passed; wsjtx built and active WebSDR
+package updated. No HF/PTT was triggered by these checks.

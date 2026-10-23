@@ -325,6 +325,7 @@ set (wsjtx_CXXSRCS
   getfile.cpp
   Audio/soundout.cpp
   Audio/soundin.cpp
+  Audio/WasapiLoopback.cpp
   widgets/meterwidget.cpp
   widgets/signalmeter.cpp
   widgets/plotter.cpp
@@ -1687,6 +1688,8 @@ add_executable (reist16_audio_checks EXCLUDE_FROM_ALL tests/reist16/reist16_audi
   Modulator/Modulator.cpp Audio/soundout.cpp Decoder/decodedtext.cpp)
 set_target_properties (reist16_audio_checks PROPERTIES AUTOMOC ON)
 target_link_libraries (reist16_audio_checks wsjt_fort wsjt_cxx wsjt_qt Qt5::Multimedia)
+add_executable (reist16_tx_message_checks EXCLUDE_FROM_ALL tests/reist16/tx_message_checks.cpp)
+target_link_libraries (reist16_tx_message_checks wsjt_fort wsjt_cxx wsjt_qt)
 add_executable (ft8_wave_checks EXCLUDE_FROM_ALL tests/ft8/ft8_wave_checks.f90)
 add_executable (ft8_native_checks EXCLUDE_FROM_ALL tests/ft8/native_wave_checks.cpp
   tests/ft8/native_ldpc_checks.cpp tests/ft2/native_ft4_checks.cpp lib/ft8/gen_ft8wave.f90
@@ -1848,6 +1851,12 @@ else ()
   endif ()
 endif ()
 target_link_libraries (wsjtx Qt5::SerialPort wsjt_cxx wsjt_qt wsjt_qtmm ${FFTW3_LIBRARIES} ${LIBM_LIBRARIES})
+if (WIN32)
+  target_link_libraries (wsjtx ole32 uuid)
+  add_executable (wasapi_loopback_checks EXCLUDE_FROM_ALL tests/audio/wasapi_loopback_checks.cpp Audio/WasapiLoopback.cpp)
+  target_include_directories (wasapi_loopback_checks PRIVATE ${CMAKE_SOURCE_DIR})
+  target_link_libraries (wasapi_loopback_checks Qt5::Core ole32 uuid)
+endif ()
 
 # make a library for WSJT-X UDP servers
 # add_library (wsjtx_udp SHARED ${UDP_library_CXXSRCS})

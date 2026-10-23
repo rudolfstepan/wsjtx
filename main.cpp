@@ -176,6 +176,14 @@ int main(int argc, char *argv[])
       QCommandLineOption test_option (QStringList {} << "test-mode"
                                       , "Writable files in test location.  Use with caution, for testing only.");
       parser.addOption (test_option);
+      QCommandLineOption receive_only_option ("receive-only", "Disable transmission and Tune in this instance.");
+      parser.addOption (receive_only_option);
+
+#ifdef Q_OS_WIN
+      QCommandLineOption loopback_option ("wasapi-loopback",
+        "Receive audio from the named Windows playback device (WASAPI loopback).", "output-device");
+      parser.addOption (loopback_option);
+#endif
 
       if (!parser.parse (a.arguments ()))
         {
@@ -197,6 +205,14 @@ int main(int argc, char *argv[])
         }
 
       QStandardPaths::setTestModeEnabled (parser.isSet (test_option));
+      a.setProperty ("receiveOnly", parser.isSet (receive_only_option));
+#ifdef Q_OS_WIN
+      if (parser.isSet (loopback_option)) {
+        auto output = parser.value (loopback_option).trimmed ();
+        if (output.isEmpty ()) throw std::runtime_error ("WASAPI playback device name must not be empty");
+        a.setProperty ("wasapiLoopbackDevice", output);
+      }
+#endif
 
       // support for multiple instances running from a single installation
       bool multiple {false};

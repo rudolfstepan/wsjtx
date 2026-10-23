@@ -24,8 +24,12 @@ Copy-Item -LiteralPath (Join-Path $root 'contrib\Ephemeris\JPLEPH') -Destination
 Copy-Item -LiteralPath (Join-Path $root 'sounds') -Destination $bin -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $root 'COPYING') -Destination $package -Force
 Copy-Item -LiteralPath (Join-Path $root 'docs\REIST16.txt') -Destination $package -Force
+Copy-Item -LiteralPath (Join-Path $root 'docs\REIST16-QSO2.md') -Destination $package -Force
 Copy-Item -LiteralPath (Join-Path $root 'docs\PLUTO-WSJTX.txt') -Destination $package -Force
 Copy-Item -LiteralPath (Join-Path $root 'Start-Pluto.ps1'),(Join-Path $root 'start-pluto.bat') -Destination $package -Force
+Copy-Item -LiteralPath (Join-Path $root 'Start-WebSDR.ps1'),(Join-Path $root 'start-websdr.bat'),(Join-Path $root 'docs/WEBSDR-WSJTX.txt') -Destination $package -Force
+Copy-Item -LiteralPath (Join-Path $root 'Start-Yaesu-WebSDR.ps1'),(Join-Path $root 'start-yaesu-websdr.bat') -Destination $package -Force
+Copy-Item -LiteralPath (Join-Path $root 'Start-Reist16-Selftest.ps1'),(Join-Path $root 'start-reist16-selftest.bat') -Destination $package -Force
 Copy-Item -LiteralPath (Join-Path $root 'Start-HackRF.ps1'),(Join-Path $root 'start-hackrf.bat'),(Join-Path $root 'docs/HACKRF-WSJTX.txt') -Destination $package -Force
 $hackrfRuntime=Join-Path $root '.tools/hackrf/runtime'
 if(Test-Path -LiteralPath (Join-Path $hackrfRuntime 'hackrf-0.dll')){New-Item -ItemType Directory -Force -Path (Join-Path $bin 'hackrf') | Out-Null;Get-ChildItem -LiteralPath $hackrfRuntime | Copy-Item -Destination (Join-Path $bin 'hackrf') -Recurse -Force}

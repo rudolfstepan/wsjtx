@@ -89,6 +89,25 @@ int main(int argc,char**argv) {
       check(!modulator.isActive(),"audio exact stop");
     }
 
+    // The reported CQ TEST case and non-CQ messages have the exact same
+    // immutable frame length and must pass the real modulator/decoder path.
+    for (QByteArray text : {QByteArray("CQ TEST OE3SRO JN88"), QByteArray("CQ DX OE3SRO JN88"),
+         QByteArray("OE3SRO DL1ABC -10"), QByteArray("DL1ABC OE3SRO RR73")}) {
+      auto padded=text.leftJustified(37,' '); QByteArray rendered(37,' ');
+      QVector<float> frame(reist16::qso2::tx_samples); int encoded=0;
+      gen_reist16_(padded.data(),rendered.data(),&frequency,&sequence,frame.data(),&encoded,37,37);
+      check(encoded==1&&rendered==padded,"CQ TEST/non-CQ message preserved");
+      MemoryOutput output; TestModulator modulator; modulator.now=500;
+      modulator.setWaveform(frame);
+      modulator.start("REIST16",64,2400.,frequency,-4.,&output,AudioDevice::Mono,true,false,99.,15.);
+      QByteArray pcm; while(true){auto block=modulator.read(4096);if(block.isEmpty())break;pcm+=block;}
+      check(pcm.size()==2*reist16::qso2::tx_samples,"Message text must not change frame duration");
+      std::vector<float> rx(180000,0);auto samples=reinterpret_cast<int16_t const*>(pcm.constData());
+      for(int i=0;i<pcm.size()/2;i+=4)rx[6000+i/4]=samples[i]/32768.f;
+      auto decoded=reist16::qso2::decode(rx.data(),rx.size(),100,4000,2);
+      check(decoded.size()==1&&!modulator.isActive(),"CQ TEST/non-CQ production PCM must decode and finish");
+    }
+
     // Read actual jt9 stdout from the script, including six standard QSO stages.
     check(argc==2,"provide jt9 decoder output file");
     QFile file(QString::fromLocal8Bit(argv[1]));
@@ -134,7 +153,8 @@ int main(int argc,char**argv) {
     }
 
     // Exercise the exact shared-memory worker path used by MainWindow, with
-    // the live 48-half-symbol capture length, then an empty slot and repeat.
+    // the live capture length. Include frames delayed past the old 13.824-s
+    // cutoff, an empty slot, and a new nominal frame after those delayed ones.
     QSharedMemory memory(QString("reist16-check-%1").arg(app.applicationPid()));
     check(memory.create(sizeof(dec_data_t)),"create decoder shared memory");
     check(memory.lock(),"lock decoder shared memory");
@@ -145,21 +165,30 @@ int main(int argc,char**argv) {
     shared->params.ntrperiod=15;
     shared->params.nfa=100;
     shared->params.nfb=4000;
-    shared->params.ndepth=2;
-    shared->params.kin=48*3456;
-    shared->params.nzhsym=48;
+    shared->params.ndepth=3;
+    shared->params.kin=reist16::qso2::rx_capture_samples;
+    shared->params.nzhsym=reist16::qso2::rx_half_symbols;
     shared->params.newdat=true;
     memory.unlock();
     QProcess worker;
     worker.start(QDir(app.applicationDirPath()).filePath("jt9"),
                  {"-s",memory.key(),"-a",QDir::currentPath(),"-t",QDir::currentPath()});
     check(worker.waitForStarted(5000),"start shared-memory jt9");
-    for(int slot=0;slot<3;++slot) {
+    int const starts[] = {6000,-1,13200,15600,18000,6000};
+    for(int slot=0;slot<6;++slot) {
       check(memory.lock(),"lock next slot");
+      bool monitorOnly=slot>=2&&slot<=4;
+      int captureHalfSymbols=reist16::qso2::capture_half_symbols(monitorOnly);
+      int captureSamples=captureHalfSymbols*reist16::qso2::rx_block_samples;
+      shared->params.kin=captureSamples;
+      shared->params.nzhsym=captureHalfSymbols;
       std::fill(shared->d2,shared->d2+180000,0);
-      if(slot!=1) for(int i=0;i<wave.size()/4;++i) shared->d2[6000+i]=int16_t(wave[4*i]*6000);
+      if(starts[slot]>=0) {
+        check(starts[slot]+wave.size()/4<=captureSamples,"delayed frame fits live capture");
+        for(int i=0;i<wave.size()/4;++i) shared->d2[starts[slot]+i]=int16_t(wave[4*i]*6000);
+      }
       shared->params.nutc=slot*15;
-      shared->ipc[0]=48;
+      shared->ipc[0]=captureHalfSymbols;
       shared->ipc[1]=1;
       memory.unlock();
       QElapsedTimer timer;
@@ -171,6 +200,8 @@ int main(int argc,char**argv) {
       }
       check(answer.contains("<DecodeFinished>"),"shared-memory decode completed");
       check(answer.contains("CQ OE3SRO JN87")==bool(slot!=1),"live capture / empty slot / repeated capture");
+      std::cout<<"Live IPC slot "<<slot<<", start "<<starts[slot]/12000.
+               <<" s, capture "<<captureSamples/12000.<<" s, depth 3, worker "<<timer.elapsed()<<" ms"<<std::endl;
       check(memory.lock(),"acknowledge decode");
       shared->ipc[2]=1;
       memory.unlock();

@@ -9,6 +9,7 @@
 #include "Transceiver/TCITransceiver.hpp"
 #include "widgets/itoneAndicw.h"
 #include <QApplication>
+#include <QAudioDeviceInfo>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QTemporaryDir>
@@ -44,6 +45,40 @@ int main(int argc,char**argv) {
   qRegisterMetaTypeStreamOperators<TransceiverFactory::SplitMode>("TransceiverFactory::SplitMode");
   QTemporaryDir profiles(work+"/profiles-XXXXXX");check(profiles.isValid(),"temporary profiles");
   LocalNetwork network;
+  // A render-loopback RX must not replace CAT/PTT or the separate TX device.
+  {
+   auto path=profiles.filePath("Yaesu-WebSDR.ini");
+   QSettings settings(path,QSettings::IniFormat);
+   auto loopback=QString("Realtek Digital Output (Realtek USB Audio)");
+   QString output="TX output test device";
+   bool haveOutput=false;
+   for(auto const& device:QAudioDeviceInfo::availableDevices(QAudio::AudioOutput))
+     if(device.deviceName()!=loopback){output=device.deviceName();haveOutput=true;break;}
+   settings.setValue("Configuration/Rig","Yaesu FT-991");
+   settings.setValue("Configuration/CATSerialPort","COM987"); // must never open
+   settings.setValue("Configuration/SoundInName","Original Yaesu microphone");
+   settings.setValue("Configuration/AudioInputChannel","Left");
+   settings.setValue("Configuration/SoundOutName",output);
+   settings.setValue("Configuration/AudioOutputChannel","Mono");
+   settings.setValue("Configuration/MyCall","OE3SRO");
+   settings.setValue("Configuration/MyGrid","JN87");
+   settings.sync();
+   app.setProperty("wasapiLoopbackDevice",loopback);
+   app.setProperty("receiveOnly",false);
+   {
+    Configuration configuration(&network,QDir(profiles.path()),&settings,nullptr);
+    check(configuration.rig_name()=="Yaesu FT-991","hybrid must retain Yaesu CAT rig");
+    check(!configuration.is_tci(),"hybrid uses normal Yaesu transmit path");
+    check(configuration.audio_input_channel()==AudioDevice::Mono,"loopback detector must use mono");
+    if(haveOutput)check(configuration.audio_output_device().deviceName()==output,"loopback RX must not replace TX output");
+    check(!app.property("receiveOnly").toBool(),"hybrid must permit normal transmit sequencing");
+   }
+   check(settings.value("Configuration/SoundInName")=="Original Yaesu microphone","runtime loopback must preserve normal RX choice");
+   check(settings.value("Configuration/SoundOutName")==output,"TX output must persist unchanged");
+   check(settings.value("Configuration/CATSerialPort")=="COM987","CAT port must persist unchanged");
+   app.setProperty("wasapiLoopbackDevice",QVariant());
+   std::cout<<"PASS hybrid configuration: WASAPI mono RX, Yaesu rig/CAT, independent TX output, original microphone choice preserved; no radio opened.\n";
+  }
   for(bool hackrf:{true,false}) {
    auto path=profiles.filePath(hackrf?"HackRF.ini":"Pluto.ini");
    QTcpServer port;check(port.listen(QHostAddress::LocalHost,0),"allocate loopback test port");

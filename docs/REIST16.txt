@@ -1,10 +1,14 @@
-REIST16-QSO/2 — aktueller Stand vom 22. Oktober 2026
+REIST16-QSO/2 — aktueller Stand vom 23. Oktober 2026
 build by OE3SRO
 
 Dieser Build sendet QSO/2: 77 Informationsbits, CRC14 + LDPC(174,91),
 16-GFSK, 200 ms/Symbol, 5 Hz Tonabstand, 64 Symbole / 12,8 s in 15-s-Slots.
 Nomineller Start +0,500 s, letzter erlaubter Start +1,000 s.
-TX-Fenster bis +14,200 s, RX-Aufnahme bis +13,824 s.
+TX-Fenster bis +14,200 s, RX-Aufnahme im Sende-/Empfangsbetrieb bis +13,824 s.
+Im reinen Empfangsmodus (--receive-only) reicht sie jetzt bis +14,400 s,
+damit verzögerte WebSDR-Rahmen vollständiger erhalten bleiben. Das gilt auch
+für den zusätzlichen Empfänger im REIST16-Selbsttest. Die kombinierte
+Yaesu-/WebSDR-Instanz behält den früheren Decoderstart für automatische Antworten.
 Äußere Tonmitten: 75 Hz; keine gemessene belegte Bandbreite.
 Das neue Format benötigt auf beiden Seiten die aktualisierte Anwendung.
 QSO/1 bleibt im neuen Empfänger unterstützt. FT8 ist ein separates Format.

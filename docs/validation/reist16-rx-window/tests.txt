@@ -1,0 +1,24 @@
+PASS REIST16 CQ TEST/QSO preflight, unsupported text rejection, 37-character entry limits, mode restoration and PTT-aware TX indication. No radio/audio opened.
+PASS delayed noisy frames: old 0/6, extended 6/6
+PASS QSO/2 wire mapping, 12 clean edge/start round trips, 12/48 kHz, ABI and bounds
+PASS REIST16: 8 weak-signal frames, 3 simultaneous stations, frequency/DT/SNR, bounds and negative controls; 4.2583 s
+ PASS REIST16: six QSO waveforms and unsupported-message rejection.
+Live IPC slot 0, start 0.5 s, capture 13.824 s, depth 3, worker 1023 ms
+Live IPC slot 1, start -8.33333e-05 s, capture 13.824 s, depth 3, worker 15 ms
+Live IPC slot 2, start 1.1 s, capture 14.4 s, depth 3, worker 982 ms
+Live IPC slot 3, start 1.3 s, capture 14.4 s, depth 3, worker 988 ms
+Live IPC slot 4, start 1.5 s, capture 14.4 s, depth 3, worker 1338 ms
+Live IPC slot 5, start 0.5 s, capture 13.824 s, depth 3, worker 1298 ms
+PASS REIST16: mode IDs, UTC parity, 7 production PCM round trips, QSO parser, live IPC worker lifecycle.
+000000   5 -0.1  300 %  CQ OE3SRO JN87                       
+<DecodeFinished>   0   1        0
+000000   5  0.0  800 %  OE3SRO DL1ABC JO31                   
+<DecodeFinished>   0   1        0
+000000   5  0.1 1300 %  DL1ABC OE3SRO -12                    
+<DecodeFinished>   0   1        0
+000000   5  0.2 1800 %  OE3SRO DL1ABC R-10                   
+<DecodeFinished>   0   1        0
+000000   6  0.3 2300 %  DL1ABC OE3SRO RR73                   
+<DecodeFinished>   0   1        0
+000000   5  0.4 2800 %  OE3SRO DL1ABC 73                     
+<DecodeFinished>   0   1        0

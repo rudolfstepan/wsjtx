@@ -9,6 +9,8 @@
 #include <QScopedPointer>
 #include <QPointer>
 #include <QAudioInput>
+#include <QTimer>
+#include "WasapiLoopback.hpp"
 
 #include "Audio/AudioDevice.hpp"
 
@@ -48,6 +50,8 @@ private:
   bool checkStream ();
 
   QScopedPointer<QAudioInput> m_stream;
+  QScopedPointer<WasapiLoopback> m_loopback;
+  QScopedPointer<QTimer> m_loopback_timer;
   QPointer<AudioDevice> m_sink;
   qint64 cummulative_lost_usec_;
 };

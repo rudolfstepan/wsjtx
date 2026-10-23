@@ -29,9 +29,15 @@ Bandbreite. Die Gauß-Pulsform hat BT=4; die Hüllkurve wird an beiden Enden
 Neue PTT-Anforderungen bleiben auf die ersten 300 ms des zugewiesenen Slots
 beschränkt. Audio darf bis +1,000 s beginnen: der Rahmen endet dann bei
 +13,800 s. Das Sendefenster endet bei +14,200 s. Der Empfänger startet nach
-48 Halbsymbolen zu je 3456 Samples, also bei +13,824 s. Rechenzeit und
-CAT-Latenz bleiben Bestandteil des realen Antwortbudgets; die Slotlänge ist
-keine Laufzeitgarantie auf jedem Rechner.
+48 Halbsymbolen zu je 3456 Samples, also bei +13,824 s. Nur im expliziten
+reinen Empfangsmodus (`--receive-only`) sind es 50 Halbsymbole bis +14,400 s.
+Damit bleibt dem zusätzlichen WebSDR-Empfänger mehr Reserve für verzögerte
+Rahmen. Eine allgemeine Verlängerung würde das Antwortbudget bis zum Ende
+des nächsten PTT-Anforderungsfensters bei +15,300 s auf etwa 0,9 s verkürzen.
+Im lokalen Prozess-Test benötigte Tiefe 3 etwa 1,0–1,3 s; diese Messung ist
+keine Laufzeitgarantie. Deshalb behält der Sende-/Empfangsbetrieb den früheren
+Start. CAT-Latenz muss zusätzlich den Audiostart bis +1,000 s erlauben.
+Die Prüfungen gegen verspätetes Senden bleiben aktiv.
 
 ## Bitvertrag
 
@@ -150,8 +156,13 @@ This build transmits **REIST16-QSO/2** in the existing 15-second UTC mode:
 FSK tones, 200 ms per symbol, 5 Hz spacing and 64 symbols (12.8 s).
 BT is 4; the outer tone-centre span is 75 Hz, not a measured occupied bandwidth.
 TX starts nominally at +0.5 s and may start no later than +1.0 s.
-The receiver capture ends at +13.824 s; processing and CAT latency still
-consume the available reply budget.
+Transceive capture ends at +13.824 s. Explicit receive-only mode (`--receive-only`)
+extends capture to +14.400 s to retain delayed WebSDR frames. Extending all
+receivers would leave only about 0.9 s for decoding and GUI processing before
+the next PTT-request window closes. A local depth-3 worker test took about
+1.0–1.3 s, so transceive operation retains the earlier start. This measurement
+is not a runtime guarantee. CAT acknowledgement must still permit audio to
+start by +1.0 s; existing late-transmit guards remain active.
 
 Both endpoints need this update to exchange QSO/2. The new receiver also
 accepts QSO/1, including mixed slots; old receivers cannot decode QSO/2.

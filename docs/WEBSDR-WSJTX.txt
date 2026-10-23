@@ -1,0 +1,116 @@
+WSJT-X Yaesu-TX / WebSDR-RX / build by OE3SRO
+===========================================
+
+Eine Instanz fuer Senden und Empfangen
+-------------------------------------
+start-yaesu-websdr.bat startet genau EINE WSJT-X-Custom-Instanz aus dem
+Paket OE3SRO-reist16-websdr. Sie verwendet das vorhandene Profil
+WSJT-X - Custom mit deiner Yaesu FT-991, CAT/PTT und USB-Audioausgang.
+Nur der Empfangseingang wird fuer diesen Start durch WASAPI-Loopback ersetzt:
+Realtek Digital Output (Realtek USB Audio), auf dem der Browser spielt.
+Keine zweite WSJT-X-Instanz und kein virtuelles Audiokabel erforderlich.
+
+Eigene REIST16-CQ ueber WebSDR kontrollieren
+------------------------------------------
+Zusaetzliche Option: start-reist16-selftest.bat.
+Fuer diesen Selbsttest werden zwei eigene Fenster geoeffnet:
+  REIST16-Selftest-TX: Yaesu-Sender, REIST16, 18104kHz USB, TX1500Hz.
+  REIST16-Selftest-RX: Browserempfang, REIST16, WASAPI, fest receive-only.
+Der separate Empfaenger bleibt waehrend deiner Aussendung aktiv und kann
+das eigene CQ nach dem Slot in Band Activity anzeigen.
+
+Zuerst die normale Custom-Instanz schliessen, damit nur der Testsender den
+Yaesu-CAT-Port verwendet. Beim ersten Start uebernimmt das TX-Testprofil die
+vorhandene Custom-Konfiguration; das Original wird nicht veraendert. RX hat
+keine CAT-Verbindung. Beide Testprofile haben eigene Logs/Save-Verzeichnisse
+und UDP-Ports2241/2242; PSK Reporter und UDP-Steueranfragen sind aus.
+Der Starter stellt beide Testprofile auf REIST16/18104kHz zurueck; sonstige
+bestehende Testprofil-Einstellungen bleiben erhalten.
+
+Browser manuell auf18104kHz USB stellen, Audio ueber Realtek Digital Output,
+Filter etwa300-2700Hz. Im TX-Fenster Tx6/CQ auswaehlen, freie Frequenz pruefen
+und Enable TX selbst einschalten. Im RX-Fenster Monitor eingeschaltet lassen.
+Der Starter aktiviert keine Aussendung. Eine tatsaechliche HF-CQ-Aufnahme
+ist erst nach deiner Aussendung nachgewiesen; WebSDR-Verzoegerung und der
+Ausbreitungsweg koennen den Empfang/Decode verhindern.
+
+Optionale Vorbereitung ohne Fensterstart:
+ .\Start-Reist16-Selftest.ps1 -PrepareOnly
+Andere Test-VFO-Frequenz im freigegebenen17m-Bereich:
+ .\Start-Reist16-Selftest.ps1 -FrequencyHz 18103000
+Browser entsprechend manuell anpassen. Start-Yaesu-WebSDR bleibt die Option
+fuer normale QSOs mit WebSDR-RX und Yaesu-TX in EINER Instanz.
+
+Eine vorhandene normale Custom-Instanz zuerst schliessen. Derselbe CAT-Port
+und dasselbe Profil duerfen nicht parallel verwendet werden. Der Starter
+importiert oder ueberschreibt keine Konfiguration und schaltet Enable TX
+nicht ein. Die normale Yaesu-Mikrofon-Auswahl bleibt im Profil erhalten;
+beim Start ueber start.bat gilt wieder der normale lokale Yaesu-Empfang.
+
+In dieser EINEN Instanz kann eine WebSDR-decodierte Station ausgewaehlt
+und ueber die Yaesu beantwortet werden. Die vorhandene Auto-Sequenz nutzt
+die empfangenen Nachrichten. Windows mischt die Ausgangskanaele und liefert
+PCM16-Mono im Decoderformat. Der Sendeausgang bleibt separat an der Yaesu.
+
+Frequenz und Modus
+-----------------
+Browser/WebSDR manuell auf dieselbe USB-VFO-Frequenz wie die Yaesu abstimmen.
+CAT steuert die Yaesu; es stimmt den Browser NICHT automatisch um.
+Zum FT8-Test:18100kHz USB und FT8 in WSJT-X.
+Zum REIST16-Test nach Pruefung auf freie Frequenz:18104kHz USB,
+Browserfilter ca.300-2700Hz und TX-Audio1500Hz.
+Vor dem Senden Yaesu-TX-Ausgang "Speakers (USB Audio CODEC )", CAT/PTT und
+Frequenz wie gewohnt kontrollieren. Browser muss weiter ueber Realtek
+Digital Output spielen, nicht ueber den Yaesu-USB-Audioausgang.
+Enable TX und Auto-Sequenz werden wie bisher in WSJT-X bedient.
+
+Windows-Uhr synchronisieren. WebSDR-/Browser-Pufferung verschiebt DT und
+kann die Decodierung verhindern. Der komplette Audiomix des gewaehlten
+Windows-Ausgangs wird erfasst, auch Systemtoene und andere Programme.
+Ein tatsaechlicher Yaesu/WebSDR-QSO ist noch gesondert zu pruefen.
+
+Optionen
+--------
+Anderer Browser-Wiedergabeausgang:
+ .\Start-Yaesu-WebSDR.ps1 -PlaybackDevice '2 - LG SMARTGAME+ (AMD High Definition Audio Device)'
+Exakten Namen des aktiven Windows-Wiedergabegeraets verwenden.
+Bei fehlendem/mehrdeutigem Ausgang erscheint ein Fehler; kein Mikrofon-
+Fallback. Nach Aufnahmeabbruch die Instanz neu starten.
+ .\Start-Yaesu-WebSDR.ps1 -CheckOnly
+prueft Pfade und laufende Instanzen, ohne zu starten.
+
+start-websdr.bat bleibt eine ZUSAETZLICHE reine Empfangs-Testoption mit
+separatem Profil WSJT-X - WebSDR und explizitem --receive-only.
+Fuer Yaesu-Senden mit WebSDR-Empfang start-yaesu-websdr.bat verwenden.
+
+Lokaler Nachweis
+----------------
+WASAPI-Browserempfang hat im produktiven FT8-Decoder mehrere Nachrichten
+bei18.100MHz decodiert. Native48/12kHz-Aufnahme sowie Pause/Fortsetzen
+bestanden. Die Yaesu/Loopback-Konfiguration wurde mit separatem TX-Geraet,
+CAT-Port und Erhalt des urspruenglichen Mikrofons geprueft, ohne HF.
+Realtek Stereo Mix allein erfasste den Digitalausgang nicht; der direkte
+WASAPI-Eingang umgeht diesen fehlenden Audioweg.
+
+REIST16-Nachrichteneingabe und TX-Anzeige
+---------------------------------------
+Alle sechs Sendefelder nehmen im REIST16-Modus hoechstens37Zeichen an,
+auch beim Einfuegen. Zusaetzlich muss der Text ein unterstuetztes Standard-
+CQ/QSO-Format sein. CQ TEST OE3SRO JN88 ist gueltig. Freie lange Saetze oder
+CQ-Zusaetze ueber vier Buchstaben sind dadurch nicht automatisch darstellbar.
+Ungueltige Formate werden beim abgeschlossenen Bearbeiten rosa markiert und
+vor einer PTT-Anforderung abgewiesen. Beim Moduswechsel gelten wieder die
+urspruenglichen Eingabegrenzen.
+Die TX-Anzeige beruecksichtigt bei REIST16 auch angefordertes/ausstehendes
+PTT und das vom Funkgeraet gemeldete PTT. Ein noch aktives Funkgeraet wird
+nicht wegen eines bereits beendeten Software-Rahmens als Empfang angezeigt.
+
+REIST16-Aufnahmefenster
+----------------------
+Im reinen Empfangsmodus (--receive-only) erfasst REIST16 jetzt Audio bis
+14.400s statt13.824s im15s-Slot. Das gibt verzoegerten WebSDR-Rahmen576ms
+mehr Reserve und gilt auch fuer den zusaetzlichen Selbsttest-Empfaenger.
+Funkformat und Sendezeiten bleiben gleich. start-yaesu-websdr.bat verwendet
+weiter13.824s:der vollstaendige Decoder brauchte im lokalen Tiefe3-Prozesstest
+etwa1.0-1.3s. Ein allgemeiner Start bei14.400s wuerde die verbleibenden900ms
+bis zum Ende des naechsten PTT-Anforderungsfensters oft ueberschreiten.

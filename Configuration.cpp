@@ -2736,6 +2736,18 @@ void Configuration::impl::read_settings ()
 
 void Configuration::impl::find_audio_devices ()
 {
+  auto loopback = qApp->property ("wasapiLoopbackDevice").toString ();
+  if (!loopback.isEmpty ()) {
+    ui_->sound_input_combo_box->clear ();
+    ui_->sound_input_combo_box->addItem ("WASAPI Loopback: " + loopback);
+    ui_->sound_input_combo_box->setEnabled (false);
+    ui_->sound_input_combo_box->setToolTip (tr ("Windows playback audio selected by the WebSDR launcher."));
+    next_audio_input_channel_ = AudioDevice::Mono;
+    ui_->sound_input_channel_combo_box->clear ();
+    ui_->sound_input_channel_combo_box->addItem ("Mono");
+    ui_->sound_input_channel_combo_box->setCurrentIndex (AudioDevice::Mono);
+    ui_->sound_input_channel_combo_box->setEnabled (false);
+  } else {
   //
   // retrieve audio input device
   //
@@ -2749,9 +2761,10 @@ void Configuration::impl::find_audio_devices ()
       ui_->sound_input_channel_combo_box->setCurrentIndex (next_audio_input_channel_);
     }
   //
+  }
   // retrieve audio output device
   //
-  saved_name = settings_->value("SoundOutName").toString();
+  auto saved_name = settings_->value("SoundOutName").toString();
   if (is_tci_ && tci_audio_) saved_name = "TCI audio";  // TCI
   if (next_audio_output_device_.deviceName () != saved_name || next_audio_output_device_.isNull ())
     {

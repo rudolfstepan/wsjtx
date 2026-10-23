@@ -1,10 +1,10 @@
 # REIST16 — experimentelle Betriebsart / experimental mode
 
-**build by OE3SRO · Stand / updated: 2026-10-21**
+**build by OE3SRO · Stand / updated: 2026-10-23**
 
 [Deutsch](../README.md) · [English](../README.en.md) · [Profilvertrag / protocol](REIST16.txt) · [Pluto](PLUTO-WSJTX.txt)
 
-## Aktueller Stand: QSO/2 — 22. Oktober 2026
+## Aktueller Stand: QSO/2 — 23. Oktober 2026
 
 Dieser Build sendet **QSO/2**: 12,8 s Signalzeit, 15-s-UTC-Slots, 16-GFSK,
 5 Hz Tonabstand, 77 Informationsbits und LDPC(174,91) mit CRC14.
@@ -14,6 +14,23 @@ QSO/1. [Neuer Profilvertrag, Messbedingungen und Grenzen](REIST16-QSO2.md).
 This build transmits **QSO/2**, a 12.8 s LDPC-protected message within the
 existing 15-second mode. Both endpoints need the update; the new receiver
 also accepts QSO/1. [Protocol and measurement notes](REIST16-QSO2.md).
+
+Browser-WebSDR-Empfang über WASAPI ist mit Yaesu-Senden in einer Instanz
+möglich: `start-yaesu-websdr.bat`. `start-reist16-selftest.bat` ergänzt einen
+eigenen reinen Empfänger für den Empfang der eigenen Aussendung. Nur der
+explizite reine Empfangsmodus (`--receive-only`) erfasst jetzt bis 14,400 s;
+der Sende-/Empfangsbetrieb behält 13,824 s für das Antwortbudget.
+Im verzögerten Rauschtest gelangen damit 6/6 statt 0/6 Decodes. Das ist
+Verzögerungstoleranz, kein belegter zusätzlicher dB-Gewinn. Die untersuchte
+CQ-Mittelung ist noch nicht im Decoder enthalten. [WebSDR-Anleitung](WEBSDR-WSJTX.txt).
+
+WASAPI browser reception and Yaesu transmission can share one instance via
+`start-yaesu-websdr.bat`. The self-test launcher adds a dedicated receiver.
+Only explicit receive-only operation now captures through 14.400 s;
+transceive operation retains 13.824 s to preserve the reply budget.
+The delayed noisy-frame test achieved 6/6 instead of 0/6 decodes. This
+demonstrates delay tolerance, not an additional measured dB gain.
+Experimental repeated-CQ averaging is not part of the shipped decoder.
 
 Die folgenden Angaben und das QSO-Bild dokumentieren QSO/1 vom 21. Oktober.
 The following specification and RF screenshot document the earlier QSO/1.

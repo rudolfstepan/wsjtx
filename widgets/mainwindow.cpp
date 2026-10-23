@@ -62,6 +62,7 @@
 #include "itoneAndicw.h" // TCI
 
 #include "helper_functions.h"
+#include "lib/reist16/tx_message.hpp"
 #include "revision_utils.hpp"
 #include "qt_helpers.hpp"
 #include "Network/NetworkAccessManager.hpp"
@@ -1260,7 +1261,7 @@ MainWindow::MainWindow(QDir const& temp_directory, bool multiple,
   m_tci_audio = (m_config.tci_audio() && m_config.is_tci());
 
   if (!m_tci_audio) {
-    if (!m_config.audio_input_device ().isNull ())
+    if (!m_config.audio_input_device ().isNull () || !qApp->property ("wasapiLoopbackDevice").toString ().isEmpty ())
       {
         Q_EMIT startAudioInputStream (m_config.audio_input_device ()
                                       , m_rx_audio_buffer_frames
@@ -2331,7 +2332,7 @@ void MainWindow::fixStop()
       m_earlyDecode2=47;
     }
   } else if (m_mode=="REIST16") {
-    m_hsymStop=48;
+    m_hsymStop=reist16::qso2::capture_half_symbols(qApp->property("receiveOnly").toBool());
   } else if (isFT4Family()) {
   m_hsymStop=m_mode=="FT2" ? 23 : 21;
   } else if(m_mode=="FST4" or m_mode=="FST4W") {
@@ -3701,7 +3702,7 @@ void MainWindow::on_actionSettings_triggered()           // Setup Dialog (Settin
     bool was_monitoring = m_monitoring;
     if (m_monitoring && (m_config.restart_tci () or !m_tci_audio)) on_monitorButton_clicked (false);
     if (!m_tci_audio) {
-      if(m_config.restart_audio_input () && !m_config.audio_input_device ().isNull ()) {
+      if(m_config.restart_audio_input () && (!m_config.audio_input_device ().isNull () || !qApp->property ("wasapiLoopbackDevice").toString ().isEmpty ())) {
         Q_EMIT startAudioInputStream (m_config.audio_input_device ()
                                       , m_rx_audio_buffer_frames
                                       , m_detector, m_downSampleFactor
@@ -3886,6 +3887,7 @@ void MainWindow::on_actionAbout_triggered()                  //Display "About"
 
 void MainWindow::on_autoButton_clicked (bool checked)
 {
+  if (qApp->property ("receiveOnly").toBool ()) checked = false;
   if (ui->DX_Call_Button->isChecked() && m_specOp==SpecOp::HOUND && m_config.superFox() && !m_bDoubleClicked) return;  // for Wait & Call
   m_config.transceiver_tune (false);  // reset rig tuning
   if (checked && ui->tuneButton->isChecked() && !(m_mode=="WSPR" || m_mode=="FST4W")) return; // not allowed while tuning
@@ -7919,6 +7921,11 @@ void MainWindow::guiUpdate()
     if(msgLength==0 and !m_tune) on_stopTxButton_clicked();
 
     if(g_iptt==0 and ((m_bTxTime and (m_mode=="REIST16" ? fTR < 0.02 : fTR < 0.75) and (msgLength>0)) or m_tune)) {
+      if (m_mode=="REIST16" && !m_tune && !reist16::validTxMessage (txMsg)) {
+        on_stopTxButton_clicked ();
+        showStatusMessage (tr ("REIST16: use a standard CQ/QSO message, maximum 37 characters. No transmission started."));
+        return;
+      }
       //### Allow late starts
       icw[0]=m_ncw;
       g_iptt = 1;
@@ -8069,6 +8076,12 @@ void MainWindow::guiUpdate()
           gen_reist16_(message,msgsent,&f0,&sequence,foxcom_.wave,&ok,(FCL)37,(FCL)37);
           if(!ok) {
             on_stopTxButton_clicked();
+            // Cancel pending CAT acknowledgement/audio timers as well. An
+            // early return must not leave PTT asserted on a rejected frame.
+            ptt1Timer.stop ();
+            m_tx_when_ready = false;
+            Q_EMIT endTransmitMessage (true);
+            stopTx ();
             showStatusMessage(tr("REIST16 requires a standard CQ/QSO message and a lowest audio tone of 100–4000 Hz."));
             return;
           }
@@ -8473,10 +8486,13 @@ void MainWindow::guiUpdate()
       }
     }
 
+    bool const txIndicating = m_mode=="REIST16"
+      ? reist16::txIndicatorActive (m_transmitting, g_iptt!=0, m_tx_when_ready, m_rigState.ptt ())
+      : m_transmitting;
     progressBar.setVisible(true);
     // turn the progressbar red during transmission
     if(m_config.progressBar_red()) {
-      if(m_transmitting) {
+      if(txIndicating) {
         if (m_useDarkStyle) {
           progressBar.setStyleSheet(QString("QProgressBar {color: #ffffff; text-align: center;} QProgressBar::chunk {background-color: #ff0000;}"));
           progressBar.setFormat ("%v/%m");
@@ -8525,7 +8541,7 @@ void MainWindow::guiUpdate()
       progressBar.setValue(n);
     }
     if(m_mode!="Echo") {
-      if(m_monitoring or m_transmitting) {
+      if(m_monitoring or txIndicating) {
         progressBar.setMaximum(m_TRperiod);
         int isec=int(fmod(tsec,m_TRperiod));
         if(m_TRperiod-int(m_TRperiod)>0.0) {
@@ -8541,7 +8557,7 @@ void MainWindow::guiUpdate()
 
     astroUpdate ();
 
-    if(m_transmitting) {
+    if(txIndicating) {
       char s[42];
       if(SpecOp::FOX==m_specOp and ui->tabWidget->currentIndex()==1) {
         snprintf(s,sizeof(s),"Tx:  %d Slots",foxcom_.nslots);
@@ -8660,6 +8676,7 @@ void MainWindow::useNextCall()
 
 void MainWindow::startTx2()
 {    
+  if (qApp->property ("receiveOnly").toBool ()) return;
   bool modulator_active;
   bool tci_active = m_tci_audio;
   if (tci_active) modulator_active=m_tci_mod_active;
@@ -10142,6 +10159,17 @@ void MainWindow::on_ignoreButton_clicked()                    //Ignore button
 
 void MainWindow::msgtype(QString t, QLineEdit* tx)               //msgtype()
 {
+  if (m_mode=="REIST16") {
+    bool valid = reist16::validTxMessage (t);
+    auto palette = tx->palette ();
+    palette.setColor (QPalette::Base, valid ? QColor (Qt::transparent) : QColor ("#ffccff"));
+    tx->setPalette (palette);
+    tx->setToolTip (tr ("REIST16: maximum 37 characters; standard CQ/QSO messages only."));
+    auto position = tx->cursorPosition ();
+    tx->setText (t.toUpper ());
+    tx->setCursorPosition (position);
+    return;
+  }
 // Set background colors of the Tx message boxes, depending on message type
   char message[38];
   char msgsent[38];
@@ -11074,11 +11102,11 @@ void MainWindow::on_actionREIST16_triggered()
   m_bFastMode=false;
   WSPR_config(false);
   switch_mode (Modes::REIST16);
-  m_nsps=6912;
+  m_nsps=2*reist16::qso2::rx_block_samples;
   m_FFTSize = m_nsps/2;
   if (m_tci_audio) Q_EMIT m_config.transceiver_blocksize (m_FFTSize);
   else Q_EMIT FFTSize (m_FFTSize);
-  m_hsymStop=48;
+  m_hsymStop=reist16::qso2::capture_half_symbols(qApp->property("receiveOnly").toBool());
   setup_status_bar (bVHF);
   m_toneSpacing=reist16::qso2::tone_spacing;
   ui->actionREIST16->setChecked(true);
@@ -11954,6 +11982,8 @@ void MainWindow::on_actionFreqCal_triggered()
 
 void MainWindow::switch_mode (Mode mode)
 {
+  for (auto field : {ui->tx1, ui->tx2, ui->tx3, ui->tx4, ui->tx5->lineEdit (), ui->tx6})
+    reist16::setMessageLimit (field, mode==Modes::REIST16);
   no_a7_decodes = true;  // Don't allow a7 decodes during the first period because they can be leftovers from the previous mode
   msk144qsy = false;     // MSK144 QSY
   QTimer::singleShot ((int(1500.0*m_TRperiod)), [=] {no_a7_decodes = false;});
@@ -12501,6 +12531,7 @@ void MainWindow::on_rptSpinBox_valueChanged(int n)
 
 void MainWindow::on_tuneButton_clicked (bool checked)
 {
+  if (qApp->property ("receiveOnly").toBool ()) checked = false;
   ui->pbBandHopping->setChecked(false); // disable band hopping
   // prevent tuning on top of a SuperFox message
   if (SpecOp::HOUND==m_specOp && m_config.superFox() && !m_tune) {
@@ -12909,6 +12940,7 @@ void MainWindow::rigFailure (QString const& reason)
 
 void MainWindow::transmit (double snr)
 {
+  if (qApp->property ("receiveOnly").toBool ()) return;
   double toneSpacing=0.0;
   if (m_mode == "JT65") {
     if(m_nSubMode==0) toneSpacing=11025.0/4096.0;
