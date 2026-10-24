@@ -25,6 +25,10 @@ build by OE3SRO
 Extract the entire ZIP, then double-click Start-WSJT-X.bat.
 Keep bin and share together; the EXE requires the bundled DLLs and data.
 For the separate HackRF One profile, use start-hackrf.bat; see HACKRF-WSJTX.txt.
+HackRF runtime DLLs are not bundled by CI; see HACKRF-WSJTX.txt for setup.
+REIST16-QSO/2: experimental 15-second CQ/QSO mode; select Mode > REIST16.
+Update both endpoints. REIST16 is a separate protocol, incompatible with FT8.
+For browser reception, see WEBSDR-WSJTX.txt and docs/index.html.
 On first launch, configure your station and radio in Settings.
 Existing WSJT-X - Custom profiles are reused without importing other profiles.
 
@@ -53,6 +57,8 @@ New-Item -ItemType Directory -Force -Path $docs | Out-Null
 Copy-Item -LiteralPath "$root\docs\REIST16.txt" -Destination $docs -Force
 Copy-Item -LiteralPath "$root\docs\PLUTO-WSJTX.txt" -Destination $docs -Force
 Copy-Item -LiteralPath "$root\docs\HACKRF-WSJTX.txt" -Destination $docs -Force
+Copy-Item -LiteralPath "$root\docs\WEBSDR-WSJTX.txt" -Destination $docs -Force
+Copy-Item -LiteralPath "$root\docs\releases" -Destination $docs -Recurse -Force
 Copy-Item -LiteralPath "$root\docs\WINDOWS-QUICKSTART.html" -Destination "$docs\index.html" -Force
 New-Item -ItemType Directory -Force -Path "$docs\images" | Out-Null
 Copy-Item -LiteralPath "$root\docs\images\ft2-qso-oe3sro-og5o-2026-10-16.png" -Destination "$docs\images" -Force

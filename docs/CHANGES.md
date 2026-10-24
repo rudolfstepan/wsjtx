@@ -4,6 +4,24 @@
 
 ## Deutsch
 
+### 2026-10-24 — Release 3.0.2-oe3sro.5 mit REIST16-QSO/2
+
+- Erstes Download-Release mit REIST16-QSO/2, Pluto-/HackRF-Bridges und
+  WASAPI-WebSDR-Empfang. [Release Notes](releases/3.0.2-oe3sro.5.md).
+- REIST16-Bedienung, Profilgrenzen und deutsche/englische Offline-Anleitung
+  aktualisiert; QSO/1-Hardwarebild klar vom aktuellen QSO/2 getrennt.
+- Bridge-Prüfungen finden Hamlib-DLLs auch auf frischen CI-Runnern.
+  HackRF und der produktive SDR-Einstellungsdialog werden in CI geprüft.
+
+### 2026-10-23 — WebSDR und REIST16-Aufnahmefenster
+
+- Browserempfang per WASAPI-Loopback; Yaesu-TX und Browser-RX in einer
+  Custom-Instanz, zusätzlicher reiner REIST16-Selbsttest-Empfänger.
+- Reiner Empfang bis 14,400 s, Transceive weiter 13,824 s für Auto Seq.
+  Verzögerte Rauschframes: 6/6 statt 0/6; kein zusätzlicher dB-Nachweis.
+- CQ-/QSO-Eingabeprüfung, Nachrichtenlänge und PTT-Anzeige korrigiert.
+  [Bedienung](WEBSDR-WSJTX.txt), [Aufnahmeprüfung](../docs/validation/reist16-rx-window/README.txt).
+
 ### 2026-10-22 — HackRF-TX und Pluto-Verbindungsdiagnose
 
 - HackRF wird beim Laden, Auswählen und Speichern der Einstellungen anhand
@@ -259,6 +277,32 @@ ergänzt. [8bf344fde](https://github.com/rudolfstepan/wsjtx/commit/8bf344fde)
 speichert den FT2-Fortsetzungspunkt; dieser Commit ändert keine Programmfunktion.
 
 ## English
+
+### 2026-10-24 — Release 3.0.2-oe3sro.5 with REIST16-QSO/2
+
+- First download release with REIST16-QSO/2, Pluto/HackRF bridges and WASAPI
+  WebSDR reception. [Release notes](releases/3.0.2-oe3sro.5.md).
+- Updated REIST16 operation, profile limits and bilingual offline guide;
+  historical QSO/1 RF evidence is distinguished from current QSO/2.
+- Bridge checks resolve Hamlib DLLs on clean CI runners. CI also verifies
+  the HackRF bridge and production SDR settings dialog.
+
+### 2026-10-23 — WebSDR and REIST16 capture windows
+
+- WASAPI browser reception, Yaesu TX/browser RX in one Custom instance,
+  and a separate receive-only REIST16 self-test receiver.
+- Receive-only capture to 14.400 s; transceive retains 13.824 s for Auto Seq.
+  Delayed noisy-frame test: 6/6 instead of 0/6, without an extra dB claim.
+- Corrected CQ/QSO preflight, message length and PTT-aware indication.
+  [Operation](WEBSDR-WSJTX.txt).
+
+### 2026-10-22 — HackRF integration and TX recovery
+
+- Separate HackRF profile and TCI bridge; settings preserve TCI audio when
+  loading, switching rigs and saving. PTT without audio is rejected without
+  stopping the bridge or replaying a discarded transmission later.
+- Improved Pluto connection diagnostics. Software/mock validation passed;
+  HackRF RF acceptance is pending. [Setup](HACKRF-WSJTX.txt).
 
 ### 2026-10-22 — REIST16-QSO/2
 

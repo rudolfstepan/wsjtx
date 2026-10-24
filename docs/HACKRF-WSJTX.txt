@@ -45,6 +45,13 @@ Runtime: tools/Setup-HackrfBridge.ps1 kopiert den vorhandenen libhackrf-
 Windows-Runtime aus dem SDR-Projekt mit Abhängigkeiten und Lizenzen. Es werden
 keine Treiber installiert. --check-runtime prüft nur DLL-Exporte ohne USB-Init.
 Prüfung ohne Funk: tools/Test-HackrfBridge.ps1.
+Im öffentlichen GitHub-Release sind HackRF-Bridge und Starter enthalten,
+jedoch keine libhackrf-Runtime-DLLs. Für echte Hardware die passende
+64-Bit-Windows-libhackrf-Runtime mit ihren Abhängigkeiten und Lizenzen in
+bin/hackrf bereitstellen (hackrf-0.dll, libusb-1.0.dll, libwinpthread-1.dll;
+weitere vom gewählten Build benötigte DLLs ebenfalls übernehmen).
+Die Simulation benötigt diese Runtime nicht. Das Release enthält die
+geprüfte Pluto-libiio-Runtime bereits unter bin/pluto.
 SDK-Referenz (Great Scott Gadgets, v2026.01.3):
 https://github.com/greatscottgadgets/hackrf/blob/v2026.01.3/host/libhackrf/src/hackrf.h
 

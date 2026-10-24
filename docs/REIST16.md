@@ -1,10 +1,53 @@
 # REIST16 — experimentelle Betriebsart / experimental mode
 
-**build by OE3SRO · Stand / updated: 2026-10-23**
+**build by OE3SRO · Stand / updated: 2026-10-24 · Release 3.0.2-oe3sro.5**
 
 [Deutsch](../README.md) · [English](../README.en.md) · [Profilvertrag / protocol](REIST16.txt) · [Pluto](PLUTO-WSJTX.txt)
 
-## Aktueller Stand: QSO/2 — 23. Oktober 2026
+## Was ist REIST16? / What is REIST16?
+
+REIST16 ist OE3SROs experimentelle Betriebsart für kurze strukturierte
+Amateurfunkgespräche in WSJT-X. CQ, Locator, Rapport, R-Rapport, RR73 und 73
+bilden den vertrauten QSO-Ablauf; Doppelklick und Auto Seq unterstützen
+Auswahl und Antworten. Die Nachricht wird als Tonfolge über einen SSB-
+Audioweg übertragen. Das aktuelle Format heißt **QSO/2** und ist im
+[Windows-Release 3.0.2-oe3sro.5](../docs/releases/3.0.2-oe3sro.5.md) enthalten.
+REIST16 verwendet die 77-Bit-Nachrichtenpackung und LDPC-Bausteine von WSJT-X,
+hat aber eine eigene Modulation und Synchronisation. Es ist zu FT8 nicht
+funkkompatibel. QSO/2 ersetzt den Faltungscode und die CRC32 des historischen
+QSO/1 durch CRC14 und LDPC; die ältere Beschreibung weiter unten gilt nur
+für QSO/1.
+
+REIST16 is OE3SRO's experimental WSJT-X mode for short structured amateur-radio
+contacts. CQ, locator, report, R-report, RR73 and 73 follow the familiar QSO
+sequence, with double-click selection and Auto Seq. Messages travel as audio
+tones through an SSB path. The current **QSO/2** format is included in
+Windows release 3.0.2-oe3sro.5. It reuses WSJT-X's 77-bit message packing and
+LDPC components, with its own modulation and synchronization; it is incompatible
+with FT8 over the air. QSO/2 replaces QSO/1's convolutional code and CRC32 with
+CRC14 and LDPC. The historical specification below applies only to QSO/1.
+
+### Einstieg / Getting started
+
+1. Das gesamte Windows-ZIP entpacken, **Start-WSJT-X.bat** starten und
+   Rufzeichen, Locator, CAT sowie Audio in den Einstellungen einrichten.
+2. Beide Systemuhren synchronisieren und **Mode → REIST16** wählen.
+3. Eine gemeinsame USB-Frequenz vereinbaren; es gibt keine vorgegebene
+   REIST16-Standardfrequenz. Die Stationen senden in entgegengesetzten
+   15-s-Slots (`:00/:30` und `:15/:45`). Beide benötigen QSO/2.
+4. Mit **Monitor** empfangen; den gewünschten CQ-/QSO-Text und Auto Seq
+   prüfen, bevor **Enable Tx** die Aussendung freigibt.
+
+Extract the complete ZIP, launch **Start-WSJT-X.bat** and configure station,
+CAT and audio. Synchronize both clocks, select **Mode → REIST16**, agree on
+a USB frequency and use opposite 15-second TX slots. There is no default
+REIST16 calling frequency. Both endpoints need QSO/2. Use **Monitor** to
+receive and check the intended message and Auto Seq before enabling TX.
+Supported structured messages use pack77 types 1 and 2, including supported
+`/P` and `/R` callsigns; free text, telemetry and special contest formats are
+outside this profile. PSK Reporter spotting is disabled for REIST16.
+
+## Aktueller Stand: QSO/2
 
 Dieser Build sendet **QSO/2**: 12,8 s Signalzeit, 15-s-UTC-Slots, 16-GFSK,
 5 Hz Tonabstand, 77 Informationsbits und LDPC(174,91) mit CRC14.
@@ -118,7 +161,7 @@ Drift, Fading, überlappende Signale und Langzeitstabilität bleiben zu messen.
 PSK-Reporter-Spots sind für REIST16 abgeschaltet; der lokale MODE-Wert ist
 keine Behauptung einer registrierten ADIF-Betriebsart.
 
-## English
+## English — QSO/1 (historical)
 
 REIST16 is this fork's new **experimental** CQ/QSO mode. Select **Mode →
 REIST16** for fixed 15-second UTC slots, standard structured messages,

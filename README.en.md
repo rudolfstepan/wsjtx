@@ -12,8 +12,10 @@ Extract it completely, then launch **Start-WSJT-X.bat**.
 The [guide](docs/WINDOWS-QUICKSTART.html) is included as **docs/index.html**
 and is also available separately as **documentation.zip**.
 
-[Version 3.0.2-oe3sro.4](docs/releases/3.0.2-oe3sro.4.md) adds personal DX
-windows and a persistent PSK Reporter query cooldown with improved HTTP 429/503 handling.
+[Version 3.0.2-oe3sro.5](docs/releases/3.0.2-oe3sro.5.md) is the first release
+with **REIST16-QSO/2**, Pluto/HackRF integration and browser WebSDR reception.
+PSK Reporter tools, personal DX windows and FT8/FT4/FT2 optimizations remain
+included. REIST16 remains experimental.
 
 **[Latest CI builds](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml):**
 Open the latest successful run and download the versioned
@@ -58,12 +60,32 @@ Software and mocked-device checks passed; RF acceptance is still pending.
 
 ## REIST16: new experimental mode
 
-The current source and upcoming CI artifacts add **REIST16**, a separate
-CQ/QSO protocol with fixed 15-second UTC slots, QSO/2 16-GFSK, LDPC and 12.8 s frames,
-standard messages and Auto Seq. A user-operated Yaesu/Pluto test confirms
-decoding in both directions. This does not establish FT8-equivalent sensitivity.
-The stable release linked above predates REIST16; use a successful CI build
-of this source or build locally. See [REIST16](docs/REIST16.md) / [QSO/2](docs/REIST16-QSO2.md),
+**REIST16** is OE3SRO's experimental mode for short structured amateur-radio
+contacts, included in the Windows release starting with **3.0.2-oe3sro.5**.
+Select **Mode → REIST16** for CQ, locator, report, R-report, RR73 and 73,
+double-click selection and Auto Seq.
+
+Its current **QSO/2** format carries WSJT-X's 77-bit standard messages using
+CRC14 and LDPC(174,91) on sixteen Gaussian FSK tones. A 12.8-second signal
+fits inside a 15-second UTC slot. Tone spacing is 5 Hz, with 75 Hz between
+the outer tone centres; this is not measured occupied bandwidth. REIST16
+is incompatible with FT8 over the air. Update both endpoints for QSO/2;
+the new receiver also accepts QSO/1. Free text and special contest formats
+are outside the supported message profile.
+
+Synchronize both system clocks, agree on a USB frequency and select opposite
+TX slots (`:00/:30` and `:15/:45`). Soundcard/USB audio works as for other
+modes. PlutoSDR and HackRF use the included TCI bridges; supply the HackRF
+runtime separately. `start-yaesu-websdr.bat` combines WASAPI browser reception
+with Yaesu transmission in one instance.
+[WebSDR and receive-only self-test](docs/WEBSDR-WSJTX.txt).
+
+The Yaesu/Pluto screenshot from 21 October documents the earlier **QSO/1**.
+QSO/2 has been checked with production audio, noise tests and WebSDR recordings;
+these do not establish general FT8-equivalent sensitivity or fading tolerance.
+Repeated-CQ averaging is not implemented. REIST16 sends no PSK Reporter spots
+and does not claim a registered ADIF mode.
+See [REIST16](docs/REIST16.md) / [QSO/2](docs/REIST16-QSO2.md),
 [the profile contract](docs/REIST16.txt) and [Pluto setup](docs/PLUTO-WSJTX.txt).
 
 ![Yaesu OE3SRO / Pluto OE3SRO/P REIST16 exchange](docs/images/REIST16_QSO.png)

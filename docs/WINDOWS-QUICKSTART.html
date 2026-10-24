@@ -16,15 +16,25 @@
 </head>
 <body>
   <h1>WSJT-X OE3SRO Custom</h1>
-  <p><strong>build by OE3SRO</strong> · Windows x64 · <a href="#deutsch">Deutsch</a> / <a href="#english">English</a></p>
+  <p><strong>build by OE3SRO</strong> · Windows x64 · Release 3.0.2-oe3sro.5 · <a href="#deutsch">Deutsch</a> / <a href="#english">English</a></p>
   <div class="intro">Windows-Paket mit integrierter PSK-Reporter-Liste, Anrufhilfen, FT2 und experimentellem REIST16.
     Die Paketversion und der Quellstand stehen in <code>build-info.json</code> im Hauptordner.</div>
 
   <section id="deutsch">
     <h2>REIST16 — neue experimentelle Betriebsart</h2>
+    <p>REIST16 ist OE3SROs experimentelle Betriebsart für kurze strukturierte Amateurfunkgespräche:
+      CQ, Locator, Rapport, R-Rapport, RR73 und 73 mit Doppelklick und Auto Seq.
+      QSO/2 überträgt 77 Informationsbits mit CRC14 und LDPC(174,91) auf 16-GFSK-Tönen.
+      5 Hz Tonabstand ergeben 75 Hz zwischen den äußeren Tonmitten; das ist keine gemessene belegte Bandbreite.
+      REIST16 ist mit FT8 nicht funkkompatibel. Freitext und Contest-Sonderformate werden nicht unterstützt.</p>
     <p>Aktuell: QSO/2 mit 12,8 s Signalzeit, LDPC und 15-s-Slots. Beide Gegenstellen
       aktualisieren. <a href="REIST16-QSO2.md">Neues Profil und Rauschmessung</a>.
       Der folgende Hardwareversuch gehört zum bisherigen QSO/1.</p>
+    <p>Beide Systemuhren synchronisieren, dieselbe USB-Frequenz vereinbaren und entgegengesetzte
+      Sendeslots wählen: <code>:00/:30</code> und <code>:15/:45</code>. Es gibt keine eingetragene Standardfrequenz.
+      Der neue Empfänger erkennt auch QSO/1. Eine allgemeine FT8-gleiche Empfindlichkeit oder
+      Fadingfestigkeit ist nicht nachgewiesen. CQ-Mittelung ist noch nicht implementiert;
+      REIST16 sendet keine PSK-Reporter-Spots und beansprucht keine registrierte ADIF-Betriebsart.</p>
     <p><strong>Mode → REIST16</strong> aktiviert den neuen CQ-/QSO-Modus mit festen 15-Sekunden-Slots.
       Er verwendet Soundkarten-Audio, beispielsweise Yaesu USB-Audio. Eine passende Frequenz selbst einstellen.
       <strong>start-pluto.bat</strong> startet die Pluto-Bridge und die zweite WSJT-X-Instanz mit eigenem Profil.
@@ -45,6 +55,17 @@
     </ol>
     <p>Der Launcher verwendet das Profil <strong>Custom</strong>. Ein vorhandenes Custom-Profil einschließlich Einstellungen und Logbuch wird weiterverwendet.
       Das Paket importiert keine Einstellungen aus einer anderen WSJT-X-Installation. Eine vorherige Custom-Version vor dem Start normal beenden.</p>
+
+    <h3>Pluto, HackRF und Browser-WebSDR</h3>
+    <p><strong>start-pluto.bat</strong> nutzt ein eigenes Pluto-Profil und die mitgelieferte libiio-Runtime.
+      <strong>start-hackrf.bat</strong> nutzt ein eigenes HackRF-Profil; die libhackrf-Runtime samt Abhängigkeiten
+      und Lizenzen muss separat unter <code>bin/hackrf</code> bereitgestellt werden.
+      <a href="HACKRF-WSJTX.txt">HackRF-Anleitung</a>. Die reale HF-Abnahme dieser HackRF-Bridge steht aus.</p>
+    <p><strong>start-yaesu-websdr.bat</strong> verbindet Browserempfang per WASAPI und Yaesu-Senden in einer Instanz
+      mit vorhandenem Custom-Profil. Windows-Wiedergabeausgang und Browserfrequenz müssen passend gewählt werden.
+      <strong>start-reist16-selftest.bat</strong> ergänzt einen eigenen reinen Empfänger für die eigene Aussendung.
+      Nur <code>--receive-only</code> erfasst bis 14,400 s; Transceive behält 13,824 s für automatische Antworten.
+      <a href="WEBSDR-WSJTX.txt">WebSDR-Einrichtung und Selbsttest</a>. Die Starter aktivieren keine Aussendung.</p>
 
     <h3>PSK Reporter — Wer hört mich?</h3>
     <p><strong>View → PSK Reporter — Who hears me?</strong> öffnet die Empfängerliste. Abfragen verwenden Rufzeichen,
@@ -116,9 +137,19 @@
 
   <section id="english" lang="en">
     <h2>REIST16 — new experimental mode</h2>
+    <p>REIST16 is OE3SRO's experimental mode for short structured amateur-radio contacts:
+      CQ, locator, report, R-report, RR73 and 73 with double-click selection and Auto Seq.
+      QSO/2 carries 77 information bits with CRC14 and LDPC(174,91) on sixteen Gaussian FSK tones.
+      Tone spacing is 5 Hz and outer tone-centre span is 75 Hz, not measured occupied bandwidth.
+      REIST16 is incompatible with FT8 over the air; free text and special contest formats are unsupported.</p>
     <p>Current profile: QSO/2, 12.8 s LDPC-protected frames in 15-second slots.
       Update both endpoints. <a href="REIST16-QSO2.md">Profile and noise measurements</a>.
       The earlier RF screenshot demonstrates QSO/1.</p>
+    <p>Synchronize both clocks, agree on a USB frequency and select opposite TX slots:
+      <code>:00/:30</code> and <code>:15/:45</code>. There is no default calling frequency.
+      The new receiver also accepts QSO/1. General FT8-equivalent sensitivity or fading tolerance
+      has not been established. CQ averaging is not implemented. REIST16 sends no PSK Reporter spots
+      and does not claim a registered ADIF mode.</p>
     <p><strong>Mode → REIST16</strong> selects the experimental CQ/QSO mode with fixed 15-second UTC slots.
       Use a frequency agreed with the peer. <strong>start-pluto.bat</strong> launches the Pluto bridge and a separate WSJT-X profile;
       see <a href="PLUTO-WSJTX.txt">Pluto setup</a> and <a href="REIST16.txt">the protocol and test notes</a>. The user screenshot above confirms two-way decoding
@@ -134,6 +165,17 @@
     </ol>
     <p>The launcher uses the <strong>Custom</strong> profile. Existing Custom settings and logs are reused.
       No settings are imported from another WSJT-X installation. Close an earlier Custom instance normally before launching.</p>
+
+    <h3>Pluto, HackRF and browser WebSDR</h3>
+    <p><strong>start-pluto.bat</strong> uses a separate Pluto profile and the bundled libiio runtime.
+      <strong>start-hackrf.bat</strong> uses its own profile; supply the libhackrf runtime, dependencies
+      and licenses separately in <code>bin/hackrf</code>. <a href="HACKRF-WSJTX.txt">HackRF setup</a>.
+      RF acceptance of this HackRF bridge is pending.</p>
+    <p><strong>start-yaesu-websdr.bat</strong> combines WASAPI browser reception and Yaesu transmission in one
+      existing Custom instance. Match the Windows playback device and browser frequency.
+      <strong>start-reist16-selftest.bat</strong> adds a dedicated receiver for your own transmissions.
+      Only <code>--receive-only</code> captures through 14.400 s; transceive retains 13.824 s for automatic replies.
+      <a href="WEBSDR-WSJTX.txt">WebSDR and self-test setup</a>. Launchers do not enable transmission automatically.</p>
 
     <h3>PSK Reporter — Who hears me?</h3>
     <p>Open <strong>View → PSK Reporter — Who hears me?</strong>. Queries read callsign, mode, and band directly from the running main window.

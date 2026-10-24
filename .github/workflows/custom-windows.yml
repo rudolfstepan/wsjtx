@@ -99,6 +99,9 @@ jobs:
       - name: Verify Pluto bridge without RF hardware
         run: ./tools/Test-PlutoBridge.ps1
 
+      - name: Verify HackRF bridge and production SDR settings without RF hardware
+        run: ./tools/Test-HackrfBridge.ps1
+
       - name: Prepare pinned Pluto runtime
         run: ./tools/Setup-PlutoBridge.ps1 -Download
 

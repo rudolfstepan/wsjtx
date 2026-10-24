@@ -1,6 +1,7 @@
 # Eigene WSJT-X-Version mit PSK Reporter und experimentellem REIST16
 
-REIST16 ergänzt den aktuellen Quellstand um einen eigenen15-s-CQ-/QSO-Modus.
+Release 3.0.2-oe3sro.5 enthält REIST16-QSO/2 als experimentellen
+15-s-CQ-/QSO-Modus mit 12,8 s Signalzeit, CRC14 und LDPC(174,91).
 [Bedienung und Hardwareversuch](docs/REIST16.md), [Profilvertrag](docs/REIST16.txt)
 und [Pluto-Bridge](docs/PLUTO-WSJTX.txt). Die Yaesu-/Pluto-Dekodierung wurde
 vom Benutzer dokumentiert; eine Empfangsschwelle ist noch nicht vermessen.
@@ -121,7 +122,8 @@ Eine SHA256-Datei liegt neben dem ZIP. Nach dem Entpacken des Artefakts auch das
 innere ZIP vollständig entpacken und **Start-WSJT-X.bat** öffnen.
 
 Der CI-Runner lädt geprüfte Hamlib-/OmniRig-Abhängigkeiten, baut mit denselben
-Skripten wie lokal, prüft PSK Reporter und FT2/FT4 und paketiert erst nach
+Skripten wie lokal, prüft PSK Reporter, FT8/FT4/FT2, REIST16 und die
+Pluto-/HackRF-Bridges ohne Hardware und paketiert erst nach
 erfolgreichen Tests. `Verify-CustomPackage.ps1 -PortableOnly` prüft die Laufzeit
 ohne installierte Originalversion und ohne persönliche Konfiguration. Das Paket
 enthält keine INI oder Logbuchdaten; beim ersten Start werden Stationsdaten und
@@ -140,13 +142,14 @@ anlegen und committen. Anschließend den zugehörigen Tag auf diesen Commit setz
 und nach origin pushen, zum Beispiel:
 
 ```powershell
-git tag oe3sro-v3.0.2-1
-git push origin oe3sro-v3.0.2-1
+git tag oe3sro-v3.0.2-5
+git push origin oe3sro-v3.0.2-5
 ```
 
 Der Workflow prüft die CMake-Version, baut und testet den getaggten Quellstand
 und veröffentlicht erst danach das Release mit Windows-ZIP, Dokumentations-ZIP
-und beiden SHA256-Dateien. Die erste Paketversion lautet `3.0.2-oe3sro.1`;
+und beiden SHA256-Dateien als GitHub **Latest**. Für diesen Stand lautet
+die Paketversion `3.0.2-oe3sro.5`;
 die zugrunde liegende Anwendung bleibt WSJT-X 3.0.2-devel mit Custom-Branding.
 
 ## Lokaler Start und Bedienung

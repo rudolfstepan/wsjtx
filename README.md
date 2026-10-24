@@ -12,9 +12,10 @@ Anleitung. Vollständig entpacken und **Start-WSJT-X.bat** öffnen.
 Die [Anleitung](docs/WINDOWS-QUICKSTART.html) liegt im Paket unter **docs/index.html**;
 sie ist auch separat als **documentation.zip** verfügbar.
 
-[Version 3.0.2-oe3sro.4](docs/releases/3.0.2-oe3sro.4.md) ergänzt persönliche
-DX-Zeitfenster und eine über Neustarts erhaltene PSK-Reporter-Abfragepause mit
-verbesserter HTTP-429-/503-Behandlung.
+[Version 3.0.2-oe3sro.5](docs/releases/3.0.2-oe3sro.5.md) enthält erstmals
+**REIST16-QSO/2**, die Pluto-/HackRF-Anbindung und Browser-WebSDR-Empfang.
+PSK-Reporter-Werkzeuge, persönliche DX-Zeitfenster und FT8-/FT4-/FT2-
+Optimierungen bleiben enthalten. REIST16 bleibt experimentell.
 
 **[Neueste CI-Builds](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml):**
 Den neuesten erfolgreichen Lauf öffnen und unter **Artifacts** das versionierte
@@ -59,13 +60,33 @@ Software- und Mock-Prüfungen bestanden; reale HF-Abnahme dieser Bridge steht au
 
 ## REIST16: neue experimentelle Betriebsart
 
-Der aktuelle Quellstand und die daraus erzeugten CI-Pakete ergänzen
-**REIST16**: ein eigenständiges CQ-/QSO-Protokoll mit festen 15-Sekunden-UTC-Slots,
-QSO/2 mit 16-GFSK, LDPC, 12,8 s Signalzeit, Standardnachrichten und Auto Seq. Ein vom Benutzer
-ausgeführter Yaesu-/Pluto-Versuch belegt Dekodierung in beiden Richtungen.
-Eine FT8-gleiche Empfangsempfindlichkeit ist damit nicht nachgewiesen.
-Das oben verlinkte stabile Release enthält REIST16 noch nicht; dafür einen
-erfolgreichen CI-Build dieses Quellstands verwenden oder lokal bauen.
+**REIST16** ist eine von OE3SRO entwickelte experimentelle Betriebsart für
+kurze strukturierte Amateurfunkgespräche. Sie ist ab **3.0.2-oe3sro.5** im
+Windows-Release enthalten. Unter **Mode → REIST16** stehen CQ, Locator,
+Rapport, R-Rapport, RR73 und 73 sowie Doppelklick und Auto Seq zur Verfügung.
+
+Das aktuelle Funkformat **QSO/2** überträgt die 77-Bit-Standardnachrichten
+von WSJT-X mit CRC14 und LDPC(174,91) auf 16 gaußgeformten FSK-Tönen.
+Ein Signal dauert 12,8 Sekunden innerhalb eines 15-Sekunden-UTC-Slots.
+Die Töne liegen 5 Hz auseinander; die äußeren Tonmitten haben 75 Hz Abstand.
+Das ist keine gemessene belegte Bandbreite. REIST16 ist mit FT8 nicht
+funkkompatibel. Beide Gegenstellen benötigen QSO/2; der neue Empfänger
+versteht zusätzlich das ältere QSO/1. Freitext und Contest-Sonderformate
+gehören nicht zum unterstützten Nachrichtenprofil.
+
+Für den Einstieg beide Systemuhren synchronisieren, dieselbe USB-Frequenz
+vereinbaren und entgegengesetzte TX-Slots wählen (`:00/:30` bzw. `:15/:45`).
+Soundkarten-/USB-Audio funktioniert wie bei den anderen Modi. PlutoSDR und
+HackRF nutzen die mitgelieferten TCI-Bridges; der HackRF-Treiber ist separat
+bereitzustellen. Browserempfang über WASAPI und Yaesu-Senden sind mit
+`start-yaesu-websdr.bat` in einer Instanz möglich.
+[WebSDR und reiner Empfangs-Selbsttest](docs/WEBSDR-WSJTX.txt).
+
+Das Yaesu-/Pluto-Bild vom 21. Oktober dokumentiert das frühere **QSO/1**.
+QSO/2 wurde mit Produktionsaudio, Rauschtests und WebSDR-Aufnahmen geprüft;
+daraus folgt keine allgemeine FT8-gleiche Empfindlichkeit oder Fadingfestigkeit.
+CQ-Mittelung ist noch nicht implementiert. Für REIST16 werden keine
+PSK-Reporter-Spots gesendet; eine registrierte ADIF-Betriebsart wird nicht behauptet.
 Siehe [REIST16](docs/REIST16.md) / [QSO/2](docs/REIST16-QSO2.md), [Profilvertrag](docs/REIST16.txt) und
 [Pluto-Einrichtung](docs/PLUTO-WSJTX.txt).
 

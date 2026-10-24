@@ -1,6 +1,6 @@
 # REIST16-QSO/2 — 15-Sekunden-Weak-Signal-Profil
 
-Stand: 22. Oktober 2026 · build by OE3SRO
+Stand: 24. Oktober 2026 · Release 3.0.2-oe3sro.5 · build by OE3SRO
 
 Unter **Mode → REIST16** sendet dieser Stand QSO/2. Ein kompletter Rahmen
 dauert 12,8 s und enthält eine Standardnachricht mit 77 Informationsbits.
@@ -142,7 +142,10 @@ wurden gemeinsam über die Produktionsschnittstelle empfangen.
 Diese endlichen Versuche belegen keine allgemeine Fehlalarmrate und keine
 Empfindlichkeit unter beliebiger Drift, Mehrweg oder Fading. Das
 Yaesu-/Pluto-QSO-Bild vom 21. Oktober gehört zum bisherigen QSO/1-Profil.
-Eine neue QSO/2-Funkabnahme liegt noch nicht vor.
+Zusätzliche QSO/2-WebSDR-Empfangsaufnahmen und die getrennten Aufnahmefenster
+sind in [REIST16.md](REIST16.md) und
+[der Aufnahmeprüfung](../docs/validation/reist16-rx-window/README.txt) dokumentiert.
+Sie ersetzen keine Abnahme eines vollständigen beidseitigen QSO/2-Hardware-QSOs.
 
 Die Entwurfsgrundlage für kurze strukturierte Nachrichten, LDPC und
 Soft-Decodierung erläutern Franke, Somerville und Taylor in
@@ -181,5 +184,7 @@ All four random-phase/mild-drift cases without fading decoded at −16 dB;
 only one of the four faded cases did. Fading also reduced average signal power.
 There were no outputs in 128 noise/interference slots. These finite tests do
 not establish general false-alarm, fading or RF performance. The earlier
-Yaesu/Pluto screenshot demonstrates QSO/1; QSO/2 has not yet had a new RF test.
+Yaesu/Pluto screenshot demonstrates QSO/1. Later QSO/2 WebSDR recordings and
+capture-window checks are documented in [REIST16.md](REIST16.md); these do
+not establish a complete bidirectional QSO/2 hardware contact.
 See the retained validation files for the final counts and exact conditions.

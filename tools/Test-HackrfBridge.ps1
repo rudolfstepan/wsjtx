@@ -4,7 +4,8 @@ $root=Split-Path $PSScriptRoot -Parent
 $mingw=if($env:WSJTX_MINGW_PREFIX){$env:WSJTX_MINGW_PREFIX}else{'C:\msys64\mingw64'}
 $previousPath=$env:PATH
 try{
-    $env:PATH="$mingw\bin;$env:PATH"
+    $hamlibBin=Join-Path $root '.tools\hamlib\hamlib-w64-4.7.2\bin'
+    $env:PATH="$mingw\bin;$hamlibBin;$env:PATH"
     if(!$SkipBuild){& "$mingw\bin\cmake.exe" --build "$root\build-custom" --target wsjtx wsjtx_hackrf_bridge hackrf_bridge_checks pluto_bridge_checks sdr_configuration_checks --parallel 6;if($LASTEXITCODE){throw 'HackRF test build failed'}}
     & "$root\build-custom\sdr_configuration_checks.exe"
     if($LASTEXITCODE){throw 'Production SDR configuration checks failed'}
