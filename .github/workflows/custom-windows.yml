@@ -6,6 +6,15 @@ on:
     tags: ['**']
   pull_request:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Existing release tag (oe3sro-vX.Y.Z-N); leave empty for a build only'
+        required: false
+        type: string
+
+concurrency:
+  group: oe3sro-windows-${{ inputs.release_tag || github.ref_name }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -14,6 +23,8 @@ jobs:
   windows:
     outputs:
       version: ${{ steps.version.outputs.version }}
+      release_tag: ${{ steps.version.outputs.release_tag }}
+      commit: ${{ steps.version.outputs.commit }}
     runs-on: windows-2022
     timeout-minutes: 60
     defaults:
@@ -25,10 +36,13 @@ jobs:
 
       - uses: actions/checkout@v6
         with:
+          ref: ${{ inputs.release_tag || github.ref }}
           persist-credentials: false
 
       - name: Derive artifact version
         id: version
+        env:
+          REQUESTED_RELEASE_TAG: ${{ inputs.release_tag }}
         run: |
           $source = Get-Content -Raw CMakeLists.txt
           $match = [regex]::Match($source, '(?s)project\s*\(\s*wsjtx\s+VERSION\s+(\d+\.\d+\.\d+)(?:\.\d+)?\s')
@@ -36,12 +50,24 @@ jobs:
           $commit = (git rev-parse --short=9 HEAD).Trim()
           if ($LASTEXITCODE) { throw 'Cannot read source revision.' }
           $version = "$($match.Groups[1].Value)-devel-$commit-build$env:GITHUB_RUN_NUMBER.$env:GITHUB_RUN_ATTEMPT"
-          if ($env:GITHUB_REF_TYPE -eq 'tag' -and $env:GITHUB_REF_NAME.StartsWith('oe3sro-v')) {
-            $tag = [regex]::Match($env:GITHUB_REF_NAME, '^oe3sro-v(\d+\.\d+\.\d+)-([1-9]\d*)$')
+          $releaseTag = $env:REQUESTED_RELEASE_TAG
+          if (!$releaseTag -and $env:GITHUB_REF_TYPE -eq 'tag' -and $env:GITHUB_REF_NAME.StartsWith('oe3sro-v')) {
+            $releaseTag = $env:GITHUB_REF_NAME
+          }
+          if ($releaseTag) {
+            $tag = [regex]::Match($releaseTag, '^oe3sro-v(\d+\.\d+\.\d+)-([1-9]\d*)$')
             if (!$tag.Success -or $tag.Groups[1].Value -ne $match.Groups[1].Value) { throw 'Release tag must match oe3sro-vX.Y.Z-N and the CMake version.' }
             $version = "$($tag.Groups[1].Value)-oe3sro.$($tag.Groups[2].Value)"
+            $tagCommit = (git rev-parse "refs/tags/$releaseTag^{commit}").Trim()
+            if ($LASTEXITCODE -or $tagCommit -ne (git rev-parse HEAD).Trim()) { throw 'Release must build the existing tag commit.' }
+            $notes = "docs/releases/$version.md"
+            if (!(Test-Path -LiteralPath $notes) -or [string]::IsNullOrWhiteSpace((Get-Content -Raw $notes))) {
+              throw "Missing or empty release notes: $notes"
+            }
           }
           "version=$version" >> $env:GITHUB_OUTPUT
+          "release_tag=$releaseTag" >> $env:GITHUB_OUTPUT
+          "commit=$((git rev-parse HEAD).Trim())" >> $env:GITHUB_OUTPUT
 
       - name: Install UCRT64 and Qt dependencies
         id: msys2
@@ -153,7 +179,7 @@ jobs:
           "@ >> $env:GITHUB_STEP_SUMMARY
 
   release:
-    if: startsWith(github.ref, 'refs/tags/oe3sro-v')
+    if: needs.windows.outputs.release_tag != ''
     needs: windows
     runs-on: ubuntu-latest
     permissions:
@@ -161,6 +187,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          ref: ${{ needs.windows.outputs.commit }}
           persist-credentials: false
       - uses: actions/download-artifact@v8
         with:
@@ -169,7 +196,7 @@ jobs:
       - name: Publish versioned Windows release with documentation
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_TAG: ${{ needs.windows.outputs.release_tag }}
           RELEASE_VERSION: ${{ needs.windows.outputs.version }}
         run: |
           set -euo pipefail
@@ -178,6 +205,19 @@ jobs:
           test -f "release-assets/wsjtx-OE3SRO-${RELEASE_VERSION}-windows-x64.zip"
           test -f "release-assets/wsjtx-OE3SRO-${RELEASE_VERSION}-documentation.zip"
           (cd release-assets && sha256sum --check ./*.sha256)
-          gh release create "$RELEASE_TAG" release-assets/*.zip release-assets/*.sha256 \
-            --verify-tag --latest --title "WSJT-X OE3SRO Custom ${RELEASE_VERSION}" \
-            --notes-file "$notes"
+          # A failed upload leaves a draft that can safely be retried.
+          # Published releases are immutable through this workflow.
+          existing=$(gh api "repos/$GITHUB_REPOSITORY/releases" --paginate \
+            --jq ".[] | select(.tag_name == \"$RELEASE_TAG\") | .draft")
+          if [ -n "$existing" ]; then
+            if [ "$existing" != true ]; then
+              echo '::error::Release is already published; use a new release tag.'
+              exit 1
+            fi
+          else
+            gh release create "$RELEASE_TAG" --verify-tag --draft \
+              --title "WSJT-X OE3SRO Custom ${RELEASE_VERSION}" --notes-file "$notes"
+          fi
+          gh release upload "$RELEASE_TAG" release-assets/*.zip release-assets/*.sha256 --clobber
+          gh release edit "$RELEASE_TAG" --draft=false --latest \
+            --title "WSJT-X OE3SRO Custom ${RELEASE_VERSION}" --notes-file "$notes"

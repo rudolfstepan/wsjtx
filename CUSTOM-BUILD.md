@@ -175,15 +175,28 @@ anlegen und committen. Anschließend den zugehörigen Tag auf diesen Commit setz
 und nach origin pushen, zum Beispiel:
 
 ```powershell
-git tag oe3sro-v3.0.2-5
-git push origin oe3sro-v3.0.2-5
+git tag oe3sro-v3.0.2-6
+git push origin oe3sro-v3.0.2-6
 ```
 
 Der Workflow prüft die CMake-Version, baut und testet den getaggten Quellstand
 und veröffentlicht erst danach das Release mit Windows-ZIP, Dokumentations-ZIP
 und beiden SHA256-Dateien als GitHub **Latest**. Für diesen Stand lautet
-die Paketversion `3.0.2-oe3sro.5`;
+die Paketversion `3.0.2-oe3sro.6`;
 die zugrunde liegende Anwendung bleibt WSJT-X 3.0.2-devel mit Custom-Branding.
+
+Alternativ in Actions **OE3SRO Windows EXE → Run workflow** auswählen und
+unter `release_tag` den bereits gepushten Release-Tag eintragen. Der Build
+verwendet exakt dessen Commit und prüft vor der Kompilierung, dass die Version
+passt und die Release Notes vorhanden und nicht leer sind. Ein leeres Feld
+erzeugt bei Auswahl eines Branches nur ein Build-Artefakt; normale Branch-Pushes
+veröffentlichen ebenfalls kein Release. Wird ein Release-Tag als Ref ausgewählt,
+startet wie beim Tag-Push der Release-Ablauf.
+
+ZIPs und Prüfsummen werden zunächst in einen Entwurf hochgeladen und erst
+anschließend als **Latest** veröffentlicht. Ein nach fehlgeschlagenem Upload
+verbliebener Entwurf kann erneut ausgeführt werden. Bereits veröffentlichte
+Releases werden nicht überschrieben; dafür einen neuen Versions-Tag verwenden.
 
 ## Lokaler Start und Bedienung
 
