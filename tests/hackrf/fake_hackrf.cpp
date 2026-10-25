@@ -43,7 +43,8 @@ static int start(bool tx,Callback callback,void* context){
  };
  // Reproduce libhackrf's synchronous preparation of all four TX transfers.
  if(tx)for(int i=0;i<4;++i)if(!transfer()){active=false;state.mode=0;return -2;}
- worker=std::thread([=](){while(active){std::this_thread::sleep_for(std::chrono::milliseconds(42));if(!active)break;if(!transfer()){active=false;break;}}});return 0;
+ auto rxDue=std::chrono::steady_clock::now()+std::chrono::milliseconds(state.rxDelayMs.load());
+ worker=std::thread([=](){while(active){std::this_thread::sleep_for(std::chrono::milliseconds(42));if(!active)break;if(!tx&&(state.pauseRx||std::chrono::steady_clock::now()<rxDue))continue;if(!transfer()){active=false;break;}}});return 0;
 }
 API int hackrf_start_rx(void*,Callback cb,void* ctx){return start(false,cb,ctx);}
 API int hackrf_start_tx(void*,Callback cb,void* ctx){return start(true,cb,ctx);}

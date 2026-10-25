@@ -60,24 +60,40 @@ bool RadioWorker::submit(std::vector<float> const& samples) {
 void RadioWorker::run() {
   try {
     std::unique_ptr<Radio> hardware;
-    if(!options.simulate) {
-      if(options.hackrf)hardware.reset(new HackrfRadio(options.library,options.serial,options.frequency,int(options.rxGain),options.rxVga,int(options.txGain),options.amplitude));
-      else hardware.reset(new IioRadio(options.library,options.uri,options.frequency,options.rxGain,options.txGain));
-    }
+    auto receiveDeadline=std::chrono::steady_clock::now()+std::chrono::seconds(30);
+    auto openHardware=[&] {
+      if(options.simulate)return;
+      if(!options.hackrf) {hardware.reset(new IioRadio(options.library,options.uri,options.frequency,options.rxGain,options.txGain));return;}
+      while(!quit) {
+        try {hardware.reset(new HackrfRadio(options.library,options.serial,rxFrequency.load(),int(options.rxGain),options.rxVga,int(options.txGain),options.amplitude,options.txAmp));return;}
+        catch(std::exception const& e) {
+          if(std::chrono::steady_clock::now()>=receiveDeadline)throw;
+          emit waitingForDevice(QString("Waiting for HackRF: %1").arg(QString::fromUtf8(e.what())));
+          std::unique_lock<std::mutex> guard(mutex);
+          available.wait_for(guard,std::chrono::seconds(1),[this]{return quit.load();});
+        }
+      }
+    };
+    openHardware();
+    if(quit)return;
     UsbModulator modulator;
     UsbDemodulator demodulator;
     bool active=false;
     unsigned txBlocks=0;
     auto txStarted=std::chrono::steady_clock::now();
     long long rx=options.frequency,tx=options.frequency;
-    emit ready();
+    bool receiving=!options.hackrf || options.simulate;
+    if(receiving)emit ready();
+    else emit waitingForDevice("Waiting for first HackRF USB RX samples (up to 30 seconds)");
     auto due=std::chrono::steady_clock::now();
     while(!quit) {
       bool on=requestedPtt;
+      if(on && !receiving) {requestedPtt=false;on=false;}
       auto changePtt=[&](bool value) {
         if(hardware) hardware->ptt(value);
         active=value;
         if(value) {txBlocks=0;txStarted=std::chrono::steady_clock::now();}
+        else receiveDeadline=std::chrono::steady_clock::now()+std::chrono::seconds(30);
         modulator=UsbModulator{};
         demodulator=UsbDemodulator{};
         { std::lock_guard<std::mutex> guard(mutex); pending.clear();waiting=false; }
@@ -124,7 +140,25 @@ void RadioWorker::run() {
         }
         ++txBlocks;
       } else if(hardware) {
-        auto iq=hardware->receive();
+        std::vector<IQ> iq;
+        try {iq=hardware->receive();}
+        catch(std::exception const& e) {
+          if(!options.hackrf || std::chrono::steady_clock::now()>=receiveDeadline)throw;
+          requestedPtt=false;receiving=false;
+          emit waitingForDevice(QString("Reconnecting HackRF RX: %1").arg(QString::fromUtf8(e.what())));
+          hardware.reset();openHardware();if(quit)break;
+          hardware->tune(rx,tx);demodulator=UsbDemodulator{};
+          continue;
+        }
+        if(iq.empty()) {
+          if(std::chrono::steady_clock::now()>=receiveDeadline)throw std::runtime_error("HackRF supplied no USB RX samples for 30 seconds; check USB connection, driver and device ownership");
+          requestedPtt=false;
+          if(receiving) {receiving=false;emit waitingForDevice("Waiting for HackRF USB RX data; transmission disabled");}
+          demodulator=UsbDemodulator{};
+          continue;
+        }
+        receiveDeadline=std::chrono::steady_clock::now()+std::chrono::seconds(30);
+        if(!receiving){receiving=true;emit ready();}
         auto decoded=demodulator.process(iq.data(),int(iq.size()));
         emit this->audio(audioPacket(1,decoded));
       } else {
@@ -146,10 +180,18 @@ void RadioWorker::run() {
 Bridge::Bridge(Options const& o) : options(o),server("WSJT-X "+o.deviceName(),QWebSocketServer::NonSecureMode,this),
   radio(o),rxFrequency(o.frequency),txFrequency(o.frequency) {
   connect(&radio,&RadioWorker::ready,this,[this]{
-    available=true;
+    available=true;waitingDevice=false;lastError.clear();
     writeReady(true);
+    if(client) {if(!greeted)greet();else if(streaming)send("audio_samplerate:48000;audio_start:0;");}
     qInfo().noquote()<<options.deviceName()<<QString(" bridge ready: ws://127.0.0.1:%1 | %2 | %3 Hz | USB | RX %4 dB, TX %5 dB")
        .arg(options.port).arg(options.simulate?"SIMULATION":options.hackrf?options.serial:options.uri).arg(rxFrequency).arg(options.rxGain).arg(options.txGain);
+  });
+  connect(&radio,&RadioWorker::waitingForDevice,this,[this](QString reason){
+    available=false;waitingDevice=true;lastError=reason;keyed=false;
+    radio.ptt(false);
+    send("trx:0,false;audio_stop:0;");
+    writeReady(false,reason);
+    qWarning().noquote()<<reason;
   });
   connect(&radio,&RadioWorker::fault,this,&Bridge::fail);
   connect(&radio,&RadioWorker::txAborted,this,[this](QString reason){
@@ -175,9 +217,9 @@ Bridge::Bridge(Options const& o) : options(o),server("WSJT-X "+o.deviceName(),QW
   });
   connect(&server,&QWebSocketServer::newConnection,this,[this]{
     auto socket=server.nextPendingConnection();
-    if(!available) {socket->close();socket->deleteLater();return;}
     if(client) {socket->close(QWebSocketProtocol::CloseCodePolicyViolated,"SDR already has a WSJT-X client");socket->deleteLater();return;}
     client=socket;
+    greeted=false;
     connect(socket,&QWebSocket::disconnected,this,[this,socket]{
       radio.ptt(false);keyed=false;streaming=false;split=false;
       radio.tune(rxFrequency,rxFrequency);
@@ -191,15 +233,19 @@ Bridge::Bridge(Options const& o) : options(o),server("WSJT-X "+o.deviceName(),QW
       if(!readAudioPacket(packet,audio)) {fail("Invalid TCI transmit audio packet");return;}
       if(keyed) radio.submit(audio);
     });
+    if(available)greet();
+  });
+}
+void Bridge::greet() {
+    greeted=true;
     send(QString("protocol:1.9;device:%3;version:WSJTX-SDRBridge,1.1;receive_only:false;trx_count:1;channels_count:2;"
                  "vfo_limits:%4,%5;if_limits:-24000,24000;modulations_list:usb;"
                  "modulation:0,usb;vfo:0,0,%1;vfo:0,1,%2;split_enable:0,false;trx:0,false;"
                  "audio_samplerate:48000;start;ready;").arg(rxFrequency).arg(txFrequency).arg(options.deviceName()).arg(options.minimumFrequency()).arg(options.maximumFrequency()));
-  });
 }
 void Bridge::start() {
   if(!server.listen(QHostAddress::LocalHost,options.port)) {fail(server.errorString());return;}
-  radio.start();
+  waitingDevice=true;writeReady(false,"Waiting for SDR device");radio.start();
 }
 Bridge::~Bridge() {
   server.close();
@@ -210,7 +256,7 @@ void Bridge::writeReady(bool ok,QString const& reason) {
   if(options.readyFile.isEmpty()) return;
   QSaveFile file(options.readyFile);
   if(file.open(QIODevice::WriteOnly|QIODevice::Truncate)) {
-    file.write(QJsonDocument(QJsonObject{{"device",options.deviceName()},{"serial",options.serial},{"sampleRate",rf_rate},{"ok",ok},{"error",reason.isEmpty()?lastError:reason},{"simulate",options.simulate},{"port",options.port},{"ptt",keyed},
+    file.write(QJsonDocument(QJsonObject{{"device",options.deviceName()},{"serial",options.serial},{"sampleRate",rf_rate},{"ok",ok},{"state",ok?"ready":waitingDevice?"waiting":"failed"},{"error",reason.isEmpty()?lastError:reason},{"simulate",options.simulate},{"port",options.port},{"ptt",keyed},
                {"rxFrequency",double(rxFrequency)},{"txFrequency",double(txFrequency)},
                {"pid",double(QCoreApplication::applicationPid())},
                {"txAborts",int(txAbortCount)},{"lastTxWarning",lastTxWarning}}).toJson());
@@ -227,6 +273,7 @@ void Bridge::fail(QString const& reason) {
   lastError=reason;
   qCritical().noquote()<<reason;
   available=false;
+  waitingDevice=false;
   keyed=false;
   radio.ptt(false);
   radio.stop();
@@ -243,6 +290,11 @@ void Bridge::commands(QString const& messages) {
     auto args=(colon<0?QString():command.mid(colon+1)).split(',');
     if(name=="trx" && args.size()>=2 && args[0]=="0") {
       bool on=args[1]=="true";
+      if(on && !available) {
+        radio.ptt(false);send("trx:0,false;");
+        reportTxAbort("SDR TX rejected: waiting for radio USB data; enable TX again after recovery","device_not_ready");
+        continue;
+      }
       if(on && (!available || !streaming)) {
         // A CAT/PTT test or late audio_start must not destroy the RX service.
         // Refuse this TX request; a later audio_start never keys by itself.
@@ -268,9 +320,9 @@ void Bridge::commands(QString const& messages) {
       split=args.last()=="true";
       if(!split && txFrequency!=rxFrequency) radio.tune(rxFrequency,rxFrequency);
       send(QString("split_enable:0,%1;").arg(split?"true":"false"));
-    } else if(name=="audio_start") {streaming=true;send("audio_samplerate:48000;audio_start:0;");}
+    } else if(name=="audio_start") {streaming=true;if(available)send("audio_samplerate:48000;audio_start:0;");}
     else if(name=="audio_stop") {streaming=false;radio.ptt(false);send("audio_stop:0;");}
-    else if(name=="start") send("start;");
+    else if(name=="start") {if(available)send("start;");}
     else if(name=="stop") {radio.ptt(false);send("stop;");}
     else if(name=="smeter") send("smeter:0,0,-100;");
     else if(name=="drive") send("drive:0;"); // Hardware attenuation is set explicitly at bridge startup.

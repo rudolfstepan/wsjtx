@@ -19,6 +19,7 @@
 #include <QDebug>
 #include <QDateTime>
 #include <QTimer>
+#include <QElapsedTimer>
 
 namespace
 {
@@ -430,8 +431,18 @@ int TCITransceiver::do_start ()
   _power_ = false;
   CAT_TRACE ("TCITransceiver entered TCI do_start and url " + url_.toString() + " rig_power:" + QString::number(rig_power_) + " rig_power_off:" + QString::number(rig_power_off_) + " tci_audio:" + QString::number(tci_audio_) + " do_snr:" + QString::number(do_snr_) + " do_pwr:" + QString::number(do_pwr_) + '\n');
   commander_->open (url_);
-  tci_done6();
-  mysleep6(2000);
+  // USB-backed SDR bridges may accept the socket before their radio supplies
+  // samples. Keep processing events while waiting, and retry refused sockets.
+  QElapsedTimer startupWait;startupWait.start();
+  while(!_power_ && startupWait.elapsed()<35000) {
+    mysleep6(250);
+    if(!inConnected && commander_->state()==QAbstractSocket::UnconnectedState && startupWait.elapsed()<35000) {
+      error_.clear();
+      commander_->open(url_);
+    }
+  }
+  if(!_power_)throw error {error_.isEmpty()?tr("TCI SDR did not become ready within 35 seconds"):error_};
+  error_.clear();
   busy_split_ = true;
   const QString cmd = CmdSplitEnable + SmDP + "false" + SmTZ;
   sendTextMessage(cmd);
@@ -458,7 +469,8 @@ int TCITransceiver::do_start ()
     }
     if (tci_audio_) {
       stream_audio (true);
-      mysleep6(500);
+      QElapsedTimer audioWait;audioWait.start();
+      while(!stream_audio_ && audioWait.elapsed()<5000)mysleep6(100);
       if (!stream_audio_) {
         tci_Ready = false;
         throw error {tr ("TCI Audio could not be switched on")};
@@ -753,6 +765,8 @@ void TCITransceiver::onMessageReceived(const QString &str)
           do_modulator_stop(true);
           Q_EMIT transmitAbort(args.at(1)=="audio_not_started"
             ? tr("SDR TX audio is not started. Enable TCI audio in Settings; receiving continues.")
+            : args.at(1)=="device_not_ready"
+            ? tr("SDR is waiting for USB receive data. Transmission was cancelled; enable Tx again after the device is ready.")
             : tr("SDR TX audio timeout: transmission aborted. Receiving continues; enable Tx to retry."));
         }
         break;

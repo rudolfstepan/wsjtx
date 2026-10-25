@@ -60,7 +60,12 @@
     <p><strong>start-pluto.bat</strong> nutzt ein eigenes Pluto-Profil und die mitgelieferte libiio-Runtime.
       <strong>start-hackrf.bat</strong> nutzt ein eigenes HackRF-Profil; die libhackrf-Runtime samt Abhängigkeiten
       und Lizenzen muss separat unter <code>bin/hackrf</code> bereitgestellt werden.
-      <a href="HACKRF-WSJTX.txt">HackRF-Anleitung</a>. Die reale HF-Abnahme dieser HackRF-Bridge steht aus.</p>
+      <a href="HACKRF-WSJTX.txt">HackRF-Anleitung</a>.</p>
+    <p><strong>start-hackrf-ft8-17m.bat</strong> ergänzt ein separates HackRF-Profil für FT8 auf
+      18,100 MHz (Erststart): USB-RX/TX, TX-Gain 47 dB, IQ-Pegel 1,0 und interner Verstärker nur bei TX.
+      Die Bridge wartet auf USB-Daten und hält TCI bei begrenzter RX-Erholung verbunden.
+      Der Benutzer bestätigt PSK-Reporter-Fernempfang in Finnland (−25 dB) und Spanien (−18 dB).
+      Keine kalibrierte Leistungsmessung und kein abgeschlossener QSO dokumentiert.</p>
     <p><strong>start-yaesu-websdr.bat</strong> verbindet Browserempfang per WASAPI und Yaesu-Senden in einer Instanz
       mit vorhandenem Custom-Profil. Windows-Wiedergabeausgang und Browserfrequenz müssen passend gewählt werden.
       <strong>start-reist16-selftest.bat</strong> ergänzt einen eigenen reinen Empfänger für die eigene Aussendung.
@@ -170,7 +175,12 @@
     <p><strong>start-pluto.bat</strong> uses a separate Pluto profile and the bundled libiio runtime.
       <strong>start-hackrf.bat</strong> uses its own profile; supply the libhackrf runtime, dependencies
       and licenses separately in <code>bin/hackrf</code>. <a href="HACKRF-WSJTX.txt">HackRF setup</a>.
-      RF acceptance of this HackRF bridge is pending.</p>
+      </p>
+    <p><strong>start-hackrf-ft8-17m.bat</strong> adds a separate HackRF profile, initially FT8 at
+      18.100 MHz: USB RX/TX, TX gain 47 dB, IQ amplitude 1.0 and internal amplifier during TX only.
+      The bridge waits for USB data and preserves TCI during bounded RX recovery.
+      The user reports PSK Reporter reception in Finland (−25 dB) and Spain (−18 dB).
+      No calibrated power measurement or completed QSO is documented.</p>
     <p><strong>start-yaesu-websdr.bat</strong> combines WASAPI browser reception and Yaesu transmission in one
       existing Custom instance. Match the Windows playback device and browser frequency.
       <strong>start-reist16-selftest.bat</strong> adds a dedicated receiver for your own transmissions.

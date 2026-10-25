@@ -52,6 +52,16 @@ operation, implementation, sources, and the verified build baseline.
 
 ## Separate HackRF One instance
 
+`start-hackrf-ft8-17m.bat` adds a separate HackRF RX/TX instance, initially
+using **FT8 at 18.100 MHz**. Its defaults are TX gain 47 dB, digital amplitude
+1.0 and the internal RF amplifier enabled during TX. The independent profile
+**WSJT-X - HackRF-FT8-17m** uses TCI 40004 / UDP 2243; Enable TX starts off.
+See the [HackRF instructions](docs/HACKRF-WSJTX.txt).
+The user reports reception of their FT8 CQ through PSK Reporter in Finland
+(−25 dB) and Spain (−18 dB). This confirms remote reception, with no completed
+QSO or measured output power claimed. The bridge waits for actual USB data
+and preserves the TCI connection during bounded RX recovery.
+
 `start-hackrf.bat` launches the HackRF version with its own **WSJT-X - HackRF**
 profile, local CAT/audio port 40003 and UDP port 2239. USB audio uses TCI;
 REIST16-QSO/2 and the other WSJT-X modes share this radio path.

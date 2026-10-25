@@ -4,6 +4,23 @@
 
 ## Deutsch
 
+### 2026-10-25 — HackRF FT8 auf 17 m und robuster USB-/TCI-Start
+
+- Zusätzlicher Starter `start-hackrf-ft8-17m.bat` mit eigenem Profil,
+  FT8/18,100 MHz beim Erststart, TCI 40004 und UDP 2243; RX und TX über USB.
+- Maximale Softwarevorgaben: TX-VGA 47 dB, IQ-Pegel 1,0, interner RF-Verstärker
+  nur bei TX. USB-Seitenband; bestehende Profile bleiben erhalten.
+- Bereitschaft erst nach echten RX-Samples, bis 30 s Gerätewartezeit,
+  RX-Neustart nach 3 s Stillstand; TCI bleibt bei RX-Erholung verbunden.
+  WSJT-X wartet bis 35 s auf den TCI-Start und 5 s auf die Audioantwort.
+- Lokaler Build alternativ mit MinGW Makefiles ohne Ninja; Buildverzeichnis
+  für HackRF-Prüfungen und Paketierung wählbar.
+- 4669 Mock-/Profilprüfungen, verzögerter USB-Start, RX-Erholung und echte
+  30-s-RX-Prüfung auf 17 m bestanden. Benutzer bestätigt FT8-Empfang seines
+  CQ über PSK Reporter in Finnland (−25 dB) und Spanien (−18 dB).
+  Kein abgeschlossener QSO und keine kalibrierte Leistungs-/Spektrummessung.
+  [Bedienung](HACKRF-WSJTX.txt), [Prüfbericht](validation/hackrf-ft8-17m/README.txt).
+
 ### 2026-10-24 — Release 3.0.2-oe3sro.5 mit REIST16-QSO/2
 
 - Erstes Download-Release mit REIST16-QSO/2, Pluto-/HackRF-Bridges und
@@ -277,6 +294,23 @@ ergänzt. [8bf344fde](https://github.com/rudolfstepan/wsjtx/commit/8bf344fde)
 speichert den FT2-Fortsetzungspunkt; dieser Commit ändert keine Programmfunktion.
 
 ## English
+
+### 2026-10-25 — HackRF FT8 on 17 m and robust USB/TCI startup
+
+- Additional `start-hackrf-ft8-17m.bat` launcher with an independent profile,
+  initially FT8/18.100 MHz, TCI 40004 and UDP 2243; USB RX and TX.
+- Maximum software defaults: TX VGA 47 dB, IQ amplitude 1.0, internal RF
+  amplifier during TX only. Upper sideband; existing profiles are preserved.
+- Readiness requires actual RX samples; up to 30 s device wait, RX restart
+  after 3 s without data, TCI connection preserved during RX recovery.
+  WSJT-X allows 35 s TCI startup and 5 s audio acknowledgement.
+- Optional MinGW Makefiles build without Ninja; selectable build directory
+  for HackRF checks and packaging.
+- 4669 mock/profile checks, delayed USB startup, RX recovery and a real 30 s
+  receive-only test on 17 m passed. User reports reception of their FT8 CQ
+  through PSK Reporter in Finland (−25 dB) and Spain (−18 dB).
+  No completed QSO or calibrated RF power/spectrum measurement is claimed.
+  [Setup](HACKRF-WSJTX.txt), [Validation](validation/hackrf-ft8-17m/README.txt).
 
 ### 2026-10-24 — Release 3.0.2-oe3sro.5 with REIST16-QSO/2
 

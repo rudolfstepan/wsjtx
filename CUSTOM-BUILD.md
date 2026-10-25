@@ -8,6 +8,28 @@ vom Benutzer dokumentiert; eine Empfangsschwelle ist noch nicht vermessen.
 Die lokale Pluto-Laufzeit lässt sich mit `tools/Setup-PlutoBridge.ps1 -Download`
 aus dem per SHA256 geprüften offiziellen libiio0.26-Archiv vorbereiten.
 
+## HackRF FT8 auf 17 m
+
+`start-hackrf-ft8-17m.bat` startet RX und TX über einen HackRF One mit eigenem
+Profil **HackRF-FT8-17m**, initial FT8/18,100 MHz, TCI 40004 und UDP 2243.
+Vorgaben: TX-VGA 47 dB, IQ-Pegel 1,0 und interner RF-Verstärker nur während TX;
+USB-Seitenband. Enable TX beim Erststart aus, spätere Profilwahl erhalten.
+Benutzerbestätigter PSK-Reporter-Fernempfang in Finnland (−25 dB) und Spanien
+(−18 dB); keine gemessene Ausgangsleistung und kein QSO-Abschluss behauptet.
+[Startparameter und USB-Erholung](docs/HACKRF-WSJTX.txt).
+
+Alternative ohne Ninja, mit Buildprodukten im sichtbaren Hauptprojekt:
+
+```powershell
+.\tools\Build-Custom.ps1 -Generator 'MinGW Makefiles'
+.\tools\Test-HackrfBridge.ps1 -BuildDirectory .\build-custom-make
+.\tools\Package-Custom.ps1 -BuildDirectory .\build-custom-make -Package .\dist-custom\OE3SRO-hackrf-ft8-17m
+.\tools\Test-HackrfFt8Launcher.ps1
+```
+
+Der bisherige Ninja-Build bleibt für CI verfügbar. Die Alternative benötigt
+keine Antivirus-Ausnahme. [Prüfbericht](docs/validation/hackrf-ft8-17m/README.txt).
+
 ## Abfragebegrenzung und HTTP 429
 
 Die XML-Abfrage kann mit **Too Many Requests** abgelehnt werden, während die

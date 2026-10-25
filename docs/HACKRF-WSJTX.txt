@@ -1,6 +1,74 @@
 HackRF One als eigene WSJT-X-Instanz
 build by OE3SRO
 
+Zusaetzliche Startoption: HackRF FT8 auf 17 m
+-----------------------------------------
+start-hackrf-ft8-17m.bat startet ausschliesslich den HackRF fuer RX UND TX.
+Eigene Instanz/Profil WSJT-X - HackRF-FT8-17m, TCI 40004, UDP 2243.
+Paket im Repository: dist-custom/OE3SRO-hackrf-ft8-17m.
+Erststart: FT8, Dial 18.100000 MHz USB/DIGU, Audio 1500 Hz, Monitor an,
+Auto Seq an, Enable TX aus. Spaetere Modus-/Frequenzwahlen bleiben erhalten.
+Rufzeichen/Locator nach dem Erststart kontrollieren: wie beim alten Starter
+werden nur diese beiden Werte aus Pluto, sonst Custom uebernommen.
+Kein Yaesu, Pluto oder Browser-WebSDR wird fuer den Funkweg verwendet.
+Die bisherige Startoption start-hackrf.bat bleibt separat erhalten.
+
+Auf Benutzerwunsch maximale TX-Einstellungen fuer diese neue Startoption:
+TX-VGA 47 dB, digitaler IQ-Pegel 1,0, interner RF-Verstaerker beim Senden EIN.
+Beim Empfang und Beenden wird der RF-Verstaerker ausgeschaltet; Bias-Tee AUS.
+In WSJT-X den Pwr-Regler fuer vollen digitalen Pegel auf 0 dB Daempfung setzen
+(neues Profil: Vorgabe 0 dB). Enable TX wird weiterhin vom Benutzer aktiviert.
+Die Einstellungen garantieren keine bestimmte Wattzahl; Ausgangsleistung,
+Spektrum und Frequenzgenauigkeit sind nicht kalibriert; ein abgeschlossenes
+FT8-QSO ist noch nicht bestaetigt.
+Ein externer Leistungsverstaerker wird mit dieser Option nicht angesteuert.
+Herstellerhinweise zu Leistung und Filterung:
+https://hackrf.readthedocs.io/en/stable/hackrf_one.html
+
+Optional weniger Leistung / ohne internen RF-Verstaerker:
+  .\Start-HackRF-FT8-17m.ps1 -TxGain 0 -Amplitude 0.5 -TxAmp:$false
+Nur vorbereiten, ohne Geraetezugriff: -PrepareOnly; Simulation: -Simulate.
+Vor Wechsel zwischen den beiden HackRF-Startoptionen die laufende
+HackRF-Instanz normal schliessen. Die Profile werden getrennt gespeichert.
+
+Lokaler Build ohne Ninja (bei Antivirus-Erkennung keine Ausnahme noetig):
+  .\tools\Build-Custom.ps1 -Generator 'MinGW Makefiles'
+  .\tools\Test-HackrfBridge.ps1 -BuildDirectory .\build-custom-make
+  .\tools\Package-Custom.ps1 -BuildDirectory .\build-custom-make -Package .\dist-custom\OE3SRO-hackrf-ft8-17m
+  .\tools\Test-HackrfFt8Launcher.ps1
+Der Make-Build verwendet einen eigenen Ausgabeordner im Hauptarbeitsverzeichnis;
+die Quellen bleiben im sichtbaren Hauptprojekt. CI-/Ninja-Option bleibt erhalten.
+
+Robuster USB-/TCI-Start (25. Oktober 2026)
+---------------------------------------
+Die Bridge meldet bereit erst nach dem ersten vollstaendigen USB-RX-Block.
+Bei langsamer Geraeteoeffnung oder ausbleibenden Empfangsdaten wartet sie
+bis zu 30 Sekunden. Nach 3 Sekunden ohne RX-Daten wird der Empfangsstrom
+neu gestartet; RX-Treiberfehler fuehren zum kontrollierten Neuoeffnen.
+Der Starter zeigt die Wartephase an und wartet bis zu 45 Sekunden.
+WSJT-X wartet beim TCI-Start bis zu 35 Sekunden, mit Wiederverbindung bei
+abgelehnten Socketverbindungen, und bis zu 5 Sekunden auf die Audioantwort.
+Ein empfangsseitiger USB-Aussetzer beendet die bestehende TCI-Verbindung
+nicht sofort: Audio wird pausiert, der DSP-Pfad zurueckgesetzt und nach
+neuen echten Daten wieder gestartet. Keine kuenstlichen Samples/Zeitraster.
+Waehrend des Wartens werden TX-Anforderungen verworfen, nicht nachgeholt.
+Nach der Erholung Enable TX bei Bedarf selbst wieder aktivieren.
+TX-Unterlaeufe und ungueltige TX-Daten brechen die betroffene Aussendung
+weiter ab; sie werden nicht durch Wiederholung oder Nullsamples kaschiert.
+Nach 30 Sekunden ohne Empfangsdaten folgt ein konkreter USB-/Treiberfehler.
+
+Benutzerbestaetigter FT8-Fernempfang am 25. Oktober 2026
+----------------------------------------------------
+Der Benutzer sendet CQ als OE3SRO/P auf 17 m und meldet zwei Empfangsstationen
+im PSK Reporter: Finnland -25 dB und Spanien -18 dB. Das ist ein vom Benutzer
+gemeldeter Nachweis erfolgreicher entfernter FT8-Dekodierung, kein eigener
+Abruf/Export der Empfangsmeldungen durch den Agenten. Die SNR-Werte sind keine
+Messung der Ausgangsleistung. Ein abgeschlossener QSO ist nicht dokumentiert.
+PSK Reporter mit dem tatsaechlich gesendeten Rufzeichen (hier OE3SRO/P),
+FT8 und 17 m filtern. Empfangsmeldungen koennen verzoegert eintreffen.
+Die eigene PSK-Reporter-Uploadoption steuert Meldungen eigener RX-Decodes;
+sie ist keine Voraussetzung dafuer, von anderen Stationen gemeldet zu werden.
+
 Start: start-hackrf.bat (oder Start-HackRF.ps1).
 Repository-Paket: dist-custom/OE3SRO-reist16-hackrf.
 Eigenes Profil: WSJT-X - HackRF; lokaler TCI-Port 40003, UDP-Port 2239.
@@ -31,7 +99,8 @@ portable Pakete kopiert. Die vorhandene Senderauswahl dieses Arbeitsplatzes
 kann dort gespeichert werden.
 RX-LNA: 0..40 dB in 8-dB-Schritten, RX-VGA: 0..62 dB in 2-dB-Schritten.
 TX-VGA: 0..47 dB, Vorgabe 0; digitaler IQ-Pegel 0,5. RF-Verstärker und Bias-Tee
-bleiben AUS. Diese Werte sind keine kalibrierte Ausgangsleistung.
+bleiben beim bisherigen Starter AUS. Mit -TxAmp wird der interne Verstaerker
+nur waehrend TX eingeschaltet. Diese Werte sind keine kalibrierte Ausgangsleistung.
 
 TX verwendet verlustfreie, begrenzte Warteschlangen. Vor dem nativen TX-Start
 werden die vier libhackrf-Startpuffer vollständig vorbereitet. Beim PTT-Ende

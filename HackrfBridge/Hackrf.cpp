@@ -1,6 +1,7 @@
 #include "Hackrf.hpp"
 #include <QDir>
 #include <QFileInfo>
+#include <QDebug>
 #include <algorithm>
 #include <cstring>
 #include <chrono>
@@ -45,8 +46,8 @@ HackrfApi::~HackrfApi(){
 #endif
 }
 void HackrfApi::check(int result,char const* action) const {if(result!=0)throw std::runtime_error(std::string("HackRF ")+action+": "+hackrf_error_name(result)+" ("+std::to_string(result)+")");}
-HackrfRadio::HackrfRadio(QString const& library,QString const& serial,long long frequency,int lna,int vga,int txGain,float level)
- :api(library),rxFrequency(frequency),txFrequency(frequency),amplitude(level) {
+HackrfRadio::HackrfRadio(QString const& library,QString const& serial,long long frequency,int lna,int vga,int txGain,float level,bool amplifier)
+ :api(library),rxFrequency(frequency),txFrequency(frequency),amplitude(level),txAmp(amplifier) {
   if(frequency<1000000||frequency>6000000000LL||lna<0||lna>40||lna%8||vga<0||vga>62||vga%2||txGain<0||txGain>47||!std::isfinite(level)||level<=0||level>1)throw std::runtime_error("Invalid HackRF frequency or gain");
   try {
     api.check(api.hackrf_init(),"initialize");initialized=true;
@@ -77,7 +78,7 @@ void HackrfRadio::stopStream(){
   {std::lock_guard<std::mutex> lock(mutex);rxQueue.clear();txQueue.clear();rxBytes=txBytes=rxOffset=txOffset=0;}
   if(result!=0&&result!=-1003)api.check(result,"stop stream");
 }
-void HackrfRadio::startReceive(){stopping=false;api.check(api.hackrf_set_freq(device,uint64_t(rxFrequency)),"RX frequency");rxActive=true;api.check(api.hackrf_start_rx(device,rxCallback,this),"start RX");}
+void HackrfRadio::startReceive(){api.check(api.hackrf_set_amp_enable(device,0),"RX RF amplifier OFF");stopping=false;api.check(api.hackrf_set_freq(device,uint64_t(rxFrequency)),"RX frequency");rxActive=true;api.check(api.hackrf_start_rx(device,rxCallback,this),"start RX");lastRx=std::chrono::steady_clock::now();}
 void HackrfRadio::cleanup() noexcept {
   if(device){try{stopStream();}catch(...){}api.hackrf_set_amp_enable(device,0);api.hackrf_set_antenna_enable(device,0);api.hackrf_close(device);device=nullptr;}
   if(initialized){api.hackrf_exit();initialized=false;}
@@ -90,7 +91,7 @@ void HackrfRadio::ptt(bool on){
   if(on==keyed)return;
   stopStream();keyed=on;
   {std::lock_guard<std::mutex> lock(mutex);checkFailure();}
-  if(on){api.check(api.hackrf_set_freq(device,uint64_t(txFrequency)),"TX frequency");stopping=false;}
+  if(on){api.check(api.hackrf_set_freq(device,uint64_t(txFrequency)),"TX frequency");api.check(api.hackrf_set_amp_enable(device,txAmp?1:0),"TX RF amplifier");stopping=false;}
   else startReceive();
 }
 int HackrfRadio::rxCallback(HackrfTransfer* transfer){
@@ -115,8 +116,18 @@ int HackrfRadio::txCallback(HackrfTransfer* transfer){
 }
 std::vector<IQ> HackrfRadio::receive(){
   std::unique_lock<std::mutex> lock(mutex);size_t need=2*rf_block;
-  if(!event.wait_for(lock,std::chrono::seconds(1),[&]{return stopping||!failure.empty()||rxBytes>=need;}))throw std::runtime_error("HackRF RX audio timeout");
+  if(!event.wait_for(lock,std::chrono::milliseconds(100),[&]{return stopping||!failure.empty()||rxBytes>=need;})) {
+    // An asynchronous USB start or a temporary stall is not a fatal CAT error.
+    // No artificial samples: the worker waits and resets the audio path.
+    if(std::chrono::steady_clock::now()-lastRx>=std::chrono::seconds(3)) {
+      lock.unlock();
+      qWarning()<<"HackRF waiting for USB RX data; restarting receive stream";
+      stopStream();startReceive();
+    }
+    return {};
+  }
   checkFailure();if(stopping)throw std::runtime_error("HackRF RX stopped");
+  lastRx=std::chrono::steady_clock::now();
   std::vector<IQ> result(rf_block);for(int n=0;n<2*rf_block;++n){auto& block=rxQueue.front();float value=float(static_cast<int8_t>(block[rxOffset++]))/128.f;
     if(n%2)result[n/2].imag(value);else result[n/2].real(value);--rxBytes;
     if(rxOffset==block.size()){rxQueue.pop_front();rxOffset=0;}

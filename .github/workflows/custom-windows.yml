@@ -111,6 +111,9 @@ jobs:
       - name: Verify standalone package runtime
         run: ./tools/Verify-CustomPackage.ps1 -PortableOnly
 
+      - name: Verify packaged HackRF FT8 17m launcher without hardware
+        run: ./tools/Test-HackrfFt8Launcher.ps1 -Package "$PWD/dist-custom/OE3SRO-reist16-pluto"
+
       - name: Create versioned Windows ZIP and checksum
         env:
           ARTIFACT_VERSION: ${{ steps.version.outputs.version }}

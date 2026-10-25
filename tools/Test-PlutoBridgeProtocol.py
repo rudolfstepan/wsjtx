@@ -78,7 +78,12 @@ def run_test(graceful=False,invalid=False):
         return json.loads(ready.read_text()) if ready.exists() else {}
     client=None
     try:
-        wait_until(lambda:state().get('ok'))
+        def started():
+            status=state()
+            if status.get('state')=='failed' or process.poll() is not None:
+                raise AssertionError(f'Bridge startup failed: {status}')
+            return status.get('ok')
+        wait_until(started,seconds=35)
         if graceful:
             stop.write_text('stop')
             assert process.wait(5)==0

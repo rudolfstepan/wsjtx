@@ -47,6 +47,32 @@ int main(int argc,char** argv){QCoreApplication app(argc,argv);
   check(rejected&&state->opens==state->closes&&state->initialized==0,"configuration failure closes device");
   state->devices=2;int opened=state->opens;rejected=false;try{pluto::HackrfRadio radio(dll,"",432500000,16,20,0);}catch(...){rejected=true;}state->devices=1;
   check(rejected&&state->opens==opened&&state->initialized==0,"ambiguous automatic device selection rejected before opening");
+  {
+   pluto::HackrfRadio radio(dll,"",18100000,16,20,47,1.f,true);
+   check(state->gain==47&&state->amp==0&&state->bias==0,"maximum TX gain configured; RX amp and bias remain OFF");
+   radio.ptt(true);check(state->amp==1&&state->mode==0,"internal TX amplifier enabled after RX stops");
+   std::vector<pluto::IQ> full(pluto::rf_block,{1.f,-1.f});for(int i=0;i<18;++i)radio.transmit(full);
+   check(state->mode==2&&sample(0)==127&&sample(1)==-127,"full-scale IQ8 reaches TX with amplifier enabled");
+   radio.ptt(false);check(state->amp==0&&state->mode==1,"return to RX disables TX amplifier");
+   radio.ptt(true);
+  }
+  check(state->amp==0&&state->mode==0&&state->opens==state->closes,"cleanup disables amplifier even from pending TX");
+  {
+   state->rxDelayMs=1400;
+   pluto::HackrfRadio radio(dll,"",18100000,16,20,47,1.f,true);
+   auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(4);
+   std::vector<pluto::IQ> iq;int waits=0;
+   while(iq.empty()&&std::chrono::steady_clock::now()<deadline){iq=radio.receive();if(iq.empty())++waits;}
+   check(waits>=10&&iq.size()==pluto::rf_block,"slow asynchronous USB startup waits beyond old one-second timeout without fake samples");
+   state->rxDelayMs=0;state->pauseRx=1;
+   int starts=state->rxStarts;
+   deadline=std::chrono::steady_clock::now()+std::chrono::seconds(5);
+   while(state->rxStarts==starts&&std::chrono::steady_clock::now()<deadline)radio.receive();
+   check(state->rxStarts>starts&&state->amp==0,"stalled RX stream restarted while TX amplifier stays off");
+   state->pauseRx=0;iq.clear();deadline=std::chrono::steady_clock::now()+std::chrono::seconds(2);
+   while(iq.empty()&&std::chrono::steady_clock::now()<deadline)iq=radio.receive();
+   check(iq.size()==pluto::rf_block,"RX resumes after transient USB stall");
+  }
   QTemporaryDir temp;QString profile=temp.filePath("HackRF.ini"),source=temp.filePath("Pluto.ini");
   {QSettings ini(source,QSettings::IniFormat);ini.setValue("Configuration/MyCall","OE3SRO/P");ini.setValue("Configuration/MyGrid","JN88");ini.setValue("Configuration/Password","secret");ini.sync();}
   pluto::prepareProfile(profile,source,432500000,40003,true);QSettings settings(profile,QSettings::IniFormat);
@@ -58,6 +84,18 @@ int main(int argc,char** argv){QCoreApplication app(argc,argv);
   check(prepare.waitForFinished(10000)&&prepare.exitCode()==0,"real profile CLI remains headless");auto data=QJsonDocument::fromJson(prepare.readAllStandardOutput()).object();
   check(data.value("frequency").toDouble()==6000000000.&&data.value("port").toInt()==40007,"launcher receives preserved profile endpoint and dial");
   settings.sync();check(settings.value("Configuration/MyCall")=="DL1ABC","existing HackRF station identity preserved");
+  auto ft8=temp.filePath("HackRF-FT8-17m.ini");
+  QStringList ft8Args={"--prepare-hackrf-profile",ft8,"--hackrf-station-source",source,"--hackrf-frequency","18100000","--hackrf-port","40004","--hackrf-mode","FT8","--hackrf-udp-port","2243"};
+  prepare.start(QDir(app.applicationDirPath()).filePath("wsjtx.exe"),ft8Args);
+  check(prepare.waitForFinished(10000)&&prepare.exitCode()==0,"real FT8 17m profile CLI");
+  QSettings ft8Settings(ft8,QSettings::IniFormat);
+  check(ft8Settings.value("Common/Mode")=="FT8"&&ft8Settings.value("Common/DialFreq").toULongLong()==18100000,"new FT8 profile starts on 17m");
+  check(ft8Settings.value("Configuration/UDPServerPort")==2243&&ft8Settings.value("Configuration/CATTCIPort")=="127.0.0.1:40004"&&ft8Settings.value("Configuration/TCIAudio").toBool(),"FT8 profile isolated ports and direct TCI audio");
+  check(!ft8Settings.value("Common/AutoTx").toBool(),"FT8 profile does not enable TX");
+  ft8Settings.setValue("Common/DialFreq",14074000);ft8Settings.setValue("Common/Mode","FT4");ft8Settings.sync();
+  prepare.start(QDir(app.applicationDirPath()).filePath("wsjtx.exe"),ft8Args);
+  check(prepare.waitForFinished(10000)&&prepare.exitCode()==0,"existing FT8 profile can restart");ft8Settings.sync();
+  check(ft8Settings.value("Common/Mode")=="FT4"&&ft8Settings.value("Common/DialFreq").toULongLong()==14074000,"later mode and frequency choices preserved");
   std::cout<<"PASS HackRF: "<<checks<<" ABI, half-duplex, IQ8, priming, cleanup, profile and production CLI checks; mock only\n";
  }catch(std::exception const& e){std::cerr<<e.what()<<'\n';return 1;}
 }

@@ -8,6 +8,7 @@
 #include <mutex>
 #include <cstdint>
 #include <cstddef>
+#include <chrono>
 #ifdef Q_OS_WIN
 #include <windows.h>
 #else
@@ -61,12 +62,14 @@ class HackrfRadio final:public Radio {
   std::string failure;
   long long rxFrequency,txFrequency;
   float amplitude;
+  bool txAmp;
+  std::chrono::steady_clock::time_point lastRx;
   static int rxCallback(HackrfTransfer*);
   static int txCallback(HackrfTransfer*);
   void stopStream();void startReceive();void cleanup() noexcept;
   void checkFailure();
 public:
-  HackrfRadio(QString const& library,QString const& serial,long long frequency,int lna,int vga,int txGain,float amplitude=.5f);
+  HackrfRadio(QString const& library,QString const& serial,long long frequency,int lna,int vga,int txGain,float amplitude=.5f,bool txAmp=false);
   ~HackrfRadio() override {cleanup();}
   void tune(long long,long long) override;void ptt(bool) override;
   std::vector<IQ> receive() override;void transmit(std::vector<IQ> const&) override;

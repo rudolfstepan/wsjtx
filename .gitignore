@@ -23,6 +23,7 @@ fnd
 lib/77bit/tmp
 lib/tmp
 /build-custom/
+/build-custom-make/
 /.local/
 /.tools/
 /dist-custom/

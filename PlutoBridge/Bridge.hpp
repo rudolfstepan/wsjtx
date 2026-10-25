@@ -21,6 +21,7 @@ struct Options {
   QString serial;
   int rxVga=20;
   float amplitude=.5f;
+  bool txAmp=false;
   QString deviceName() const {return hackrf?"HackRF One":"PlutoSDR";}
   long long minimumFrequency() const {return hackrf?1000000:325000000;}
   long long maximumFrequency() const {return hackrf?6000000000LL:3800000000LL;}
@@ -54,6 +55,7 @@ public:
   bool submit(std::vector<float> const&);
 Q_SIGNALS:
   void ready();
+  void waitingForDevice(QString);
   void fault(QString);
   void txAborted(QString);
   void audio(QByteArray);
@@ -68,10 +70,12 @@ class Bridge final : public QObject {
   QWebSocket* client=nullptr;
   RadioWorker radio;
   bool streaming=false,keyed=false,split=false,available=false;
+  bool waitingDevice=false,greeted=false;
   long long rxFrequency,txFrequency;
   QString lastTxWarning,lastError;
   unsigned txAbortCount=0;
   void send(QString const&);
+  void greet();
   void commands(QString const&);
   void fail(QString const&);
   void writeReady(bool,QString const& = {});

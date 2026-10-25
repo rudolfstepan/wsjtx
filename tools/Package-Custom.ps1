@@ -1,9 +1,9 @@
-param([string]$Package = '')
+param([string]$Package = '',[string]$BuildDirectory = '')
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $mingw = if ($env:WSJTX_MINGW_PREFIX) { $env:WSJTX_MINGW_PREFIX } else { 'C:\msys64\mingw64' }
 $env:PATH = "$mingw\bin;$env:PATH"
-$build = Join-Path $root 'build-custom'
+$build = if ($BuildDirectory) { $BuildDirectory } else { Join-Path $root 'build-custom' }
 $package = if ($Package) { $Package } else { Join-Path $root 'dist-custom\OE3SRO-reist16-pluto' }
 $bin = Join-Path $package 'bin'
 $data = Join-Path $package 'share\wsjtx'
@@ -32,6 +32,7 @@ Copy-Item -LiteralPath (Join-Path $root 'Start-Yaesu-WebSDR.ps1'),(Join-Path $ro
 Copy-Item -LiteralPath (Join-Path $root 'Start-Reist16-Selftest.ps1'),(Join-Path $root 'start-reist16-selftest.bat') -Destination $package -Force
 Copy-Item -LiteralPath (Join-Path $root 'Start-HackRF.ps1'),(Join-Path $root 'start-hackrf.bat'),(Join-Path $root 'docs/HACKRF-WSJTX.txt') -Destination $package -Force
 $hackrfRuntime=Join-Path $root '.tools/hackrf/runtime'
+Copy-Item -LiteralPath (Join-Path $root 'Start-HackRF-FT8-17m.ps1'),(Join-Path $root 'start-hackrf-ft8-17m.bat') -Destination $package -Force
 if(Test-Path -LiteralPath (Join-Path $hackrfRuntime 'hackrf-0.dll')){New-Item -ItemType Directory -Force -Path (Join-Path $bin 'hackrf') | Out-Null;Get-ChildItem -LiteralPath $hackrfRuntime | Copy-Item -Destination (Join-Path $bin 'hackrf') -Recurse -Force}
 $plutoRuntime = Join-Path $root '.tools\pluto\runtime'
 if (Test-Path -LiteralPath (Join-Path $plutoRuntime 'libiio.dll')) {

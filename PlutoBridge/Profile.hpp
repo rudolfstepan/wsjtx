@@ -12,7 +12,7 @@
 #include <stdexcept>
 
 namespace pluto {
-inline void prepareProfile(QString const& path,QString const& stationSource,quint64 frequency,unsigned port,bool hackrf=false) {
+inline void prepareProfile(QString const& path,QString const& stationSource,quint64 frequency,unsigned port,bool hackrf=false,QString const& mode="REIST16",unsigned udpPort=0) {
   auto rig=hackrf?"HackRF One (TCI bridge)":"PlutoSDR (TCI bridge)";
   quint64 minimum=hackrf?1000000:325000000,maximum=hackrf?6000000000ULL:3800000000ULL;
   if(QFileInfo::exists(path)) {
@@ -54,8 +54,8 @@ inline void prepareProfile(QString const& path,QString const& stationSource,quin
   out.setValue("Configuration/MonitorOFF",false);
   out.setValue("Configuration/PSKReporter",false);
   out.setValue("Configuration/UDPServer","127.0.0.1");
-  out.setValue("Configuration/UDPServerPort",hackrf?2239:2238);
-  out.setValue("Common/Mode","REIST16");
+  out.setValue("Configuration/UDPServerPort",udpPort?udpPort:(hackrf?2239:2238));
+  out.setValue("Common/Mode",mode);
   out.setValue("Common/DialFreq",QVariant::fromValue(frequency));
   out.setValue("Common/TxFreq",1500);
   out.setValue("Common/RxFreq",1500);
@@ -84,15 +84,21 @@ inline int prepareProfileCommand(int argc,char** argv,bool hackrf=false) {
   parser.addOption({prefix+"-station-source","Copy only callsign and grid","FILE"});
   parser.addOption({prefix+"-frequency","Initial SDR dial frequency","HZ","432500000"});
   parser.addOption({prefix+"-port","Local SDR bridge port","PORT",hackrf?"40003":"40002"});
+  parser.addOption({prefix+"-mode","Initial mode for a new profile (REIST16 or FT8)","MODE","REIST16"});
+  parser.addOption({prefix+"-udp-port","Initial UDP port for a new profile","PORT",hackrf?"2239":"2238"});
   try {
     if(!parser.parse(app.arguments())) throw std::runtime_error(parser.errorText().toStdString());
-    bool frequencyOk=false,portOk=false;
+    bool frequencyOk=false,portOk=false,udpOk=false;
     auto frequency=parser.value(prefix+"-frequency").toULongLong(&frequencyOk);
     auto port=parser.value(prefix+"-port").toUInt(&portOk);
+    auto udpPort=parser.value(prefix+"-udp-port").toUInt(&udpOk);
+    auto mode=parser.value(prefix+"-mode");
+    if(!udpOk || udpPort<1024 || udpPort>65535 || (mode!="REIST16" && mode!="FT8"))
+      throw std::runtime_error("Invalid SDR profile mode or UDP port");
     if(!frequencyOk || !portOk || frequency<(hackrf?1000000ULL:325000000ULL) || frequency>(hackrf?6000000000ULL:3800000000ULL) || port<1024 || port>65535)
       throw std::runtime_error("Invalid SDR profile frequency or port");
     auto path=parser.value("prepare-"+prefix+"-profile");
-    prepareProfile(path,parser.value(prefix+"-station-source"),frequency,port,hackrf);
+    prepareProfile(path,parser.value(prefix+"-station-source"),frequency,port,hackrf,mode,udpPort);
     if(hackrf){QSettings profile(path,QSettings::IniFormat);
       if(profile.value("Configuration/Rig")!="HackRF One (TCI bridge)")throw std::runtime_error("Existing HackRF profile uses another rig; select HackRF One (TCI bridge) in Settings");
       auto endpoint=profile.value("Configuration/CATTCIPort").toString();

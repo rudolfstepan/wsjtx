@@ -3,6 +3,7 @@
 #include "PlutoBridge/Iio.hpp"
 #include "Transceiver/TCITransceiver.hpp"
 #include "lib/reist16/qso2.hpp"
+#include "tests/hackrf/FakeState.hpp"
 #include "Logger.hpp"
 #include "qt_helpers.hpp"
 #include "widgets/itoneAndicw.h"
@@ -254,10 +255,40 @@ int main(int argc,char**argv) {
    {TCITransceiver isolated(&logger,{},"0","127.0.0.1:40002",true,tci__audio);
     PlutoTciChecks::pcm(isolated,QVector<float>(wave.data(),wave.data()+614400));}
    QTcpServer portProbe;
+#ifdef Q_OS_WIN
+   {
+     check(portProbe.listen(QHostAddress::LocalHost,0),"allocate delayed USB test port");
+     auto slowPort=portProbe.serverPort();portProbe.close();
+     QLibrary fake(QDir(app.applicationDirPath()).filePath("libhackrf_fake.dll"));
+     check(fake.load(),"load delayed USB mock");
+     auto mock=reinterpret_cast<FakeHackrfState*(*)()>(fake.resolve("fake_hackrf_state"))();
+     mock->rxDelayMs=2500;
+     pluto::Options slow;slow.hackrf=true;slow.library=fake.fileName();slow.frequency=18100000;slow.port=slowPort;slow.rxGain=16;slow.txGain=47;slow.txAmp=true;
+     slow.readyFile=profiles.filePath("slow-usb-ready.json");
+     pluto::Bridge slowBridge(slow);slowBridge.start();
+     TCITransceiver slowRig(&logger,{},"0",QString("127.0.0.1:%1").arg(slowPort),true,tci__audio);
+     QString slowFailure;int slowFrames=0;
+     QObject::connect(&slowRig,&Transceiver::failure,[&](QString e){slowFailure=e;});
+     QObject::connect(&slowRig,&Transceiver::tciframeswritten,[&](qint64){++slowFrames;});
+     QElapsedTimer delayed;delayed.start();slowRig.start(0);
+     check(delayed.elapsed()>=2400&&slowFailure.isEmpty()&&slowRig.state().online(),"production TCI waits for real USB data beyond former 2s handshake timeout");
+     auto slowState=slowRig.state();slowState.audio(true);slowState.period(15.);slowState.blocksize(3456);slowRig.set(slowState,1);
+     waitUntil([&]{return slowFrames>0;});
+     mock->rxDelayMs=0;mock->pauseRx=1;
+     auto deviceReady=[&]{QFile f(slow.readyFile);return f.open(QIODevice::ReadOnly)&&QJsonDocument::fromJson(f.readAll()).object().value("ok").toBool();};
+     waitUntil([&]{return !deviceReady();});
+     check(slowFailure.isEmpty()&&slowRig.state().online()&&mock->amp==0,"USB stall keeps TCI connected without enabling amplifier");
+     mock->pauseRx=0;
+     auto before=slowFrames;waitUntil([&]{return deviceReady()&&slowFrames>before;});
+     check(slowFailure.isEmpty()&&slowRig.state().online(),"TCI audio resumes after USB recovery without rig-control failure");
+     slowRig.stop();
+     std::cout<<"PASS delayed HackRF USB: first-sample readiness, tolerant production TCI startup and RX recovery without disconnect; mock only.\n";
+   }
+#endif
    check(portProbe.listen(QHostAddress::LocalHost,0),"allocate test port");
    auto port=portProbe.serverPort();portProbe.close();
    pluto::Options options;
-   options.hackrf=app.arguments().contains("--hackrf-simulation");options.simulate=true;options.port=port;
+   options.hackrf=app.arguments().contains("--hackrf-simulation")||app.arguments().contains("--hackrf-hardware-rx");options.simulate=true;options.port=port;
    pluto::Bridge bridge(options);bridge.start();
    // Allow the worker's queued ready event to bind the loopback listener.
    QElapsedTimer pause;pause.start();waitUntil([&]{return pause.elapsed()>30;});
@@ -287,13 +318,17 @@ int main(int argc,char**argv) {
    auto externalPort=portProbe.serverPort();portProbe.close();
    QProcess service;
    auto readyPath=profiles.filePath("bridge-ready.json"),stopPath=profiles.filePath("bridge-stop");
-   bool hardwareRx=app.arguments().contains("--pluto-hardware-rx");
+   bool hardwareRx=app.arguments().contains("--pluto-hardware-rx")||app.arguments().contains("--hackrf-hardware-rx");
    QStringList serviceArgs={"--port",QString::number(externalPort),"--ready-file",readyPath,"--stop-file",stopPath};
-   if(hardwareRx) serviceArgs<<"--library"<<QDir::current().filePath(".tools/pluto/runtime/libiio.dll");
+   if(hardwareRx&&options.hackrf) {
+     serviceArgs<<"--library"<<QDir::current().filePath(".tools/hackrf/runtime/hackrf-0.dll")<<"--frequency"<<"18100000";
+     auto serial=qEnvironmentVariable("WSJTX_HACKRF_TEST_SERIAL");if(!serial.isEmpty())serviceArgs<<"--serial"<<serial;
+   }
+   else if(hardwareRx) serviceArgs<<"--library"<<QDir::current().filePath(".tools/pluto/runtime/libiio.dll");
    else serviceArgs<<"--simulate"<<(options.hackrf?"--serial":"--uri")<<"thread-test:";
    service.start(QDir(app.applicationDirPath()).filePath(options.hackrf?"wsjtx_hackrf_bridge.exe":"wsjtx_pluto_bridge.exe"),serviceArgs);
    check(service.waitForStarted(),"separate bridge process starts");
-   waitUntil([&]{QFile f(readyPath);return f.open(QIODevice::ReadOnly) && QJsonDocument::fromJson(f.readAll()).object().value("ok").toBool();});
+   waitUntil([&]{QFile f(readyPath);return f.open(QIODevice::ReadOnly) && QJsonDocument::fromJson(f.readAll()).object().value("ok").toBool();},hardwareRx?35000:5000);
    QThread catThread;
    auto threaded=new TCITransceiver(&logger,{},"0",QString("127.0.0.1:%1").arg(externalPort),true,1048675);
    threaded->moveToThread(&catThread);
@@ -310,6 +345,10 @@ int main(int argc,char**argv) {
      threadState.audio(true);threadState.period(15.);threadState.blocksize(3456);
      QMetaObject::invokeMethod(threaded,[=]{threaded->set(threadState,1);},Qt::QueuedConnection);
      waitUntil([&]{return threadFrames>0 || !threadFailure.isEmpty();});
+     if(hardwareRx&&options.hackrf) {
+       QElapsedTimer observation;observation.start();
+       waitUntil([&]{return observation.elapsed()>=30000||!threadFailure.isEmpty();},32000);
+     }
    }
    QMetaObject::invokeMethod(threaded,[=]{threaded->stop();},Qt::BlockingQueuedConnection);
    catThread.quit();catThread.wait();
@@ -318,7 +357,7 @@ int main(int argc,char**argv) {
    if(!threadFailure.isEmpty()) throw std::runtime_error(threadFailure.toStdString());
    check(online,"separate process / CAT thread handshake");
    check(threadFrames>0,"separate process / CAT thread receives audio");
-   if(hardwareRx) std::cout<<"PASS real Pluto CAT thread: startup, frequency readback and RX audio; no hardware PTT requested.\n";
+   if(hardwareRx) std::cout<<"PASS real "<<(options.hackrf?"HackRF 17m, 30s observation":"Pluto")<<" CAT thread: startup, frequency readback and RX audio; no hardware PTT requested.\n";
    std::cout<<"PASS Pluto: IIO formats, USB sideband rejection, modem round trip, TCI PCM snapshot, real driver CAT/PTT/RX against simulated bridge.\n";
  } catch(std::exception const& e) {std::cerr<<e.what()<<'\n';return 1;}
 }

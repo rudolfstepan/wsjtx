@@ -52,6 +52,16 @@ enthält Bedienung, technische Umsetzung, Quellen und den geprüften Buildstand.
 
 ## HackRF One als eigene Instanz
 
+Zusätzlich startet `start-hackrf-ft8-17m.bat` eine eigene HackRF-Instanz für
+Empfang und Senden mit FT8 auf **18,100 MHz** (Erststart). Diese Option nutzt
+TX-Gain 47 dB, digitalen Pegel 1,0 und den internen RF-Verstärker während TX.
+Profil **WSJT-X - HackRF-FT8-17m**, TCI 40004 / UDP 2243; Enable TX bleibt
+beim Erststart aus. Details: [HackRF-Anleitung](docs/HACKRF-WSJTX.txt).
+Der Benutzer bestätigt FT8-Empfang seines CQ über PSK Reporter in Finnland
+(−25 dB) und Spanien (−18 dB). Das belegt Fernempfang, keinen abgeschlossenen
+QSO und keine gemessene Ausgangsleistung. Die Bridge wartet auf echte USB-Daten
+und hält die TCI-Verbindung während einer begrenzten RX-Erholung offen.
+
 `start-hackrf.bat` startet die HackRF-Variante mit eigenem Profil
 **WSJT-X - HackRF**, lokalem CAT-/Audio-Port 40003 und UDP-Port 2239.
 REIST16-QSO/2 und die übrigen WSJT-X-Modi nutzen USB-Audio über TCI.
