@@ -1,0 +1,90 @@
+WSJT-X OE3SRO — Experimentelle Websteuerung
+==========================================
+
+Status: experimentell. Server- und Browsertests ohne Funkhardware bestanden;
+eine reale HF-Abnahme der Websteuerung steht noch aus.
+
+Start
+-----
+1. WSJT-X am Stationsrechner starten und Funkgerät/Audio wie gewohnt einrichten.
+2. View -> Web control (experimental)… öffnen. Port auswählen (Vorgabe 8080) und
+   Start / new access key drücken. Den Dialog anschließend schließen.
+3. Eine der angezeigten http://IP:Port-Adressen am anderen Rechner, Tablet
+   oder Smartphone öffnen und den Zugangsschlüssel eingeben.
+4. Bei Bedarf den gewählten TCP-Port in der Firewall für das private LAN
+   freigeben. Mehrere WSJT-X-Instanzen benötigen unterschiedliche Ports.
+5. Mit Stop web control im Desktopdialog den Zugriff vollständig abschalten.
+
+Der Dienst ist nach jedem Programmstart aus. Ein erneuter Start erzeugt
+einen neuen Schlüssel; bisherige Schlüssel sind sofort ungültig.
+Die Webdateien sind in der EXE eingebettet. Kein separater Webserver, kein
+Node.js und keine Internetverbindung sind für den Betrieb erforderlich.
+
+Bedienung
+---------
+Die Browseransicht bildet den Hauptbedienbereich nach: Band Activity und
+RX Frequency, Frequenz und Betriebsart, Monitor/Stop/Decode/Erase, Enable TX,
+Halt TX und Tune, DX-Rufzeichen/Locator, RX-/TX-Audiofrequenz, Rapport,
+Auto Seq, TX-Zeitfenster, TX-Frequenz halten und die sechs Sendetexte.
+Nur im Desktop verfügbare Bedienelemente werden angeboten. Die
+Nachrichtenansicht kann über die Tab-Auswahl gewechselt werden.
+
+Eine Decodierung per Doppelklick oder Doppeltippen auswählen; alternativ
+mit der Tastatur fokussieren und Enter drücken. Das löst denselben Ablauf
+wie der Doppelklick in WSJT-X aus und kann je nach Konfiguration TX aktivieren.
+Es werden die letzten 250 Zeilen pro Fenster angezeigt. Hat sich eine Zeile
+zwischen Anzeige und Auswahl geändert, wird der Befehl abgelehnt.
+
+Log QSO öffnet die normale Logbestätigung. Rufzeichen, Locator, Name,
+Rapporte, Leistung, Kommentar und Exchanges können im Browser geändert
+und bestätigt oder verworfen werden. Die Speicherung benutzt den normalen
+WSJT-X-Logablauf. Währenddessen sind übrige Änderungen gesperrt.
+
+Wide Graph liefert das Bild des echten Qt-Wasserfalls, ungefähr alle zwei
+Sekunden. Ein geschlossenes Wide Graph lässt sich im Browser öffnen.
+Das Bild ist eine Anzeige; RX-/TX-Frequenzen werden über die Zahlenfelder
+geändert. Status und Decodelisten werden ungefähr einmal pro Sekunde gelesen.
+
+Die Anwendung bleibt die einzige Instanz für CAT, Audio, Decoder und TX.
+Desktop- und Browseränderungen erscheinen in derselben laufenden Sitzung.
+Geöffnete sonstige modale Dialoge werden gemeldet und sperren Änderungen;
+Halt TX bleibt erreichbar. Setup, Geräte-/Audioeinstellungen, zusätzliche
+Auswertungsfenster und Spezialdialoge werden weiterhin am Desktop bedient.
+Dies ist der Web-Nachbau des Hauptbedienbereichs, keine vollständige Kopie
+aller Qt-Dialoge. Audio wird nicht in den Browser übertragen.
+
+Netzwerk und Verbindungsabbruch
+------------------------------
+Der Zugangsschlüssel erlaubt Bedienung einschließlich Senden. Nur in einem
+vertrauenswürdigen LAN oder über ein VPN verwenden. Die Verbindung ist HTTP
+ohne TLS; weder Schlüssel noch Betriebsdaten werden auf Transportebene
+verschlüsselt. Keine direkte Portweiterleitung ins öffentliche Internet.
+Der Schlüssel bleibt im Arbeitsspeicher der Browserseite und wird nicht
+in URL, Cookies oder localStorage gespeichert. Neuladen verlangt Anmeldung.
+
+Bei Verbindungsfehlern bzw. veraltetem Status sperrt die Seite die Bedienung
+und versucht erneut Status abzurufen. Steuerbefehle werden nicht automatisch
+wiederholt. Ein Timeout bedeutet, dass ein Befehl bereits ausgeführt worden
+sein kann: erst den aktuellen Status prüfen. Trennen oder Browser-Schließen
+stoppt KEINEN laufenden Sendebetrieb; dafür vorher Halt TX verwenden.
+Der bestehende WSJT-X-TX-Watchdog bleibt maßgeblich.
+
+Technik und Prüfung
+-------------------
+Network/WebControlServer.cpp: begrenzter HTTP/1.1-Server auf dem Qt-GUI-Thread.
+Explizite Liste steuerbarer Widgets/Aktionen, Qt-Validatoren, Bearer-Schlüssel,
+Origin-Prüfung, kein CORS, Größen-/Verbindungslimits und Request-Timeout.
+Ein Request pro TCP-Verbindung. Kein beliebiger Dateizugriff.
+GET /api/state, GET /api/waterfall und POST /api/command verlangen den Schlüssel.
+
+tools/Test-WebControl.ps1 baut und prüft den Server ohne Funkhardware.
+tests/webcontrol/browser_checks.cjs prüft Anmeldung, Monitor, Frequenz,
+Logging, Decode-Auswahl, Desktop/Mobilansicht sowie Verbindungsausfall im
+echten Browser gegen den Qt-Testserver. Dafür separat Playwright installieren,
+PLAYWRIGHT_MODULE auf dessen Paket setzen und das Testprogramm übergeben:
+
+  node tests/webcontrol/browser_checks.cjs PFAD/webcontrol_checks.exe AUSGABE
+
+Der Browser-Test verwendet standardmäßig installiertes Microsoft Edge;
+BROWSER_CHANNEL kann einen anderen Playwright-Browserkanal auswählen.
+Der Testserver verwendet ausschließlich Testwidgets, keine Funkhardware.

@@ -9,6 +9,7 @@ $bin = Join-Path $package 'bin'
 $data = Join-Path $package 'share\wsjtx'
 $sdkBin = Join-Path $root '.tools\hamlib\hamlib-w64-4.7.2\bin'
 New-Item -ItemType Directory -Force -Path $bin, $data | Out-Null
+Copy-Item -LiteralPath (Join-Path $root 'docs/WEB-CONTROL.txt') -Destination $package -Force
 foreach ($name in @('wsjtx', 'jt9', 'wsprd', 'fmtave', 'fcal', 'fmeasure', 'wsjtx_app_version', 'wsjtx_pluto_bridge', 'wsjtx_hackrf_bridge')) {
     $source = Join-Path $build "$name.exe"
     if (!(Test-Path -LiteralPath $source)) { throw "Missing build output: $source" }

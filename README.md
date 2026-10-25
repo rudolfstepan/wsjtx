@@ -50,6 +50,19 @@ Die [Änderungshistorie des Forks](docs/CHANGES.md) dokumentiert die Custom-
 Erweiterungen und ihre Implementierungscommits. Die [FT2-Dokumentation](docs/FT2.md)
 enthält Bedienung, technische Umsetzung, Quellen und den geprüften Buildstand.
 
+## Experimentelle Websteuerung im lokalen Netzwerk
+
+Unter **View → Web control (experimental)…** den integrierten Webserver starten, die
+angezeigte Adresse im Browser öffnen und den Zugangsschlüssel eingeben.
+Die Weboberfläche bildet den Hauptbedienbereich mit Decodelisten,
+RX-/TX-Steuerung, QSO-Feldern, Sendetexten und Live-Wasserfall nach.
+Desktop und Browser bedienen dieselbe laufende WSJT-X-Instanz.
+Setup und zusätzliche Spezialdialoge bleiben am Stationsrechner.
+
+Der Dienst startet ausgeschaltet. Nur im vertrauenswürdigen LAN oder über
+VPN verwenden; HTTP ist unverschlüsselt. Ein Verbindungsabbruch beendet
+laufenden TX nicht. [Bedienung und Prüfungen](docs/WEB-CONTROL.txt).
+
 ## HackRF One als eigene Instanz
 
 Zusätzlich startet `start-hackrf-ft8-17m.bat` eine eigene HackRF-Instanz für

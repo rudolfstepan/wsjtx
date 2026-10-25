@@ -4,6 +4,18 @@
 
 ## Deutsch
 
+### 2026-10-25 — Experimentelle Websteuerung
+
+- Opt-in-Webserver unter **View → Web control (experimental)…**, nach jedem
+  Neustart ausgeschaltet und durch einen wechselbaren Zugangsschlüssel geschützt.
+- Browser-Nachbau des Hauptbedienbereichs mit Decodelisten, RX/TX, Frequenz/
+  Modus, QSO-Feldern, Sendetexten, Logbestätigung und echtem Wasserfallbild.
+  Desktop und Browser bedienen dieselbe laufende Station.
+- Vollständiger Windows-Build, Server- und Desktop-/Mobil-Browsertests bestanden;
+  noch keine HF-Abnahme. Setup und Spezialdialoge bleiben am Desktop.
+- Nur für vertrauenswürdiges LAN/VPN: HTTP ist unverschlüsselt;
+  ein Browserabbruch beendet TX nicht. [Anleitung](WEB-CONTROL.txt).
+
 ### 2026-10-25 — HackRF FT8 auf 17 m und robuster USB-/TCI-Start
 
 - Zusätzlicher Starter `start-hackrf-ft8-17m.bat` mit eigenem Profil,
@@ -294,6 +306,18 @@ ergänzt. [8bf344fde](https://github.com/rudolfstepan/wsjtx/commit/8bf344fde)
 speichert den FT2-Fortsetzungspunkt; dieser Commit ändert keine Programmfunktion.
 
 ## English
+
+### 2026-10-25 — Experimental web control
+
+- Opt-in server under **View → Web control (experimental)…**, disabled after
+  restart and protected by a rotatable access key.
+- Browser recreation of the main operating panel: decodes, RX/TX, frequency/
+  mode, QSO fields, messages, log confirmation and the actual waterfall image.
+  Desktop and browser operate the same running station.
+- Full Windows build, server checks and desktop/mobile browser tests passed;
+  no RF validation yet. Setup and special dialogs remain on the desktop.
+- Trusted LAN/VPN only: HTTP is unencrypted and browser disconnection does
+  not stop TX. [Instructions (German)](WEB-CONTROL.txt).
 
 ### 2026-10-25 — HackRF FT8 on 17 m and robust USB/TCI startup
 

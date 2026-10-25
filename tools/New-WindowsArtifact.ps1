@@ -58,6 +58,7 @@ Copy-Item -LiteralPath "$root\docs\REIST16.txt" -Destination $docs -Force
 Copy-Item -LiteralPath "$root\docs\PLUTO-WSJTX.txt" -Destination $docs -Force
 Copy-Item -LiteralPath "$root\docs\HACKRF-WSJTX.txt" -Destination $docs -Force
 Copy-Item -LiteralPath "$root\docs\WEBSDR-WSJTX.txt" -Destination $docs -Force
+Copy-Item -LiteralPath "$root\docs\WEB-CONTROL.txt" -Destination $docs -Force
 Copy-Item -LiteralPath "$root\docs\releases" -Destination $docs -Recurse -Force
 Copy-Item -LiteralPath "$root\docs\WINDOWS-QUICKSTART.html" -Destination "$docs\index.html" -Force
 New-Item -ItemType Directory -Force -Path "$docs\images" | Out-Null

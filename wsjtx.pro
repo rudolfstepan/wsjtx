@@ -121,6 +121,7 @@ FORMS    += \
 
 RC_FILE = wsjtx.rc
 RESOURCES = wsjtx.qrc
+RESOURCES += web/web.qrc
 
 unix {
 LIBS += -L lib -ljt9

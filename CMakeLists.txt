@@ -341,6 +341,7 @@ set (wsjtx_CXXSRCS
   widgets/colorhighlighting.cpp
   WSPR/WsprTxScheduler.cpp
   widgets/mainwindow.cpp
+  Network/WebControlServer.cpp
   Configuration.cpp
   main.cpp
   Network/wsprnet.cpp
@@ -1615,6 +1616,7 @@ function (add_resources resources path)
 endfunction (add_resources resources path)
 
 add_resources (wsjtx_RESOURCES "" ${TOP_LEVEL_RESOURCES})
+add_resources (wsjtx_RESOURCES /web web/index.html web/app.js web/style.css)
 add_resources (wsjtx_RESOURCES /Palettes ${PALETTE_FILES})
 add_resources (wsjtx_RESOURCES /Translations ${QM_FILES})
 

@@ -3,6 +3,7 @@
 #include "PskReporterDialog.hpp"
 #include "PskReporterHighlight.hpp"
 #include "TxQualityDialog.hpp"
+#include "Network/WebControlServer.hpp"
 
 #include <QAudio>
 #include <QAudioOutput>
@@ -1457,6 +1458,26 @@ MainWindow::MainWindow(QDir const& temp_directory, bool multiple,
 
   ui->sbToneSpacing->values({10, 15, 20, 25, 30});
   QTimer::singleShot (4000, [=] {programStart=false;});
+
+  auto webControl = new WebControlServer(this, m_wideGraph.data(), m_logDlg.data());
+  webControl->selectDecode = [this] (QString const& id, int line) {
+    auto browser = id == "decodedTextBrowser" ? ui->decodedTextBrowser : ui->decodedTextBrowser2;
+    browser->setTextCursor(QTextCursor(browser->document()->findBlockByNumber(line)));
+    if (id == "decodedTextBrowser") doubleClickOnCall2(Qt::NoModifier);
+    else doubleClickOnCall(Qt::NoModifier);
+  };
+  webControl->stationStatus = [this] {
+    return QJsonObject{{"frequency", ui->labDialFreq->text()}, {"utc", ui->labUTC->text()},
+      {"mode", m_mode}, {"transmitting", m_transmitting}, {"monitoring", m_monitoring},
+      {"callsign", m_config.my_callsign()}, {"grid", m_config.my_grid()},
+      {"rxTitle", ui->rh_decodes_title_label->text()}, {"bandTitle", ui->lh_decodes_title_label->text()},
+      {"rxHeadings", ui->rh_decodes_headings_label->text()}, {"bandHeadings", ui->lh_decodes_headings_label->text()},
+      {"status", tx_status_label.text()}, {"lastTx", last_tx_label.text()}, {"watchdog", watchdog_label.text()},
+      {"progress", progressBar.value()}, {"progressMax", progressBar.maximum()}};
+  };
+  auto webAction = ui->menuView->addAction(tr("Web control (experimental)…"));
+  connect(webAction, &QAction::triggered, webControl, &WebControlServer::showSettings);
+  connect(this, &MainWindow::finished, webControl, &WebControlServer::stop);
 
 // this must be the last statement of constructor
   if (!m_valid) throw std::runtime_error {"Fatal initialization exception"};

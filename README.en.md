@@ -50,6 +50,18 @@ The [fork change history](docs/CHANGES.md) records the custom additions and
 their implementation commits. The [FT2 documentation](docs/FT2.md) covers
 operation, implementation, sources, and the verified build baseline.
 
+## Experimental LAN web control
+
+Open **View → Web control (experimental)…**, start the server, close the dialog, then open
+the displayed address in a browser and enter the access key. The browser
+recreates the main operating panel: decodes, RX/TX controls, QSO fields,
+messages, logging and the live waterfall. Both interfaces operate the same
+running station. Setup and additional dialogs remain on the desktop.
+
+The server is off after every restart. Use a trusted LAN or VPN: HTTP is
+unencrypted, and disconnecting the browser does not halt transmission.
+[Operating instructions and tests (German)](docs/WEB-CONTROL.txt).
+
 ## Separate HackRF One instance
 
 `start-hackrf-ft8-17m.bat` adds a separate HackRF RX/TX instance, initially

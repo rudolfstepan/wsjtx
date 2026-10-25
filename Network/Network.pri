@@ -1,4 +1,5 @@
 SOURCES += \
+Network/WebControlServer.cpp \
 Network/FileDownload.cpp \
 Network/FoxVerifier.cpp \
 Network/LotWUsers.cpp \
@@ -10,6 +11,7 @@ Network/PSKReporter.cpp \
 Network/wsprnet.cpp
 
 HEADERS    += \
+Network/WebControlServer.hpp \
 Network/FileDownload.hpp \
 Network/FoxVerifier.hpp \
 Network/LotWUsers.hpp \

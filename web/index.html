@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>WSJT-X · Experimentelle Websteuerung</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script>
+</head>
+<body>
+<header><div><strong>WSJT-X</strong><span class="edition">OE3SRO · Websteuerung (experimentell)</span></div><span id="connection" role="status">Nicht verbunden</span><button id="logout" hidden>Trennen</button></header>
+<form id="login"><h1>Mit der Station verbinden</h1><p>Den Zugangsschlüssel findest du am Stationsrechner unter <b>View → Web control (experimental)…</b>.</p><label>Zugangsschlüssel<input id="key" type="password" autocomplete="off" required></label><button>Verbinden</button><p>Experimentelle Funktion. Nur im vertrauenswürdigen LAN oder über VPN verwenden. Der Zugang erlaubt auch das Senden.</p></form>
+<main id="station" hidden>
+  <section class="stationbar"><div><span id="callsign">—</span><small id="grid"></small></div><strong id="frequency">—</strong><span id="mode">—</span><time id="utc">—</time><span id="radioStatus">—</span></section>
+  <div id="notice" role="alert" hidden></div>
+  <div class="toolbar"><div id="band"></div><label>Mode <select id="modes" aria-label="Betriebsart"></select></label></div>
+  <section class="decodes">
+    <article><h2><span id="bandTitle">Band Activity</span> <small>Doppelklick / Doppeltippen zum Antworten</small></h2><div id="bandHeadings" class="columns">UTC    dB   DT   Freq   Message</div><div id="decodedTextBrowser" class="decode-list" tabindex="0"></div></article>
+    <article><h2 id="rxTitle">Rx Frequency</h2><div id="rxHeadings" class="columns">UTC    dB   DT   Freq   Message</div><div id="decodedTextBrowser2" class="decode-list" tabindex="0"></div></article>
+  </section>
+  <nav id="transport" aria-label="Empfang und Senden"></nav>
+  <div class="cycle"><span id="status"></span><span id="lastTx"></span><progress id="progress" aria-label="Fortschritt des Sende-/Empfangsintervalls" max="100" value="0"></progress><span id="watchdog"></span></div>
+  <section class="operating"><article><h2>DX Station</h2><div id="dx" class="fields"></div></article><article><h2>QSO-Steuerung</h2><div id="qso" class="fields"></div></article><article class="messages"><h2>Sendetexte</h2><div id="messages"></div></article></section>
+  <section class="waterfall"><h2>Wide Graph <label><input id="showWaterfall" type="checkbox" checked> Livebild</label></h2><p id="waterfallHint">Wide Graph ist geschlossen. <button id="openWaterfall">Wasserfall öffnen</button></p><img id="waterfall" alt="Live-Wasserfall der Station" hidden></section>
+  <section id="log" hidden><h2>QSO protokollieren</h2><div id="logFields" class="fields"></div><button id="saveLog">QSO speichern</button><button id="cancelLog">Abbrechen</button></section>
+  <footer>Die Desktopanwendung steuert Funkgerät und Audio. Eine getrennte Browserverbindung beendet einen laufenden Sendebetrieb nicht. <span id="lastUpdate"></span></footer>
+</main>
+<div id="error" role="alert" hidden></div>
+</body></html>

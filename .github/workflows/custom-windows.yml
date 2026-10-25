@@ -84,6 +84,9 @@ jobs:
       - name: Verify PSK Reporter integration
         run: ./tools/Test-PskReporter.ps1
 
+      - name: Verify web control without RF hardware
+        run: ./tools/Test-WebControl.ps1
+
       - name: Verify logbook and UDP regressions
         run: ./tools/Test-Core.ps1
 
