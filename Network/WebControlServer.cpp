@@ -22,6 +22,9 @@
 #include <QSlider>
 #include <QTextEdit>
 #include <QTextBlock>
+#include <QTextFragment>
+#include <QTextCharFormat>
+#include <QTextBlockFormat>
 #include <QTimer>
 #include <QUuid>
 #include <QBuffer>
@@ -29,6 +32,7 @@
 #include <QUrl>
 #include <QValidator>
 #include <QTabWidget>
+#include <algorithm>
 #include <cmath>
 
 namespace {
@@ -43,6 +47,60 @@ QStringList const controls {
 QStringList const modes {"actionFT8", "actionFT4", "actionFT2", "actionREIST16", "actionJT65", "actionJT9",
   "actionQ65", "actionMSK144", "actionWSPR", "actionFST4", "actionFST4W"};
 QStringList const logFields {"call", "grid", "name", "sent", "rcvd", "txPower", "comments", "exchSent", "exchRcvd"};
+
+bool validAccessKey (QString const& key)
+{
+  return key.size() <= 128 && std::all_of(key.begin(), key.end(), [] (QChar ch) {
+    return ch.unicode() >= 0x20 && ch.unicode() <= 0x7e;
+  });
+}
+
+QString cssColor (QColor const& color)
+{
+  // CSS puts the alpha channel last, whereas QColor::HexArgb puts it first.
+  return color.name(QColor::HexRgb) + (color.alpha() == 255 ? QString() : QString("%1").arg(color.alpha(), 2, 16, QLatin1Char('0')));
+}
+
+QJsonObject textStyle (QTextCharFormat const& format)
+{
+  QJsonObject result;
+  if (format.foreground().style() != Qt::NoBrush) result["foreground"] = cssColor(format.foreground().color());
+  if (format.background().style() != Qt::NoBrush) result["background"] = cssColor(format.background().color());
+  result["bold"] = format.fontWeight() >= QFont::Bold;
+  result["italic"] = format.fontItalic();
+  result["underline"] = format.underlineStyle() != QTextCharFormat::NoUnderline;
+  result["strikeout"] = format.fontStrikeOut();
+  if (!format.toolTip().isEmpty()) result["tooltip"] = format.toolTip();
+  return result;
+}
+
+QJsonArray formattedRuns (QTextBlock const& block, QList<QTextEdit::ExtraSelection> const& selections)
+{
+  // PSK Reporter uses ExtraSelection overlays rather than changing the document.
+  QList<QTextEdit::ExtraSelection> overlays;
+  for (auto const& selection : selections)
+    if (selection.cursor.selectionStart() < block.position() + block.length() - 1 &&
+        selection.cursor.selectionEnd() > block.position()) overlays.append(selection);
+  QJsonArray runs;
+  for (auto it = block.begin(); !it.atEnd(); ++it) {
+    auto fragment = it.fragment();
+    if (!fragment.isValid()) continue;
+    QVector<int> boundaries {fragment.position(), fragment.position() + fragment.length()};
+    for (auto const& selection : overlays) {
+      boundaries.append(qBound(boundaries.first(), selection.cursor.selectionStart(), fragment.position() + fragment.length()));
+      boundaries.append(qBound(boundaries.first(), selection.cursor.selectionEnd(), fragment.position() + fragment.length()));
+    }
+    std::sort(boundaries.begin(), boundaries.end());
+    boundaries.erase(std::unique(boundaries.begin(), boundaries.end()), boundaries.end());
+    for (int i = 1; i < boundaries.size(); ++i) {
+      auto format = fragment.charFormat();
+      for (auto const& selection : overlays)
+        if (selection.cursor.selectionStart() <= boundaries[i-1] && selection.cursor.selectionEnd() > boundaries[i-1]) format.merge(selection.format);
+      runs.append(QJsonObject{{"text", fragment.text().mid(boundaries[i-1] - fragment.position(), boundaries[i] - boundaries[i-1])}, {"style", textStyle(format)}});
+    }
+  }
+  return runs;
+}
 
 QJsonObject describe (QWidget * w)
 {
@@ -111,10 +169,12 @@ WebControlServer::WebControlServer (QWidget * window, QWidget * waterfall, QDial
   connect(this, &QTcpServer::newConnection, this, &WebControlServer::acceptConnections);
 }
 
-bool WebControlServer::start (quint16 port)
+bool WebControlServer::start (quint16 port, QString const& accessKey)
 {
+  auto customKey = accessKey.trimmed();
+  if (!validAccessKey(customKey)) return false;
   stop();
-  token_ = QUuid::createUuid().toString(QUuid::WithoutBraces) + QUuid::createUuid().toString(QUuid::WithoutBraces);
+  token_ = customKey.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces) + QUuid::createUuid().toString(QUuid::WithoutBraces) : customKey;
   return listen(QHostAddress::AnyIPv4, port);
 }
 
@@ -126,18 +186,22 @@ void WebControlServer::stop ()
 
 void WebControlServer::showSettings ()
 {
-  QDialog dialog(window_); dialog.setWindowTitle(tr("Web control (experimental)"));
+  QDialog dialog(window_); dialog.setWindowTitle(tr("Web control (experimental)")); dialog.setObjectName("webControlSettings");
   QFormLayout layout(&dialog);
   QLabel description(tr("Experimental feature: operate this station from a browser on your LAN.\n"
     "The access key permits transmitting. Use a trusted LAN or VPN; HTTP is unencrypted.\n"
     "Web control is off after application restart. Losing the browser connection does not halt TX."));
   description.setWordWrap(true); layout.addRow(&description);
-  QSpinBox port; port.setRange(1024, 65535); port.setValue(isListening() ? serverPort() : 8080);
+  QSpinBox port; port.setObjectName("webControlPort"); port.setRange(1024, 65535); port.setValue(isListening() ? serverPort() : 8080);
   layout.addRow(tr("Port"), &port);
-  QLineEdit key; key.setReadOnly(true); layout.addRow(tr("Access key"), &key);
+  QLineEdit key; key.setObjectName("webControlKey"); key.setMaxLength(128);
+  key.setPlaceholderText(tr("Enter your own key, or leave empty for a random key"));
+  layout.addRow(tr("Access key"), &key);
   QLabel addresses; addresses.setTextInteractionFlags(Qt::TextSelectableByMouse); layout.addRow(&addresses);
-  QPushButton startButton(tr("Start / new access key")), stopButton(tr("Stop web control"));
+  QPushButton startButton(tr("Start / apply key")), stopButton(tr("Stop web control")), randomButton(tr("Start / new random key"));
+  startButton.setObjectName("webControlStart"); randomButton.setObjectName("webControlRandom");
   layout.addRow(&startButton, &stopButton);
+  layout.addRow(&randomButton);
   auto refresh = [&] {
     key.setText(token_);
     QStringList urls;
@@ -149,6 +213,14 @@ void WebControlServer::showSettings ()
     addresses.setText(urls.isEmpty() ? tr("Web control is stopped") : urls.join('\n'));
   };
   connect(&startButton, &QPushButton::clicked, &dialog, [&] {
+    if (!validAccessKey(key.text().trimmed())) {
+      QMessageBox::warning(&dialog, tr("Web control (experimental)"), tr("Use up to 128 ASCII characters (letters, digits, spaces and punctuation), or leave the key empty to generate one."));
+      return;
+    }
+    if (!start(quint16(port.value()), key.text())) QMessageBox::warning(&dialog, tr("Web control (experimental)"), errorString());
+    refresh();
+  });
+  connect(&randomButton, &QPushButton::clicked, &dialog, [&] {
     if (!start(quint16(port.value()))) QMessageBox::warning(&dialog, tr("Web control (experimental)"), errorString());
     refresh();
   });
@@ -207,10 +279,14 @@ void WebControlServer::readRequest (QTcpSocket * s)
   if (data.size() < end + 4 + length) return;
   if (data.size() != end + 4 + length) { respond(s, 400, "{}"); return; }
   auto path = request[1]; auto method = request[0];
-  if (method == "GET" && (path == "/" || path == "/app.js" || path == "/style.css")) {
+  // A query string does not change the resource path (including the common /?).
+  // Authentication continues to use only the Authorization header below.
+  int query = path.indexOf('?');
+  if (query >= 0) path.truncate(query);
+  if (method == "GET" && (path == "/" || path == "/app.js" || path == "/i18n.js" || path == "/style.css")) {
     QFile file(":/web/" + (path == "/" ? QString("index.html") : QString::fromLatin1(path.mid(1))));
     if (!file.open(QIODevice::ReadOnly)) { respond(s, 404, "{}"); return; }
-    respond(s, 200, file.readAll(), path == "/" ? "text/html; charset=utf-8" : path == "/app.js" ? "application/javascript" : "text/css"); return;
+    respond(s, 200, file.readAll(), path == "/" ? "text/html; charset=utf-8" : path.endsWith(".js") ? "application/javascript; charset=utf-8" : "text/css; charset=utf-8"); return;
   }
   if (token_.isEmpty() || headers.value("authorization") != "Bearer " + token_.toLatin1()) { respond(s, 401, "{\"error\":\"Access key required\"}"); return; }
   // No CORS; reject cross-origin browser requests even with a supplied key.
@@ -250,16 +326,26 @@ QJsonObject WebControlServer::state () const
   for (auto const& id : modes) if (auto a = window_->findChild<QAction *>(id))
     actions[id] = QJsonObject{{"text", a->text().remove('&')}, {"checked", a->isChecked()}, {"enabled", a->isEnabled()}};
   result["modes"] = actions;
+  QJsonObject palettes;
   for (auto const& id : {"decodedTextBrowser", "decodedTextBrowser2"}) {
     QJsonArray rows;
     if (auto text = window_->findChild<QTextEdit *>(id)) {
+      auto selections = text->extraSelections();
+      auto palette = text->viewport()->palette();
+      palettes[id] = QJsonObject{{"foreground", cssColor(palette.color(QPalette::Text))},
+                                {"background", cssColor(palette.color(QPalette::Base))}};
       auto block = text->document()->lastBlock();
       for (int i = 0; block.isValid() && i < 250; ++i, block = block.previous()) {
-        rows.prepend(QJsonObject{{"line", block.blockNumber()}, {"text", block.text()}});
+        auto style = textStyle(block.charFormat());
+        auto background = block.blockFormat().background();
+        if (background.style() != Qt::NoBrush) style["background"] = cssColor(background.color());
+        auto runs = formattedRuns(block, selections);
+        rows.prepend(QJsonObject{{"line", block.blockNumber()}, {"text", block.text()}, {"style", style}, {"runs", runs}});
       }
     }
     result[id] = rows;
   }
+  result["decodePalette"] = palettes;
   QJsonObject log;
   if (log_ && log_->isVisible()) for (auto const& id : logFields)
     if (auto w = log_->findChild<QWidget *>(id)) log[id] = describe(w);

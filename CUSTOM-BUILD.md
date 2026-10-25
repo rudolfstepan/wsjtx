@@ -30,6 +30,17 @@ Alternative ohne Ninja, mit Buildprodukten im sichtbaren Hauptprojekt:
 Der bisherige Ninja-Build bleibt für CI verfügbar. Die Alternative benötigt
 keine Antivirus-Ausnahme. [Prüfbericht](docs/validation/hackrf-ft8-17m/README.txt).
 
+Alle vorhandenen lokalen WSJT-X-Pakete lassen sich mit einem vollständigen
+MinGW-Neubau gemeinsam aktualisieren:
+
+```powershell
+.\tools\Rebuild-AllCustom.ps1
+```
+
+Der Befehl erneuert auch die Kompatibilitäts-EXEs in `build-custom`, erhält
+Stationsprofile und prüft die neun Produktionsprogramme in jedem Paket per
+SHA256. Buildprotokoll und Paketübersicht liegen unter `tmp/rebuild-all-…`.
+
 ## Abfragebegrenzung und HTTP 429
 
 Die XML-Abfrage kann mit **Too Many Requests** abgelehnt werden, während die

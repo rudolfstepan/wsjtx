@@ -14,7 +14,8 @@ public:
   ~WasapiLoopback ();
   WasapiLoopback (WasapiLoopback const&) = delete;
   WasapiLoopback& operator= (WasapiLoopback const&) = delete;
-  QByteArray read (); // signed PCM16, mono, requested sample rate
+  // A capture gap discards preceding PCM and requests a sink timing reset.
+  QByteArray read (bool * timingReset = nullptr); // signed PCM16, mono
   void suspend ();
   void resume ();
 private:

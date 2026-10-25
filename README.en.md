@@ -54,9 +54,26 @@ operation, implementation, sources, and the verified build baseline.
 
 Open **View → Web control (experimental)…**, start the server, close the dialog, then open
 the displayed address in a browser and enter the access key. The browser
+accepts the key set on the desktop with **Start / apply key**; alternatively,
+**Start / new random key** generates one. The browser
 recreates the main operating panel: decodes, RX/TX controls, QSO fields,
 messages, logging and the live waterfall. Both interfaces operate the same
 running station. Setup and additional dialogs remain on the desktop.
+
+![English web interface with FT8 band activity, QSO controls, transmit messages and live waterfall](docs/images/web-control-ft8-en-2026-10-25.png)
+
+Original screenshot, 25 October 2026: **OE3SRO/P (JN88)** receiving FT8
+on **14.074 MHz (20 m)**. Station and connection status appear at the top,
+followed by decode lists and RX/TX actions. The three lower panels contain
+the DX station, QSO controls and six transmit messages; **Wide Graph** shows
+the desktop application's waterfall image. Magenta rows follow the configured
+desktop formatting. The screenshot shows reception, with no completed QSO
+documented. [Interface walkthrough (German)](docs/WEB-CONTROL.txt).
+
+The **Language** selector offers German and English. **Browser language** selects
+a supported browser language, falling back to English. Manual choices are saved
+in the browser. Station colors, callsign highlighting and PSK Reporter markers
+follow the desktop display.
 
 The server is off after every restart. Use a trusted LAN or VPN: HTTP is
 unencrypted, and disconnecting the browser does not halt transmission.
@@ -241,6 +258,17 @@ Run these commands from the repository directory:
 .\tools\Test-Reist16.ps1
 .\tools\Package-Custom.ps1
 ```
+
+To perform a clean MinGW Makefiles build and update **all existing local
+packages** under `dist-custom`:
+
+```powershell
+.\tools\Rebuild-AllCustom.ps1
+```
+
+This uses `build-custom-make`, refreshes each variant's programs and runtime
+libraries, and verifies their SHA256 hashes without importing station profiles.
+Logs and the package inventory are written to `tmp/rebuild-all-…`.
 
 The release build is placed in `build-custom`; the package with runtime
 libraries, decoders, and station data is placed in `dist-custom\OE3SRO-reist16-pluto`.

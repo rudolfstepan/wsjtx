@@ -75,12 +75,19 @@ Anderer Browser-Wiedergabeausgang:
  .\Start-Yaesu-WebSDR.ps1 -PlaybackDevice '2 - LG SMARTGAME+ (AMD High Definition Audio Device)'
 Exakten Namen des aktiven Windows-Wiedergabegeraets verwenden.
 Bei fehlendem/mehrdeutigem Ausgang erscheint ein Fehler; kein Mikrofon-
-Fallback. Nach Aufnahmeabbruch die Instanz neu starten.
+Fallback. Kurze Audiounterbrechungen setzen den Aufnahmepuffer und die
+Empfangszeitbasis automatisch zurueck; Monitor bleibt aktiv. Der betroffene
+Slot kann dabei verloren gehen. Geraete-/Treiberfehler werden weiter gemeldet.
  .\Start-Yaesu-WebSDR.ps1 -CheckOnly
 prueft Pfade und laufende Instanzen, ohne zu starten.
 
 start-websdr.bat bleibt eine ZUSAETZLICHE reine Empfangs-Testoption mit
 separatem Profil WSJT-X - WebSDR und explizitem --receive-only.
+Der gleichwertige, ausdruecklich benannte Starter start-wasapi.bat startet
+diesen WASAPI-Empfaenger auch einzeln neben einem laufenden TX-Fenster.
+Er startet keinen Sender und aendert dessen Profil nicht. Den Empfangsmodus
+(z.B. REIST16) und die Browserfrequenz im RX-Fenster einstellen; die eigene
+WebSDR-Konfiguration bleibt bei weiteren Starts erhalten.
 Fuer Yaesu-Senden mit WebSDR-Empfang start-yaesu-websdr.bat verwenden.
 
 Lokaler Nachweis

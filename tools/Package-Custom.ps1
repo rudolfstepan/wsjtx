@@ -10,10 +10,23 @@ $data = Join-Path $package 'share\wsjtx'
 $sdkBin = Join-Path $root '.tools\hamlib\hamlib-w64-4.7.2\bin'
 New-Item -ItemType Directory -Force -Path $bin, $data | Out-Null
 Copy-Item -LiteralPath (Join-Path $root 'docs/WEB-CONTROL.txt') -Destination $package -Force
+New-Item -ItemType Directory -Force -Path (Join-Path $package 'images') | Out-Null
+Copy-Item -LiteralPath (Join-Path $root 'docs/images/web-control-ft8-2026-10-25.png') -Destination (Join-Path $package 'images') -Force
+Copy-Item -LiteralPath (Join-Path $root 'docs/images/web-control-ft8-en-2026-10-25.png') -Destination (Join-Path $package 'images') -Force
 foreach ($name in @('wsjtx', 'jt9', 'wsprd', 'fmtave', 'fcal', 'fmeasure', 'wsjtx_app_version', 'wsjtx_pluto_bridge', 'wsjtx_hackrf_bridge')) {
     $source = Join-Path $build "$name.exe"
     if (!(Test-Path -LiteralPath $source)) { throw "Missing build output: $source" }
-    Copy-Item -LiteralPath $source -Destination $bin -Force
+    $destination = Join-Path $bin "$name.exe"
+    try { [IO.File]::Copy([IO.Path]::GetFullPath($source), [IO.Path]::GetFullPath($destination), $true) }
+    catch [IO.IOException] {
+        if (($_.Exception.HResult -band 0xffff) -notin @(32,33)) { throw }
+        # Keep running radio/decoder processes alive; Windows permits renaming
+        # their loaded EXEs. The replacement takes effect at the next launch.
+        $backup = Join-Path $bin ("$name-before-update-" + (Get-Date -Format 'yyyyMMdd-HHmmssfff') + '.exe')
+        Move-Item -LiteralPath $destination -Destination $backup
+        [IO.File]::Copy([IO.Path]::GetFullPath($source), [IO.Path]::GetFullPath($destination), $true)
+        Write-Output "Running executable retained as $backup; restart the application to use the update."
+    }
 }
 foreach ($name in @('rigctl', 'rigctld', 'rigctlcom')) {
     Copy-Item -LiteralPath (Join-Path $sdkBin "$name.exe") -Destination (Join-Path $bin "$name-wsjtx.exe") -Force
@@ -29,6 +42,7 @@ Copy-Item -LiteralPath (Join-Path $root 'docs\REIST16-QSO2.md') -Destination $pa
 Copy-Item -LiteralPath (Join-Path $root 'docs\PLUTO-WSJTX.txt') -Destination $package -Force
 Copy-Item -LiteralPath (Join-Path $root 'Start-Pluto.ps1'),(Join-Path $root 'start-pluto.bat') -Destination $package -Force
 Copy-Item -LiteralPath (Join-Path $root 'Start-WebSDR.ps1'),(Join-Path $root 'start-websdr.bat'),(Join-Path $root 'docs/WEBSDR-WSJTX.txt') -Destination $package -Force
+Copy-Item -LiteralPath (Join-Path $root 'Start-Wasapi.ps1'),(Join-Path $root 'start-wasapi.bat') -Destination $package -Force
 Copy-Item -LiteralPath (Join-Path $root 'Start-Yaesu-WebSDR.ps1'),(Join-Path $root 'start-yaesu-websdr.bat') -Destination $package -Force
 Copy-Item -LiteralPath (Join-Path $root 'Start-Reist16-Selftest.ps1'),(Join-Path $root 'start-reist16-selftest.bat') -Destination $package -Force
 Copy-Item -LiteralPath (Join-Path $root 'Start-HackRF.ps1'),(Join-Path $root 'start-hackrf.bat'),(Join-Path $root 'docs/HACKRF-WSJTX.txt') -Destination $package -Force

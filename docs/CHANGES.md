@@ -6,6 +6,19 @@
 
 ### 2026-10-25 — Experimentelle Websteuerung
 
+- Original-Screenshot von OE3SRO/P beim FT8-Empfang auf 20 m in README DE/EN
+  und Offline-Anleitung eingebunden; Bedienbereiche im Rundgang erklärt.
+  Screenshot wird mit Windows- und Dokumentationspaketen ausgeliefert.
+- Eigener Zugangsschlüssel im Desktopdialog über **Start / apply key**;
+  Zufallsschlüssel bleiben wählbar. Anmeldung ohne native Formularnavigation,
+  Ladeprüfung der Skripte und korrektes Routing für URLs mit Fragezeichen.
+- `Rebuild-AllCustom.ps1` baut mit MinGW vollständig neu und aktualisiert alle
+  vorhandenen lokalen Pakete mit Hashprüfung und aktuellen Buildmetadaten.
+- Deutsch/Englisch mit Sprachautomatik, umschaltbarer und im Browser
+  gespeicherter Auswahl; Sprachwechsel erhält QSO-Daten ohne Steuerbefehl.
+- Decodelisten übernehmen die Desktopfarben und Textformatierung einschließlich
+  Logbuch-/Stationshervorhebungen und PSK-Reporter-Overlays; keine geratenen
+  CQ-/Rufzeichenfarben im Browser. Native und Browserprüfungen erweitert.
 - Opt-in-Webserver unter **View → Web control (experimental)…**, nach jedem
   Neustart ausgeschaltet und durch einen wechselbaren Zugangsschlüssel geschützt.
 - Browser-Nachbau des Hauptbedienbereichs mit Decodelisten, RX/TX, Frequenz/
@@ -309,6 +322,19 @@ speichert den FT2-Fortsetzungspunkt; dieser Commit ändert keine Programmfunktio
 
 ### 2026-10-25 — Experimental web control
 
+- Original screenshot of OE3SRO/P receiving FT8 on 20 m included in both READMEs
+  and the offline guide, with a walkthrough of the controls. The screenshot is
+  included in Windows and documentation packages.
+- Custom access keys in the desktop dialog using **Start / apply key**, with
+  random keys still available. Login avoids native form navigation, checks
+  script initialization and accepts resource URLs with query strings.
+- `Rebuild-AllCustom.ps1` performs a clean MinGW build and updates all existing
+  local packages with hash verification and current build metadata.
+- German/English with browser-language detection, a persistent language selector
+  and language changes that preserve QSO data without sending commands.
+- Decode lists mirror desktop colors and text emphasis, including station/logbook
+  highlighting and PSK Reporter overlays. Native and browser checks cover these
+  formats instead of guessing colors from CQ text or callsigns in the browser.
 - Opt-in server under **View → Web control (experimental)…**, disabled after
   restart and protected by a rotatable access key.
 - Browser recreation of the main operating panel: decodes, RX/TX, frequency/

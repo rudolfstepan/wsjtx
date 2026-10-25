@@ -1616,7 +1616,6 @@ function (add_resources resources path)
 endfunction (add_resources resources path)
 
 add_resources (wsjtx_RESOURCES "" ${TOP_LEVEL_RESOURCES})
-add_resources (wsjtx_RESOURCES /web web/index.html web/app.js web/style.css)
 add_resources (wsjtx_RESOURCES /Palettes ${PALETTE_FILES})
 add_resources (wsjtx_RESOURCES /Translations ${QM_FILES})
 
@@ -1629,6 +1628,7 @@ qt5_wrap_ui (wsjtx_GENUISRCS ${wsjtx_UISRCS})
 # Resource generation
 qt5_add_resources (wsjtx_RESOURCES_RCC
   ${CMAKE_BINARY_DIR}/wsjtx.qrc
+  web/web.qrc
   contrib/QDarkStyleSheet/qdarkstyle/style.qrc
   )
 

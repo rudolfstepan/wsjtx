@@ -21,6 +21,7 @@
 #include <QSysInfo>
 #include <QDir>
 #include <QDirIterator>
+#include <QFile>
 #include <QStandardPaths>
 #include <QStringList>
 #include <QLockFile>
@@ -106,6 +107,28 @@ namespace
 
 int main(int argc, char *argv[])
 {
+  // Audit the resources in the production executable without opening a station,
+  // loading profiles, or requiring a GUI platform plugin.
+  for (int i = 1; i < argc; ++i) if (std::string(argv[i]) == "--check-web-resources") {
+    QCoreApplication app(argc, argv);
+    QFile page(":/web/index.html");
+    if (!page.open(QIODevice::ReadOnly)) { std::cerr << "Missing embedded web login page\n"; return 1; }
+    auto html = QString::fromUtf8(page.readAll());
+    QRegularExpression reference(R"rx(<(?:script|link)\b[^>]*(?:src|href)="(/[^"]+)")rx");
+    auto references = reference.globalMatch(html);
+    int count = 0;
+    while (references.hasNext()) {
+      auto path = ":/web" + references.next().captured(1);
+      QFile resource(path);
+      if (!resource.open(QIODevice::ReadOnly) || resource.size() == 0) {
+        std::cerr << "Missing embedded web resource: " << path.toStdString() << '\n'; return 1;
+      }
+      ++count;
+    }
+    if (count == 0) { std::cerr << "Web login page has no embedded dependencies\n"; return 1; }
+    std::cout << "Production web resources OK: login page and " << count << " dependencies\n";
+    return 0;
+  }
   init_random_seed ();
 
   // make the Qt type magic happen

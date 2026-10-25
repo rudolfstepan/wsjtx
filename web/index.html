@@ -2,25 +2,25 @@
 <html lang="de">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>WSJT-X · Experimentelle Websteuerung</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script>
+  <title data-i18n="title">WSJT-X · Experimentelle Websteuerung</title><link rel="stylesheet" href="/style.css"><script src="/i18n.js" defer></script><script src="/app.js" defer></script>
 </head>
 <body>
-<header><div><strong>WSJT-X</strong><span class="edition">OE3SRO · Websteuerung (experimentell)</span></div><span id="connection" role="status">Nicht verbunden</span><button id="logout" hidden>Trennen</button></header>
-<form id="login"><h1>Mit der Station verbinden</h1><p>Den Zugangsschlüssel findest du am Stationsrechner unter <b>View → Web control (experimental)…</b>.</p><label>Zugangsschlüssel<input id="key" type="password" autocomplete="off" required></label><button>Verbinden</button><p>Experimentelle Funktion. Nur im vertrauenswürdigen LAN oder über VPN verwenden. Der Zugang erlaubt auch das Senden.</p></form>
+<header><div><strong>WSJT-X</strong><span class="edition" data-i18n="edition">OE3SRO · Websteuerung (experimentell)</span></div><label class="language"><span data-i18n="language">Sprache</span><select id="language" aria-label="Sprache" data-i18n-aria="language"><option value="auto" data-i18n="automatic">Browsersprache</option><option value="de" lang="de">Deutsch</option><option value="en" lang="en">English</option></select></label><span id="connection" role="status">Nicht verbunden</span><button id="logout" data-i18n="logout" hidden>Trennen</button></header>
+<section id="login" aria-labelledby="loginTitle"><h1 id="loginTitle" data-i18n="loginTitle">Mit der Station verbinden</h1><p data-i18n="loginHint">Den Zugangsschlüssel findest du am Stationsrechner unter View → Web control (experimental)…</p><label><span data-i18n="accessKey">Zugangsschlüssel</span><input id="key" type="password" autocomplete="off" required></label><button id="connect" type="button" data-i18n="connect" disabled>Verbinden</button><p id="startupNotice" role="status" data-i18n="startupNotice">Weboberfläche wird geladen. Bleibt diese Meldung sichtbar, bitte die Seite neu laden. / Loading web controls. If this message remains, please reload the page.</p><p data-i18n="loginWarning">Experimentelle Funktion. Nur im vertrauenswürdigen LAN oder über VPN verwenden. Der Zugang erlaubt auch das Senden.</p></section>
 <main id="station" hidden>
   <section class="stationbar"><div><span id="callsign">—</span><small id="grid"></small></div><strong id="frequency">—</strong><span id="mode">—</span><time id="utc">—</time><span id="radioStatus">—</span></section>
   <div id="notice" role="alert" hidden></div>
-  <div class="toolbar"><div id="band"></div><label>Mode <select id="modes" aria-label="Betriebsart"></select></label></div>
+  <div class="toolbar"><div id="band"></div><label><span data-i18n="mode">Betriebsart</span><select id="modes" aria-label="Betriebsart" data-i18n-aria="mode"></select></label></div>
   <section class="decodes">
-    <article><h2><span id="bandTitle">Band Activity</span> <small>Doppelklick / Doppeltippen zum Antworten</small></h2><div id="bandHeadings" class="columns">UTC    dB   DT   Freq   Message</div><div id="decodedTextBrowser" class="decode-list" tabindex="0"></div></article>
+    <article><h2><span id="bandTitle">Band Activity</span> <small data-i18n="replyHint">Doppelklick / Doppeltippen zum Antworten</small></h2><div id="bandHeadings" class="columns">UTC    dB   DT   Freq   Message</div><div id="decodedTextBrowser" class="decode-list" tabindex="0"></div></article>
     <article><h2 id="rxTitle">Rx Frequency</h2><div id="rxHeadings" class="columns">UTC    dB   DT   Freq   Message</div><div id="decodedTextBrowser2" class="decode-list" tabindex="0"></div></article>
   </section>
-  <nav id="transport" aria-label="Empfang und Senden"></nav>
-  <div class="cycle"><span id="status"></span><span id="lastTx"></span><progress id="progress" aria-label="Fortschritt des Sende-/Empfangsintervalls" max="100" value="0"></progress><span id="watchdog"></span></div>
-  <section class="operating"><article><h2>DX Station</h2><div id="dx" class="fields"></div></article><article><h2>QSO-Steuerung</h2><div id="qso" class="fields"></div></article><article class="messages"><h2>Sendetexte</h2><div id="messages"></div></article></section>
-  <section class="waterfall"><h2>Wide Graph <label><input id="showWaterfall" type="checkbox" checked> Livebild</label></h2><p id="waterfallHint">Wide Graph ist geschlossen. <button id="openWaterfall">Wasserfall öffnen</button></p><img id="waterfall" alt="Live-Wasserfall der Station" hidden></section>
-  <section id="log" hidden><h2>QSO protokollieren</h2><div id="logFields" class="fields"></div><button id="saveLog">QSO speichern</button><button id="cancelLog">Abbrechen</button></section>
-  <footer>Die Desktopanwendung steuert Funkgerät und Audio. Eine getrennte Browserverbindung beendet einen laufenden Sendebetrieb nicht. <span id="lastUpdate"></span></footer>
+  <nav id="transport" aria-label="Empfang und Senden" data-i18n-aria="transport"></nav>
+  <div class="cycle"><span id="status"></span><span id="lastTx"></span><progress id="progress" aria-label="Fortschritt des Sende-/Empfangsintervalls" data-i18n-aria="cycle" max="100" value="0"></progress><span id="watchdog"></span></div>
+  <section class="operating"><article><h2 data-i18n="dxTitle">DX Station</h2><div id="dx" class="fields"></div></article><article><h2 data-i18n="qsoTitle">QSO-Steuerung</h2><div id="qso" class="fields"></div></article><article class="messages"><h2 data-i18n="messagesTitle">Sendetexte</h2><div id="messages"></div></article></section>
+  <section class="waterfall"><h2>Wide Graph <label><input id="showWaterfall" type="checkbox" checked> <span data-i18n="liveImage">Livebild</span></label></h2><p id="waterfallHint"><span data-i18n="waterfallClosed">Wide Graph ist geschlossen.</span> <button id="openWaterfall" data-i18n="openWaterfall">Wasserfall öffnen</button></p><img id="waterfall" alt="Live-Wasserfall der Station" data-i18n-alt="waterfallAlt" hidden></section>
+  <section id="log" hidden><h2 data-i18n="logTitle">QSO protokollieren</h2><div id="logFields" class="fields"></div><button id="saveLog" data-i18n="saveLog">QSO speichern</button><button id="cancelLog" data-i18n="cancel">Abbrechen</button></section>
+  <footer><span data-i18n="footer">Die Desktopanwendung steuert Funkgerät und Audio. Eine getrennte Browserverbindung beendet einen laufenden Sendebetrieb nicht.</span> <span id="lastUpdate"></span></footer>
 </main>
 <div id="error" role="alert" hidden></div>
 </body></html>

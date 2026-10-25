@@ -1,5 +1,6 @@
 param(
     [switch]$ConfigureOnly,
+    [switch]$Clean,
     [ValidateSet('Ninja','MinGW Makefiles')][string]$Generator = 'Ninja',
     [string]$BuildDirectory = ''
 )
@@ -21,5 +22,12 @@ $build = if ($BuildDirectory) { $BuildDirectory } elseif ($Generator -eq 'Ninja'
     '-DCMAKE_Fortran_FLAGS=-fallow-argument-mismatch' '-DBoost_NO_BOOST_CMAKE=OFF' '-DCMAKE_POLICY_DEFAULT_CMP0167=NEW'
 if ($LASTEXITCODE) { throw 'CMake configuration failed.' }
 if ($ConfigureOnly) { return }
+if ($Clean) {
+    & "$mingw\bin\cmake.exe" --build $build --target clean
+    if ($LASTEXITCODE) { throw 'Build clean failed.' }
+}
 & "$mingw\bin\cmake.exe" --build $build --target wsjtx jt9 wsprd fmtave fcal fmeasure wsjtx_app_version wsjtx_pluto_bridge wsjtx_hackrf_bridge --parallel 6
 if ($LASTEXITCODE) { throw 'Build failed.' }
+& (Join-Path $build 'wsjtx.exe') --check-web-resources
+if ($LASTEXITCODE) { throw 'Production EXE is missing web resources.' }
+Write-Output 'Production web resource audit passed.'

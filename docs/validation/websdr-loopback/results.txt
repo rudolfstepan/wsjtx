@@ -1,5 +1,33 @@
 WebSDR WASAPI loopback validation - 2026-10-23
 ============================================
+Recovery regression - 2026-10-25
+--------------------------------
+Actual Realtek driver reproduced the old fatal discontinuity error. Packet
+diagnostics showed DATA_DISCONTINUITY on every packet despite contiguous
+device positions. Check continuity in the endpoint mix-rate frame units
+(also for converted 12 kHz PCM); tolerate one frame of rounding. Confirmed
+gaps discard preceding PCM in the current batch and reset the sink, while
+the stream remains active. Read stalls >250 ms or excessive packet backlog
+flush/restart capture automatically. Device/API failures remain errors.
+
+MinGW Makefiles production wsjtx and wasapi_loopback_checks builds passed.
+Live browser -> Realtek -> production WasapiLoopback checks:
+48 kHz: 143520/143520 samples per approx3s, RMS .053114/.053194.
+12 kHz: 35760/35880 samples per approx3s, RMS .053428/.052981.
+Both rates: pause/resume passed; forced1600ms read stall recovered, followed
+by71520/17880 fresh samples over approx1.5s. Missing endpoint rejected.
+Logs: tmp/wasapi-recovery-build-final.log, tmp/wasapi-recovery-live.log.
+
+start-wasapi.bat / Start-Wasapi.ps1 alias the standalone WebSDR receiver:
+independent profile, receive-only, no sender launch/CAT access. Mocked live
+TX process did not block independent RX; existing RX profile hash retained.
+Existing Test-Reist16Selftest.ps1 regression passed. No HF/PTT triggered.
+Updated WebSDR package wsjtx SHA256:
+9B1739717BD41481351B80EF7C3E5D5EA44D9FD7A773585220E784B8428D3543.
+Running TX executable retained as wsjtx-before-wasapi-20261025.exe via rename;
+process not stopped; final new executable installed at normal wsjtx.exe path.
+This verifies native capture/recovery, not a new on-air decode/QSO.
+
 Production build: tools/Build-Custom.ps1 / CMake wsjtx target succeeded.
 New separate package: dist-custom/OE3SRO-reist16-websdr.
 Branding: build by OE3SRO. Existing radio packages/profiles retained.

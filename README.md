@@ -54,10 +54,27 @@ enthält Bedienung, technische Umsetzung, Quellen und den geprüften Buildstand.
 
 Unter **View → Web control (experimental)…** den integrierten Webserver starten, die
 angezeigte Adresse im Browser öffnen und den Zugangsschlüssel eingeben.
+Im Desktopdialog kann ein eigener Schlüssel mit **Start / apply key** gesetzt
+oder mit **Start / new random key** ein Zufallsschlüssel erzeugt werden.
 Die Weboberfläche bildet den Hauptbedienbereich mit Decodelisten,
 RX-/TX-Steuerung, QSO-Feldern, Sendetexten und Live-Wasserfall nach.
 Desktop und Browser bedienen dieselbe laufende WSJT-X-Instanz.
 Setup und zusätzliche Spezialdialoge bleiben am Stationsrechner.
+
+![Deutsche Weboberfläche mit FT8-Bandaktivität, QSO-Steuerung, Sendetexten und Live-Wasserfall](docs/images/web-control-ft8-2026-10-25.png)
+
+Original-Screenshot vom 25. Oktober 2026: **OE3SRO/P (JN88)** empfängt FT8
+auf **14,074 MHz (20 m)**. Oben stehen Stations- und Verbindungsstatus,
+darunter die Decodelisten und RX-/TX-Aktionen. Die drei unteren Bereiche
+enthalten DX-Station, QSO-Steuerung und die sechs Sendetexte; **Wide Graph**
+zeigt das Wasserfallbild der Desktopanwendung. Die magentafarbenen Zeilen
+übernehmen die eingestellte Desktopformatierung. Das Bild zeigt Empfang,
+keinen abgeschlossenen QSO. [Rundgang durch die Oberfläche](docs/WEB-CONTROL.txt).
+
+Die Auswahl **Sprache** bietet Deutsch und Englisch; **Browsersprache** wählt
+automatisch eine unterstützte Sprache (sonst Englisch). Eine manuelle Auswahl
+bleibt im Browser gespeichert. Stationsfarben, Rufzeichenhervorhebungen und
+PSK-Reporter-Markierungen werden aus der Desktopansicht übernommen.
 
 Der Dienst startet ausgeschaltet. Nur im vertrauenswürdigen LAN oder über
 VPN verwenden; HTTP ist unverschlüsselt. Ein Verbindungsabbruch beendet
@@ -250,6 +267,17 @@ Führe im Repository-Verzeichnis aus:
 .\tools\Test-Reist16.ps1
 .\tools\Package-Custom.ps1
 ```
+
+Für einen vollständigen Neubau mit MinGW Makefiles und die Aktualisierung
+**aller vorhandenen lokalen Pakete** unter `dist-custom`:
+
+```powershell
+.\tools\Rebuild-AllCustom.ps1
+```
+
+Der Befehl verwendet `build-custom-make`, erneuert die Programmdateien und
+Laufzeitbibliotheken aller Varianten und prüft ihre SHA256-Werte. Stationsprofile
+werden nicht importiert. Logs und Paketübersicht liegen unter `tmp/rebuild-all-…`.
 
 Der Release-Build liegt unter `build-custom`; das Paket mit Laufzeitbibliotheken,
 Decodern und Stationsdaten unter `dist-custom\OE3SRO-reist16-pluto`.

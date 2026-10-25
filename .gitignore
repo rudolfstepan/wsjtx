@@ -52,3 +52,7 @@ CLAUDE.md
 /recordings/
 /settings/
 /tools/Export-Reist16Papers.ps1
+
+# Private 12 m measurement campaign (original audio and analysis).
+/samples/REIST16-QSO-2/*12m-20261025.*
+/samples/REIST16-QSO-2/websdr_recording_2026-10-25T*_24986.3kHz.wav

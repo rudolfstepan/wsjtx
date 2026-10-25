@@ -1,6 +1,7 @@
 #include "WasapiLoopback.hpp"
 #include <stdexcept>
 #include <QtGlobal>
+#include <chrono>
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -32,6 +33,10 @@ struct WasapiLoopback::Impl
   ComPtr<IAudioCaptureClient> capture;
   bool running = false;
   bool firstPacket = true;
+  UINT64 nextPosition = 0;
+  unsigned deviceRate = 0;
+  unsigned captureRate = 0;
+  std::chrono::steady_clock::time_point lastRead;
 
   ~Impl ()
   {
@@ -79,6 +84,11 @@ WasapiLoopback::WasapiLoopback (QString const& outputName, unsigned sampleRate)
       .arg (outputName).arg (matches).toStdString ());
   check (s.device->Activate (__uuidof (IAudioClient), CLSCTX_ALL, nullptr,
     reinterpret_cast<void**> (s.client.address ())), "output activation");
+  WAVEFORMATEX * mixFormat = nullptr;
+  check (s.client->GetMixFormat (&mixFormat), "output format");
+  s.deviceRate = mixFormat->nSamplesPerSec;
+  s.captureRate = sampleRate;
+  CoTaskMemFree (mixFormat);
   WAVEFORMATEX format {};
   format.wFormatTag = WAVE_FORMAT_PCM;
   format.nChannels = 1;
@@ -96,34 +106,59 @@ WasapiLoopback::WasapiLoopback (QString const& outputName, unsigned sampleRate)
     reinterpret_cast<void**> (s.capture.address ())), "capture service");
   check (s.client->Start (), "capture start");
   s.running = true;
+  s.lastRead = std::chrono::steady_clock::now ();
 }
 
 WasapiLoopback::~WasapiLoopback () = default;
 
-QByteArray WasapiLoopback::read ()
+QByteArray WasapiLoopback::read (bool * timingReset)
 {
+  if (timingReset) *timingReset = false;
   QByteArray pcm;
   auto& s = *impl_;
   if (!s.running) return pcm;
   UINT packet = 0;
   check (s.capture->GetNextPacketSize (&packet), "packet query");
   // Bound the work per timer tick. A backlog indicates an audio-thread stall;
-  // report it instead of silently stretching or compressing captured audio.
+  // reset it instead of silently stretching or compressing captured audio.
+  auto recover = [this, timingReset] {
+    suspend ();
+    resume ();
+    if (timingReset) *timingReset = true;
+    return QByteArray {};
+  };
+  auto now = std::chrono::steady_clock::now ();
+  // An audio-thread stall can leave stale data even when the driver's packet
+  // positions/flags fail to expose the loss. Resume from current audio.
+  if (now - s.lastRead > std::chrono::milliseconds (250)) return recover ();
+  s.lastRead = now;
   unsigned packets = 0;
   while (packet) {
-    if (++packets > 100) throw std::runtime_error ("WASAPI capture backlog; restart Monitor.");
+    if (++packets > 100) return recover ();
     BYTE* data = nullptr;
     UINT frames = 0;
     DWORD flags = 0;
-    check (s.capture->GetBuffer (&data, &frames, &flags, nullptr, nullptr), "packet read");
-    bool discontinuity = (flags & AUDCLNT_BUFFERFLAGS_DATA_DISCONTINUITY) && !s.firstPacket;
-    if (!discontinuity) {
-      if (flags & AUDCLNT_BUFFERFLAGS_SILENT) pcm.append (QByteArray (int (frames * 2), '\0'));
-      else pcm.append (reinterpret_cast<char const*> (data), int (frames * 2));
+    UINT64 position = 0;
+    check (s.capture->GetBuffer (&data, &frames, &flags, &position, nullptr), "packet read");
+    // Some shared-mode drivers flag EVERY packet, even when the device
+    // positions are contiguous. Only reset for a confirmed gap (or an
+    // unreliable timestamp), otherwise valid audio would be dropped forever.
+    bool discontinuity = (flags & AUDCLNT_BUFFERFLAGS_DATA_DISCONTINUITY) && !s.firstPacket
+      && ((flags & AUDCLNT_BUFFERFLAGS_TIMESTAMP_ERROR)
+        || position + 1 < s.nextPosition || position > s.nextPosition + 1);
+    // Device positions use the endpoint's mix rate, including when Windows
+    // converts the returned PCM to 12 kHz. Allow one frame of rounding.
+    s.nextPosition = position + UINT64 (frames) * s.deviceRate / s.captureRate;
+    if (discontinuity) {
+      // The flag describes a gap BEFORE this valid packet. Keep the stream
+      // running: Stop/Start can itself cause another gap on some drivers.
+      pcm.clear ();
+      if (timingReset) *timingReset = true;
     }
+    if (flags & AUDCLNT_BUFFERFLAGS_SILENT) pcm.append (QByteArray (int (frames * 2), '\0'));
+    else pcm.append (reinterpret_cast<char const*> (data), int (frames * 2));
     check (s.capture->ReleaseBuffer (frames), "packet release");
     s.firstPacket = false;
-    if (discontinuity) throw std::runtime_error ("WASAPI audio discontinuity; restart Monitor to reset reception timing.");
     check (s.capture->GetNextPacketSize (&packet), "packet query");
   }
   return pcm;
@@ -144,13 +179,14 @@ void WasapiLoopback::resume ()
     check (impl_->client->Start (), "capture restart");
     impl_->firstPacket = true;
     impl_->running = true;
+    impl_->lastRead = std::chrono::steady_clock::now ();
   }
 }
 #else
 struct WasapiLoopback::Impl {};
 WasapiLoopback::WasapiLoopback (QString const&, unsigned) { throw std::runtime_error ("WASAPI loopback requires Windows."); }
 WasapiLoopback::~WasapiLoopback () = default;
-QByteArray WasapiLoopback::read () { return {}; }
+QByteArray WasapiLoopback::read (bool * timingReset) { if (timingReset) *timingReset = false; return {}; }
 void WasapiLoopback::suspend () {}
 void WasapiLoopback::resume () {}
 #endif

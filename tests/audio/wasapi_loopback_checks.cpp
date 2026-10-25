@@ -23,7 +23,8 @@ int main (int argc, char** argv)
         double sum = 0, peak = 0;
         QElapsedTimer timer; timer.start ();
         while (timer.elapsed () < 3000) {
-          auto pcm = capture.read ();
+          bool timingReset = false;
+          auto pcm = capture.read (&timingReset);
           if (pcm.size () % 2) throw std::runtime_error ("Torn PCM frame");
           for (int i = 0; i < pcm.size (); i += 2) {
             qint16 sample; std::memcpy (&sample, pcm.constData () + i, 2);
@@ -42,6 +43,26 @@ int main (int argc, char** argv)
         QThread::msleep (100);
         capture.resume ();
       }
+      // Force a buffer overrun after receiving an initial packet. The old
+      // implementation aborted permanently here; recovery must flush stale
+      // samples and then provide fresh PCM without a manual Monitor restart.
+      QElapsedTimer warmup; warmup.start ();
+      while (capture.read ().isEmpty () && warmup.elapsed () < 2000) QThread::msleep (10);
+      QThread::msleep (1600);
+      bool reset = false;
+      auto stale = capture.read (&reset);
+      if (!reset) throw std::runtime_error ("Overrun did not reset capture timing");
+      qint64 freshSamples = 0;
+      QElapsedTimer recovery; recovery.start ();
+      while (recovery.elapsed () < 1500) {
+        bool repeatedReset = false;
+        auto fresh = capture.read (&repeatedReset);
+        if (repeatedReset) throw std::runtime_error ("Capture stuck restarting after overrun");
+        freshSamples += fresh.size () / 2;
+        QThread::msleep (10);
+      }
+      if (freshSamples < rate) throw std::runtime_error ("No sustained PCM after overrun recovery");
+      std::cout << "rate=" << rate << " overrun recovered; fresh samples=" << freshSamples << std::endl;
     }
     std::cout << "Live loopback PCM/rate/suspend/resume checks passed.\n";
     return 0;

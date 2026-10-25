@@ -8,17 +8,89 @@ Start
 -----
 1. WSJT-X am Stationsrechner starten und Funkgerät/Audio wie gewohnt einrichten.
 2. View -> Web control (experimental)… öffnen. Port auswählen (Vorgabe 8080) und
-   Start / new access key drücken. Den Dialog anschließend schließen.
+   im Feld Access key einen eigenen Schlüssel eingeben und Start / apply key
+   drücken. Ein leeres Feld erzeugt einen Zufallsschlüssel. Den Dialog schließen.
 3. Eine der angezeigten http://IP:Port-Adressen am anderen Rechner, Tablet
    oder Smartphone öffnen und den Zugangsschlüssel eingeben.
 4. Bei Bedarf den gewählten TCP-Port in der Firewall für das private LAN
    freigeben. Mehrere WSJT-X-Instanzen benötigen unterschiedliche Ports.
 5. Mit Stop web control im Desktopdialog den Zugriff vollständig abschalten.
 
-Der Dienst ist nach jedem Programmstart aus. Ein erneuter Start erzeugt
-einen neuen Schlüssel; bisherige Schlüssel sind sofort ungültig.
+Die Anmeldung erfolgt direkt in der Webansicht per Verbinden oder Enter.
+Der Knopf wird erst nach dem Laden der Browseroberfläche freigegeben. Bleibt
+die Lademeldung stehen, die Seite neu laden. Auch eine Adresse mit angehängtem
+Fragezeichen (http://IP:Port/?) öffnet die Startseite. API-Aufrufe benötigen
+weiterhin den Zugangsschlüssel im Authorization-Header, niemals in der URL.
+
+Der Dienst ist nach jedem Programmstart aus. Der Schlüssel ist im Dialog
+bearbeitbar: Start / apply key übernimmt ihn; Start / new random key erzeugt
+ausdrücklich einen neuen Zufallsschlüssel. Erlaubt sind bis zu 128 druckbare
+ASCII-Zeichen (Buchstaben, Ziffern, Leer- und Satzzeichen); äußere Leerzeichen
+werden entfernt. Ein geänderter Schlüssel macht den vorherigen ungültig.
+Der Schlüssel wird nur für die laufende Anwendung gehalten, nicht gespeichert.
 Die Webdateien sind in der EXE eingebettet. Kein separater Webserver, kein
 Node.js und keine Internetverbindung sind für den Betrieb erforderlich.
+
+Sprache und Stationsfarben
+-------------------------
+Die Sprachauswahl im Kopfbereich ist auch vor der Anmeldung verfügbar:
+Deutsch, English oder Browsersprache. Die Automatik verwendet die erste
+unterstützte Browsersprache, andernfalls Englisch. Die Auswahl wird nur
+im jeweiligen Browser gespeichert; bei blockiertem Browserspeicher bleibt
+der Wechsel für die aktuelle Seite möglich. Der Zugangsschlüssel und die
+Stationsdaten werden nicht im Browserspeicher abgelegt.
+
+Beschriftungen, Hinweise, Verbindungsstatus, Logbuchfelder und Fehlermeldungen
+folgen der gewählten Sprache. Ein Sprachwechsel benötigt keinen Neustart und
+sendet keine Steuerbefehle. Rufzeichen, Frequenzen, Decodes und Sendetexte
+werden unverändert angezeigt. Namen offener Desktopdialoge, besondere
+Desktop-Statusmeldungen und das Wasserfallbild stammen aus der Desktopansicht.
+
+Die Decodelisten übernehmen die tatsächlichen Vorder-/Hintergrundfarben aus
+WSJT-X, sowohl für ganze Zeilen als auch für einzelne Rufzeichen. Das schließt
+die eingestellten CQ-/Logbuch-/DXCC-/LoTW-Hervorhebungen und die türkisfarbenen,
+fetten, unterstrichenen PSK-Reporter-Markierungen ein. Es gibt keine zusätzliche
+CQ-/Rufzeichen-Farbregel im Browser. Änderungen der Desktopformatierung werden
+mit dem nächsten Statusabruf sichtbar. Farbeinstellungen bleiben am Desktop.
+
+Rundgang anhand des Screenshots vom 25. Oktober 2026
+--------------------------------------------------
+Originalbilder im Dokumentationsordner:
+  Deutsch: images/web-control-ft8-2026-10-25.png
+  Englisch: images/web-control-ft8-en-2026-10-25.png
+eingebettet in README.md, README.en.md und WINDOWS-QUICKSTART.html.
+Beide zeigen OE3SRO/P, Locator JN88, FT8 auf 14,074 MHz
+im 20-m-Band. Der Status lautet EMPFANG, Monitor und Auto Seq sind grün,
+TX 6 (CQ OE3SRO/P JN88) ist ausgewählt. Eine ausgewählte CQ-Nachricht ist
+noch kein Sendebeleg; ein abgeschlossener QSO ist im Bild nicht dokumentiert.
+
+1. Kopfbereich: Sprache wählt Deutsch, Englisch oder Browsersprache.
+   Verbunden zeigt die Browserverbindung; Trennen meldet den Browser ab.
+   Darunter stehen Rufzeichen, Locator, Dialfrequenz, Betriebsart, Stationszeit
+   und RX-/TX-Status. Band / Frequenz und Betriebsart ändern die Arbeitsauswahl.
+2. Bandaktivität links und RX-Frequenz rechts zeigen Decodes mit UTC, dB,
+   DT, Audiofrequenz und Nachricht. Die rechte Liste ist im Beispiel leer.
+   Doppelklick/Doppeltippen wählt eine Antwortstation. Die magentafarbenen
+   Zeilen sind übernommene Desktopfarben, keine eigene Browserklassifizierung.
+3. Aktionsleiste: QSO protokollieren öffnet die Logbestätigung; Stopp, Monitor,
+   Löschen und Dekodieren steuern den Empfangs-/Decoderablauf. TX aktivieren,
+   TX stoppen und Abstimmen bedienen die entsprechenden Desktopaktionen.
+   Darunter stehen Betriebsstatus, Pegelanzeige und TX-Watchdog-Anzeige (WD).
+4. DX-Station: DX-Rufzeichen und DX-Locator bearbeiten, Nachschlagen auslösen
+   und Standardtexte erzeugen. Der Schieberegler steuert die TX-Abschwächung
+   in dB; er zeigt keine gemessene HF-Ausgangsleistung an.
+5. QSO-Steuerung: TX · Hz und RX · Hz sind Audiofrequenzen, im Bild je 1259 Hz.
+   RX → TX bzw. TX → RX übernimmt den jeweiligen Wert. Rapport, TX gerade /
+   zuerst, TX-Frequenz halten, Auto Seq, Nur CQ, CQ-Antwort und Nachrichtenansicht
+   entsprechen den verfügbaren Bedienelementen der laufenden Desktopinstanz.
+6. Sendetexte: TX 1 bis TX 6 wählen die nächste Nachricht; die Textfelder lassen
+   sich bearbeiten. Die separaten Knöpfe TX n sofort lösen die entsprechende
+   unmittelbare Sendeaktion aus. Grün markiert die ausgewählte Nachricht.
+7. Wide Graph: Livebild zeigt das echte Desktopbild mit Frequenzskala,
+   Wasserfall, Markern und Spektrum. Auch die unten sichtbaren Qt-Regler sind
+   Bestandteil dieses Bildes und im Browser nicht anklickbar. RX-/TX-Werte
+   über die Zahlenfelder ändern; die Option Livebild blendet das Bild ein/aus.
+   Zum Lesen kleiner Details das Originalbild in voller Größe öffnen.
 
 Bedienung
 ---------
@@ -78,6 +150,15 @@ Ein Request pro TCP-Verbindung. Kein beliebiger Dateizugriff.
 GET /api/state, GET /api/waterfall und POST /api/command verlangen den Schlüssel.
 
 tools/Test-WebControl.ps1 baut und prüft den Server ohne Funkhardware.
+Der Produktionsbuild und die Testprogramme verwenden dieselbe web/web.qrc.
+Build-Custom prüft außerdem die Ressourcen direkt in der fertigen wsjtx.exe
+mit --check-web-resources, ohne GUI, Profilzugriff oder Funkhardware zu starten.
+Damit wird auch eine im eigentlichen Programm fehlende Sprachdatei erkannt.
+Zusätzlich geprüft: Qt-Zeilen-/Rufzeichenfarben, PSK-Reporter-Overlays,
+überlappende Textformate und transparente Farben. Die Browserprüfungen decken
+Deutsch/Englisch, Sprachautomatik und Fallback, gespeicherte Auswahl und
+blockierten Browserspeicher, Sprachwechsel ohne Steuerbefehle, den Erhalt
+offener QSO-Daten sowie die tatsächlichen CSS-Farben der Decodelisten ab.
 tests/webcontrol/browser_checks.cjs prüft Anmeldung, Monitor, Frequenz,
 Logging, Decode-Auswahl, Desktop/Mobilansicht sowie Verbindungsausfall im
 echten Browser gegen den Qt-Testserver. Dafür separat Playwright installieren,

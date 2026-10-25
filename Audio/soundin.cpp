@@ -66,7 +66,12 @@ void SoundInput::start(QAudioDeviceInfo const& device, int framesPerBuffer, Audi
         m_loopback_timer->setTimerType (Qt::PreciseTimer);
         connect (m_loopback_timer.data (), &QTimer::timeout, this, [this] {
           try {
-            auto pcm = m_loopback->read ();
+            bool timingReset = false;
+            auto pcm = m_loopback->read (&timingReset);
+            if (timingReset) {
+              if (m_sink) m_sink->reset ();
+              Q_EMIT status (tr ("WASAPI audio interrupted; reception restarted"));
+            }
             if (m_sink && !pcm.isEmpty ()) m_sink->write (pcm);
           } catch (std::exception const& e) {
             stop ();

@@ -14,7 +14,7 @@ class WebControlServer final : public QTcpServer
 {
 public:
   explicit WebControlServer (QWidget * window, QWidget * waterfall, QDialog * log);
-  bool start (quint16 port);
+  bool start (quint16 port, QString const& accessKey = {});
   void stop ();
   QString token () const { return token_; }
   void showSettings ();

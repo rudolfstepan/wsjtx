@@ -64,6 +64,8 @@ Copy-Item -LiteralPath "$root\docs\WINDOWS-QUICKSTART.html" -Destination "$docs\
 New-Item -ItemType Directory -Force -Path "$docs\images" | Out-Null
 Copy-Item -LiteralPath "$root\docs\images\ft2-qso-oe3sro-og5o-2026-10-16.png" -Destination "$docs\images" -Force
 Copy-Item -LiteralPath "$root\docs\images\REIST16_QSO.png" -Destination "$docs\images" -Force
+Copy-Item -LiteralPath "$root\docs\images\web-control-ft8-2026-10-25.png" -Destination "$docs\images" -Force
+Copy-Item -LiteralPath "$root\docs\images\web-control-ft8-en-2026-10-25.png" -Destination "$docs\images" -Force
 foreach ($document in @('FT2.md', 'FT8.md', 'REIST16.md', 'REIST16-QSO2.md', 'CHANGES.md')) {
     $content = [IO.File]::ReadAllText("$root\docs\$document")
     # Repository source links should also work from an extracted binary package.
