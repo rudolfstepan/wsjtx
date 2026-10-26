@@ -1,0 +1,55 @@
+{
+  "version": "3.0.2-oe3sro.7-rc3",
+  "tag": "oe3sro-v3.0.2-7-rc3",
+  "source_commit": "6b6de95fdd1d461c713eb902fe8d827b55a69216",
+  "build_origin": "local",
+  "github_actions": "disabled",
+  "source_dirty": true,
+  "source_dirty_reason": "Private local sample README excluded; all product sources committed",
+  "version_output": "WSJT-X 3.0.2-devel — build by OE3SRO",
+  "archives": [
+    {
+      "file": "wsjtx-OE3SRO-3.0.2-oe3sro.7-rc3-windows-x64.zip",
+      "bytes": 65164777,
+      "sha256": "eec9f1513cddbf835470713053a034858bd71a1515ab9c00d2d55b629a5c9918",
+      "entries": 235,
+      "integrity_verified": true
+    },
+    {
+      "file": "wsjtx-OE3SRO-3.0.2-oe3sro.7-rc3-documentation.zip",
+      "bytes": 3208830,
+      "sha256": "af3502aae64dfe96562237e6dacbf1dfba690e3dd63be1bfefb1bb280e3b3a9d",
+      "entries": 55,
+      "integrity_verified": true
+    }
+  ],
+  "program_sha256": {
+    "wsjtx": "91fa56eeed45dc6f1a8c9fe944aaa2e431ce458db6ce0e2209ec9032eab05e4a",
+    "jt9": "fc6fb255269f517b7fc08583421fbb8688c044963f51fd791595f66461e60d56",
+    "wsprd": "ec2c123fcb89590a1f339eadb55f3dddcbc7b77cbc6a1c333d1efd6df2f660cd",
+    "fmtave": "75bfeba1bbe31bb605a4711f3b3a93c10e5fa5b98f862cc7f11631e5fe6b20d4",
+    "fcal": "5a1a217426f5d6880a1855fc719299dd4f607930e51a0fd0556f9ce3eb4ec064",
+    "fmeasure": "380800f4928bbecfa6f8b71c0b1e83c40fd487efd37c342531db387bcbc6e1dd",
+    "wsjtx_app_version": "e44709fc11487c5c57ae1f5917d8afec317c09ca017e421ed2030360e18fd2bc",
+    "wsjtx_pluto_bridge": "837789e221777e42df424b83420575f030a1a4259fcef7353178f50d37a8050d",
+    "wsjtx_hackrf_bridge": "96ccd8b4fb31f8ed9caa303388a9ff0eb3f7b2cc5f5ba877258c2c8f48abe356"
+  },
+  "fresh_extracted_runtime": true,
+  "windows_path_only": true,
+  "web_resources": "Production web resources OK: login page and 3 dependencies",
+  "synthetic_weak_exact": true,
+  "synthetic_dense_exact": 48,
+  "synthetic_dense_foreign": 0,
+  "local_checks_passed": [
+    "REIST16 complete suite and IPC",
+    "Core logbook/UDP",
+    "PSK Reporter and packaged Qt/OpenSSL",
+    "Web control",
+    "TX audio and native/original FT8 reference comparison",
+    "FT2/FT4 codecs and SMP",
+    "Pluto simulated bridge/protocol",
+    "HackRF simulated bridge/protocol",
+    "REIST16 self-test launcher",
+    "HackRF FT8 launcher"
+  ]
+}
