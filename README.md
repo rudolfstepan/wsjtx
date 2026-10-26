@@ -6,9 +6,9 @@
 
 [![Windows-Build](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml/badge.svg)](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml)
 
-**[REIST16 Release Candidate 3.0.2-oe3sro.7-rc1](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-7-rc1)** —
+**[REIST16 Release Candidate 3.0.2-oe3sro.7-rc2](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-7-rc2)** —
 Mehrsignalempfang mit Abtrennung, zusätzliche Schwachsignalverfahren und
-an FT8 angeglichener digitaler Sendepegel. [Änderungen und Prüfgrenzen](docs/releases/3.0.2-oe3sro.7-rc1.md).
+an FT8 angeglichener digitaler Sendepegel. [Änderungen und Prüfgrenzen](docs/releases/3.0.2-oe3sro.7-rc2.md).
 Für Praxistests vorgesehen; die stabile Version bleibt separat verfügbar.
 
 **[Windows-Release herunterladen](https://github.com/rudolfstepan/wsjtx/releases/latest)** —
@@ -284,18 +284,19 @@ Führe im Repository-Verzeichnis aus:
 ```
 
 Für einen vollständigen Neubau mit MinGW Makefiles und die Aktualisierung
-**aller vorhandenen lokalen Pakete** unter `dist-custom`:
+des **gemeinsamen lokalen Pakets** unter `dist-custom`:
 
 ```powershell
 .\tools\Rebuild-AllCustom.ps1
 ```
 
 Der Befehl verwendet `build-custom-make`, erneuert die Programmdateien und
-Laufzeitbibliotheken aller Varianten und prüft ihre SHA256-Werte. Stationsprofile
+Laufzeitbibliotheken und prüft ihre SHA256-Werte. Alle Starter verwenden dieselben
+Programme mit getrennten Stationsprofilen. Stationsprofile
 werden nicht importiert. Logs und Paketübersicht liegen unter `tmp/rebuild-all-…`.
 
 Der einzige Custom-Build liegt unter `build-custom-make`; das Paket mit Laufzeitbibliotheken,
-Decodern und Stationsdaten unter `dist-custom\OE3SRO-reist16-pluto`.
+Decodern und Stationsdaten unter `dist-custom`.
 Der zusätzliche Modus **REIST16** verwendet 15-Sekunden-Slots für kurze CQ-/QSO-
 Nachrichten; Bedienung, Profilvertrag und Testgrenzen stehen in [REIST16.txt](docs/REIST16.txt).
 **start-pluto.bat** startet die zweite Instanz mit PlutoSDR als Funkgerät über

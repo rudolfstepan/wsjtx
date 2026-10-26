@@ -1,6 +1,6 @@
 # REIST16-QSO/2 — 15-Sekunden-Weak-Signal-Profil
 
-Stand: 26. Oktober 2026 · Release Candidate 3.0.2-oe3sro.7-rc1 · build by OE3SRO
+Stand: 26. Oktober 2026 · Release Candidate 3.0.2-oe3sro.7-rc2 · build by OE3SRO
 
 Unter **Mode → REIST16** sendet dieser Stand QSO/2. Ein kompletter Rahmen
 dauert 12,8 s und enthält eine Standardnachricht mit 77 Informationsbits.

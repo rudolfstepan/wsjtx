@@ -23,7 +23,7 @@ Einziger lokaler Custom-Build, mit MinGW Makefiles im sichtbaren Hauptprojekt:
 ```powershell
 .\tools\Build-Custom.ps1 -Generator 'MinGW Makefiles'
 .\tools\Test-HackrfBridge.ps1 -BuildDirectory .\build-custom-make
-.\tools\Package-Custom.ps1 -BuildDirectory .\build-custom-make -Package .\dist-custom\OE3SRO-hackrf-ft8-17m
+.\tools\Package-Custom.ps1 -BuildDirectory .\build-custom-make -Package .\dist-custom
 .\tools\Test-HackrfFt8Launcher.ps1
 ```
 
@@ -34,16 +34,22 @@ Messreihen aus dem entfernten Build liegen lokal unter
 `.local/validation-archive/build-custom`; veröffentlichte Messbelege behalten
 ihre ursprünglichen Pfade und Hashes als historische Angaben.
 
-Alle vorhandenen lokalen WSJT-X-Pakete lassen sich mit einem vollständigen
-MinGW-Neubau gemeinsam aktualisieren:
+Das eine lokale WSJT-X-Paket lässt sich mit einem vollständigen
+MinGW-Neubau aktualisieren:
 
 ```powershell
 .\tools\Rebuild-AllCustom.ps1
 ```
 
 Der Befehl verwendet ausschließlich `build-custom-make`, erhält
-Stationsprofile und prüft die neun Produktionsprogramme in jedem Paket per
+Stationsprofile und prüft die neun Produktionsprogramme im gemeinsamen Paket per
 SHA256. Buildprotokoll und Paketübersicht liegen unter `tmp/rebuild-all-…`.
+
+Alle Starter verwenden `dist-custom/bin`, auch WebSDR, Pluto und HackRF.
+Ihre unterschiedlichen Geräteeinstellungen liegen in getrennten Profilen
+unter `%LOCALAPPDATA%`, nicht in duplizierten Programmpaketen. Der Name
+`Rebuild-AllCustom.ps1` bleibt für vorhandene Befehle erhalten; er erzeugt
+keine alten Variantenordner erneut.
 
 ## Abfragebegrenzung und HTTP 429
 
@@ -217,7 +223,7 @@ denselben Launcher und dasselbe Custom-Profil wie der PowerShell-Aufruf:
 .\Start-Custom.ps1
 ```
 
-Das Startskript verwendet `dist-custom\OE3SRO-reist16-pluto\bin\wsjtx.exe --rig-name Custom`.
+Das Startskript verwendet `dist-custom\bin\wsjtx.exe --rig-name Custom`.
 Eine noch laufende frühere Custom-Version vor dem Neustart normal beenden.
 Die Versionsanzeige, der Fenstertitel und das About-Fenster enthalten
 **build by OE3SRO**.

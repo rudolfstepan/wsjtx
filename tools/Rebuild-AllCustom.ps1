@@ -6,11 +6,8 @@ $dist = Join-Path $root 'dist-custom'
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $logs = Join-Path $root "tmp/rebuild-all-$stamp"
 New-Item -ItemType Directory -Force -Path $logs | Out-Null
-$packages = @($dist) + @(Get-ChildItem -LiteralPath $dist -Directory | Where-Object {
-    Test-Path -LiteralPath (Join-Path $_.FullName 'bin/wsjtx.exe')
-} | Select-Object -ExpandProperty FullName)
-$packages = @($packages | Where-Object { Test-Path -LiteralPath (Join-Path $_ 'bin/wsjtx.exe') })
-if (!$packages.Count) { throw 'No existing WSJT-X packages found.' }
+New-Item -ItemType Directory -Force -Path $dist | Out-Null
+$packages = @($dist)
 Write-Output "Build and update of $($packages.Count) existing WSJT-X packages (clean: $(!$Incremental)). Logs: $logs"
 & (Join-Path $PSScriptRoot 'Build-Custom.ps1') -Generator 'MinGW Makefiles' -BuildDirectory $build -Clean:(!$Incremental) *> (Join-Path $logs 'build.log')
 if ($LASTEXITCODE) { throw 'Full build failed.' }

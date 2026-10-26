@@ -6,9 +6,9 @@
 
 [![Windows build](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml/badge.svg)](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml)
 
-**[REIST16 Release Candidate 3.0.2-oe3sro.7-rc1](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-7-rc1)** —
+**[REIST16 Release Candidate 3.0.2-oe3sro.7-rc2](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-7-rc2)** —
 Multisignal decoding with cancellation, additional weak-signal methods and
-digital transmit level matched to FT8. [Changes and validation limits](docs/releases/3.0.2-oe3sro.7-rc1.md).
+digital transmit level matched to FT8. [Changes and validation limits](docs/releases/3.0.2-oe3sro.7-rc2.md).
 Intended for field testing; the stable release remains available separately.
 
 **[Download Windows release](https://github.com/rudolfstepan/wsjtx/releases/latest)** —
@@ -274,19 +274,20 @@ Run these commands from the repository directory:
 .\tools\Package-Custom.ps1
 ```
 
-To perform a clean MinGW Makefiles build and update **all existing local
-packages** under `dist-custom`:
+To perform a clean MinGW Makefiles build and update the **single shared
+package** under `dist-custom`:
 
 ```powershell
 .\tools\Rebuild-AllCustom.ps1
 ```
 
-This uses `build-custom-make`, refreshes each variant's programs and runtime
+This uses `build-custom-make`, refreshes the shared programs and runtime
 libraries, and verifies their SHA256 hashes without importing station profiles.
+All launchers use this package with independent station profiles.
 Logs and the package inventory are written to `tmp/rebuild-all-…`.
 
 The single custom build is placed in `build-custom-make`; the package with runtime
-libraries, decoders, and station data is placed in `dist-custom\OE3SRO-reist16-pluto`.
+libraries, decoders, and station data is placed in `dist-custom`.
 The additional **REIST16** mode uses 15-second UTC slots for short CQ/QSO messages.
 See [REIST16.txt](docs/REIST16.txt) for operation, the wire profile and test limits.
 **start-pluto.bat** launches a second instance using PlutoSDR through the local
@@ -317,7 +318,7 @@ before starting the new package.
 
 Further details are available in [CUSTOM-BUILD.md](CUSTOM-BUILD.md) (German).
 Local configurations, API responses, tools, and build outputs in `.local`,
-`.tools`, `build-custom`, and `dist-custom` are excluded from Git.
+`.tools`, `build-custom-make`, and `dist-custom` are excluded from Git.
 
 ## Checks
 

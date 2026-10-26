@@ -11,7 +11,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 if (!$Package) {
-    $Package = if (Test-Path -LiteralPath "$PSScriptRoot\bin\wsjtx.exe") { $PSScriptRoot } else { "$PSScriptRoot\dist-custom\OE3SRO-hackrf-ft8-17m" }
+    $Package = if (Test-Path -LiteralPath "$PSScriptRoot\bin\wsjtx.exe") { $PSScriptRoot } else { "$PSScriptRoot\dist-custom" }
 }
 # Separate profile: defaults apply once; later frequency/mode choices persist.
 $launch = @{} + $PSBoundParameters

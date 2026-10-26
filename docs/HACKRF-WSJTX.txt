@@ -5,7 +5,7 @@ Zusaetzliche Startoption: HackRF FT8 auf 17 m
 -----------------------------------------
 start-hackrf-ft8-17m.bat startet ausschliesslich den HackRF fuer RX UND TX.
 Eigene Instanz/Profil WSJT-X - HackRF-FT8-17m, TCI 40004, UDP 2243.
-Paket im Repository: dist-custom/OE3SRO-hackrf-ft8-17m.
+Paket im Repository: dist-custom.
 Erststart: FT8, Dial 18.100000 MHz USB/DIGU, Audio 1500 Hz, Monitor an,
 Auto Seq an, Enable TX aus. Spaetere Modus-/Frequenzwahlen bleiben erhalten.
 Rufzeichen/Locator nach dem Erststart kontrollieren: wie beim alten Starter
@@ -34,7 +34,7 @@ HackRF-Instanz normal schliessen. Die Profile werden getrennt gespeichert.
 Lokaler Build ohne Ninja (bei Antivirus-Erkennung keine Ausnahme noetig):
   .\tools\Build-Custom.ps1 -Generator 'MinGW Makefiles'
   .\tools\Test-HackrfBridge.ps1 -BuildDirectory .\build-custom-make
-  .\tools\Package-Custom.ps1 -BuildDirectory .\build-custom-make -Package .\dist-custom\OE3SRO-hackrf-ft8-17m
+  .\tools\Package-Custom.ps1 -BuildDirectory .\build-custom-make -Package .\dist-custom
   .\tools\Test-HackrfFt8Launcher.ps1
 Der Make-Build verwendet einen eigenen Ausgabeordner im Hauptarbeitsverzeichnis;
 die Quellen bleiben im sichtbaren Hauptprojekt. CI-/Ninja-Option bleibt erhalten.
@@ -70,7 +70,7 @@ Die eigene PSK-Reporter-Uploadoption steuert Meldungen eigener RX-Decodes;
 sie ist keine Voraussetzung dafuer, von anderen Stationen gemeldet zu werden.
 
 Start: start-hackrf.bat (oder Start-HackRF.ps1).
-Repository-Paket: dist-custom/OE3SRO-reist16-hackrf.
+Repository-Paket: dist-custom.
 Eigenes Profil: WSJT-X - HackRF; lokaler TCI-Port 40003, UDP-Port 2239.
 Vorhandene Custom-/Yaesu- und Pluto-Profile bleiben getrennt.
 Nur beim ersten Anlegen werden Rufzeichen und Locator aus dem vorhandenen

@@ -5,7 +5,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 if (!$Package) {
-    $Package = if (Test-Path -LiteralPath "$PSScriptRoot\bin\wsjtx.exe") { $PSScriptRoot } else { "$PSScriptRoot\dist-custom\OE3SRO-reist16-websdr" }
+    $Package = if (Test-Path -LiteralPath "$PSScriptRoot\bin\wsjtx.exe") { $PSScriptRoot } else { "$PSScriptRoot\dist-custom" }
 }
 $exe = Join-Path $Package 'bin\wsjtx.exe'
 if (!(Test-Path -LiteralPath $exe)) { throw "Custom build not found: $exe" }

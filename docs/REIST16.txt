@@ -1,5 +1,5 @@
 REIST16-QSO/2 — aktueller Stand vom 26. Oktober 2026
-Release Candidate 3.0.2-oe3sro.7-rc1 · build by OE3SRO
+Release Candidate 3.0.2-oe3sro.7-rc2 · build by OE3SRO
 build by OE3SRO
 
 Dieser Build sendet QSO/2: 77 Informationsbits, CRC14 + LDPC(174,91),
@@ -49,7 +49,7 @@ REIST16 ist ein eigenständiges Protokoll und nicht zu FT8 kompatibel.
 Start und Bedienung
 -------------------
 Im Repository startet start.bat bzw. Start-Custom.ps1 das neue Paket unter
-dist-custom/OE3SRO-reist16-pluto-timing mit dem vorhandenen Profil Custom. Im entpackten
+dist-custom mit dem vorhandenen Profil Custom. Im entpackten
 Windows-ZIP dient Start-WSJT-X.bat als Einstieg. Eine vorherige Custom-
 Instanz vor dem Neustart desselben Custom-Profils normal schließen.
 

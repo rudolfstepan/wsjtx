@@ -4,6 +4,15 @@
 
 ## Deutsch
 
+### 2026-10-26 — RC2 mit gemeinsamem Programmpaket
+
+- Ergänzt die nach dem RC1-Quelltag beauftragte Paketbereinigung:
+  [3.0.2-oe3sro.7-rc2](releases/3.0.2-oe3sro.7-rc2.md).
+- Ein `dist-custom/bin` für Custom, WebSDR, Pluto und HackRF. Starter und
+  Paketwerkzeuge verwenden dieselben Programme; Stationsprofile bleiben getrennt.
+- Veraltete doppelte Build-/Paketdaten lokal entfernt, historische Messreihen
+  mit Hashprüfung archiviert. RC1 blieb ein Quelltag ohne Download-Release.
+
 ### 2026-10-26 — Release Candidate 3.0.2-oe3sro.7-rc1
 
 - REIST16-Mehrsignalempfang, Schwachsignalverfahren, Sendepegel und reale
@@ -364,6 +373,14 @@ ergänzt. [8bf344fde](https://github.com/rudolfstepan/wsjtx/commit/8bf344fde)
 speichert den FT2-Fortsetzungspunkt; dieser Commit ändert keine Programmfunktion.
 
 ## English
+
+### 2026-10-26 — RC2 with one shared program package
+
+- Includes the package consolidation requested after the RC1 source tag:
+  [3.0.2-oe3sro.7-rc2](releases/3.0.2-oe3sro.7-rc2.md).
+- All radio/receiver launchers now share `dist-custom/bin` while retaining
+  independent profiles. Obsolete generated copies are removed locally;
+  historical measurements are archived with hash verification.
 
 ### 2026-10-26 — Release Candidate 3.0.2-oe3sro.7-rc1
 

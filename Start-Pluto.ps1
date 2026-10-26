@@ -9,7 +9,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 if (!$Package) {
-    $Package = if (Test-Path -LiteralPath "$PSScriptRoot\bin\wsjtx.exe") { $PSScriptRoot } else { "$PSScriptRoot\dist-custom\OE3SRO-reist16-pluto-timing" }
+    $Package = if (Test-Path -LiteralPath "$PSScriptRoot\bin\wsjtx.exe") { $PSScriptRoot } else { "$PSScriptRoot\dist-custom" }
 }
 $bin = Join-Path $Package 'bin'
 $exe = Join-Path $bin 'wsjtx.exe'

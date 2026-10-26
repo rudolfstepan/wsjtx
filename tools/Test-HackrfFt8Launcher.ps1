@@ -1,7 +1,7 @@
 param([string]$Package = '')
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
-if (!$Package) { $Package = Join-Path $root 'dist-custom\OE3SRO-hackrf-ft8-17m' }
+if (!$Package) { $Package = Join-Path $root 'dist-custom' }
 $previousAppData = $env:LOCALAPPDATA
 $work = Join-Path $root ('tmp\hackrf-ft8-launcher-' + [guid]::NewGuid().ToString('N'))
 $global:hackrfFt8MockApps = @()

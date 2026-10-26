@@ -4,7 +4,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
-$package = if ($Package) { $Package } else { Join-Path $root 'dist-custom\OE3SRO-reist16-pluto' }
+$package = if ($Package) { $Package } else { Join-Path $root 'dist-custom' }
 $output = Join-Path $root '.local\windows-artifacts'
 $exe = Join-Path $package 'bin\wsjtx.exe'
 if (!(Test-Path -LiteralPath $exe)) { throw 'Run Package-Custom.ps1 first.' }

@@ -1,7 +1,7 @@
 param([switch]$PortableOnly,[string]$Package = '')
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
-$packageRoot = if ($Package) { $Package } else { Join-Path $root 'dist-custom\OE3SRO-reist16-pluto' }
+$packageRoot = if ($Package) { $Package } else { Join-Path $root 'dist-custom' }
 $bin = Join-Path $packageRoot 'bin'
 $checker = Join-Path $bin 'pskreporter-runtime-check.exe'
 $previousPath = $env:PATH

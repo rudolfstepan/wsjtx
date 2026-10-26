@@ -16,7 +16,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 if ($RxLna % 8 -or $RxVga % 2) { throw 'RX LNA requires 8 dB steps; RX VGA requires 2 dB steps.' }
-if (!$Package) { $Package = if (Test-Path -LiteralPath "$PSScriptRoot\bin\wsjtx.exe") { $PSScriptRoot } else { "$PSScriptRoot\dist-custom\OE3SRO-reist16-hackrf" } }
+if (!$Package) { $Package = if (Test-Path -LiteralPath "$PSScriptRoot\bin\wsjtx.exe") { $PSScriptRoot } else { "$PSScriptRoot\dist-custom" } }
 $bin = Join-Path $Package 'bin'
 $exe = Join-Path $bin 'wsjtx.exe'
 $bridge = Join-Path $bin 'wsjtx_hackrf_bridge.exe'
