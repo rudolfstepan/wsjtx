@@ -18,7 +18,7 @@ Benutzerbestätigter PSK-Reporter-Fernempfang in Finnland (−25 dB) und Spanien
 (−18 dB); keine gemessene Ausgangsleistung und kein QSO-Abschluss behauptet.
 [Startparameter und USB-Erholung](docs/HACKRF-WSJTX.txt).
 
-Alternative ohne Ninja, mit Buildprodukten im sichtbaren Hauptprojekt:
+Einziger lokaler Custom-Build, mit MinGW Makefiles im sichtbaren Hauptprojekt:
 
 ```powershell
 .\tools\Build-Custom.ps1 -Generator 'MinGW Makefiles'
@@ -27,8 +27,12 @@ Alternative ohne Ninja, mit Buildprodukten im sichtbaren Hauptprojekt:
 .\tools\Test-HackrfFt8Launcher.ps1
 ```
 
-Der bisherige Ninja-Build bleibt für CI verfügbar. Die Alternative benötigt
-keine Antivirus-Ausnahme. [Prüfbericht](docs/validation/hackrf-ft8-17m/README.txt).
+Build-, Test- und Paketwerkzeuge verwenden `build-custom-make`, auch in CI.
+Ein zweiter lokaler Hauptbuild ist nicht erforderlich. Abhängigkeiten liegen
+weiter unter `.tools`, startbare Pakete unter `dist-custom`. Historische
+Messreihen aus dem entfernten Build liegen lokal unter
+`.local/validation-archive/build-custom`; veröffentlichte Messbelege behalten
+ihre ursprünglichen Pfade und Hashes als historische Angaben.
 
 Alle vorhandenen lokalen WSJT-X-Pakete lassen sich mit einem vollständigen
 MinGW-Neubau gemeinsam aktualisieren:
@@ -37,7 +41,7 @@ MinGW-Neubau gemeinsam aktualisieren:
 .\tools\Rebuild-AllCustom.ps1
 ```
 
-Der Befehl erneuert auch die Kompatibilitäts-EXEs in `build-custom`, erhält
+Der Befehl verwendet ausschließlich `build-custom-make`, erhält
 Stationsprofile und prüft die neun Produktionsprogramme in jedem Paket per
 SHA256. Buildprotokoll und Paketübersicht liegen unter `tmp/rebuild-all-…`.
 

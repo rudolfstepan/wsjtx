@@ -39,32 +39,35 @@ subroutine gen_reist16(message,msgsent,frequency,sequence,wave,ok)
   if(n.eq.614400) ok=1
 end subroutine
 
-subroutine decode_reist16(id2,npts,nutc,nfa,nfb,depth,ios13,decoded)
+subroutine decode_reist16(id2,npts,nutc,nfa,nfb,depth,cq_ap,ios13,decoded)
   use iso_c_binding
   use packjt77, only: unpack77
   implicit none
   integer(c_int16_t), intent(in) :: id2(*)
   integer, intent(in) :: npts,nutc,nfa,nfb,depth,ios13
+  logical, intent(in) :: cq_ap
   integer, intent(out) :: decoded
-  integer(c_int8_t) :: bits(77,32)
-  real(c_float) :: freq(32),dt(32),snr(32)
+  ! Matches reist16::max_decodes; exercised through the production jt9 path.
+  integer, parameter :: max_decodes=200
+  integer(c_int8_t) :: bits(77,max_decodes)
+  real(c_float) :: freq(max_decodes),dt(max_decodes),snr(max_decodes)
   character(len=77) :: packed
   character(len=37) :: message
   integer :: n,i,j,i3
   logical :: valid
   interface
-    function decode(samples,count,low,high,level,bits,freq,dt,snr,capacity) &
-        bind(C,name='reist16_decode') result(n)
+    function decode(samples,count,low,high,level,bits,freq,dt,snr,capacity,ap) &
+        bind(C,name='reist16_decode_ex') result(n)
       import
       integer(c_int16_t), intent(in) :: samples(*)
-      integer(c_int), value :: count,low,high,level,capacity
+      integer(c_int), value :: count,low,high,level,capacity,ap
       integer(c_int8_t), intent(out) :: bits(77,*)
       real(c_float), intent(out) :: freq(*),dt(*),snr(*)
       integer(c_int) :: n
     end function
   end interface
   decoded=0
-  n=decode(id2,min(npts,180000),nfa,nfb,iand(depth,3),bits,freq,dt,snr,32)
+  n=decode(id2,min(npts,180000),nfa,nfb,iand(depth,3),bits,freq,dt,snr,max_decodes,merge(1,0,cq_ap))
   do i=1,n
     do j=1,77
       packed(j:j)=achar(iachar('0')+bits(j,i))

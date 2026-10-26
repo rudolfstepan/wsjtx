@@ -1175,7 +1175,7 @@ subroutine multimode_decoder(ss,id2,params,nfsample)
   if(params%nmode.eq.116) then
      call timer('reist16 ',0)
      call decode_reist16(id2,params%kin,params%nutc,params%nfa,params%nfb, &
-          params%ndepth,ios13,nreist)
+          params%ndepth,logical(params%lft8apon),ios13,nreist)
      call timer('reist16 ',1)
      go to 800
   endif

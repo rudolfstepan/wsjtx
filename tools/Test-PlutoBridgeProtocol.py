@@ -11,9 +11,9 @@ import time
 import uuid
 
 root=Path(__file__).resolve().parents[1]
-executable=Path(sys.argv[1]) if len(sys.argv)>1 else root/'build-custom/wsjtx_pluto_bridge.exe'
+executable=Path(sys.argv[1]) if len(sys.argv)>1 else root/'build-custom-make/wsjtx_pluto_bridge.exe'
 hackrf='hackrf' in executable.name.lower()
-work=root/('build-custom/hackrf-checks/protocol' if hackrf else '.local/pluto-protocol-checks')
+work=root/('build-custom-make/hackrf-checks/protocol' if hackrf else '.local/pluto-protocol-checks')
 work.mkdir(parents=True,exist_ok=True)
 
 def wait_until(test,seconds=5):

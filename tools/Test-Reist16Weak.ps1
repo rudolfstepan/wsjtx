@@ -4,7 +4,8 @@ param(
     [uint32]$Seed=2026102204,
     [switch]$SkipBuild,
     [switch]$ChannelOnly,
-    [switch]$SkipReference
+    [switch]$SkipReference,
+    [string]$BuildDirectory = ''
 )
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot -Parent
@@ -12,9 +13,11 @@ $mingw=if($env:WSJTX_MINGW_PREFIX){$env:WSJTX_MINGW_PREFIX}else{'C:\msys64\mingw
 $oldPath=$env:PATH
 try {
  $env:PATH="$mingw\bin;$env:PATH"
- $build=Join-Path $root 'build-custom'
+ if(!$BuildDirectory){$BuildDirectory='build-custom-make'}
+ $build=if([IO.Path]::IsPathRooted($BuildDirectory)){$BuildDirectory}else{Join-Path $root $BuildDirectory}
  $output=[IO.Path]::GetFullPath((Join-Path $root $OutputDirectory))
- if(!$output.StartsWith("$build\",[StringComparison]::OrdinalIgnoreCase)){throw 'Output must be under build-custom.'}
+ $validOutput=$output.StartsWith((Join-Path $root 'build-custom-make\'),[StringComparison]::OrdinalIgnoreCase)
+ if(!$validOutput){throw 'Output must be under build-custom-make.'}
  if(Test-Path -LiteralPath $output){throw 'Use a new output directory to preserve evidence.'}
  New-Item -ItemType Directory -Path $output | Out-Null
  if(!$SkipBuild){

@@ -4,6 +4,51 @@
 
 ## Deutsch
 
+### 2026-10-26 — Release Candidate 3.0.2-oe3sro.7-rc1
+
+- REIST16-Mehrsignalempfang, Schwachsignalverfahren, Sendepegel und reale
+  Empfangsversuche als Vorabversion zusammengefasst; [Release Notes](releases/3.0.2-oe3sro.7-rc1.md).
+- RC-Tags veröffentlichen eine GitHub-Vorabversion mit Windows-/Dokumentations-ZIP
+  und Prüfsummen, ohne das stabile „Latest“-Release zu ersetzen.
+- Ein Custom-Build unter `build-custom-make` für Build, Tests und Paketierung;
+  alte zweite Buildausgaben werden nicht mehr nachgeführt. Historische Messbelege
+  bleiben getrennt erhalten. Rohaufnahmen und Stationsprofile bleiben privat.
+
+### 2026-10-26 — REIST16-Sendepegel und Audiofrequenz
+
+- Zusätzliche QSO/2-Abschwächung um Faktor 0,8 entfernt: digitaler
+  Spitzenpegel wie FT8, etwa +1,94 dB bei gleicher Ausgangseinstellung.
+  Kein Decoderempfindlichkeits- oder HF-Leistungsnachweis; ALC neu prüfen.
+- Tx 1000 Hz beim Auswählen von REIST16. Mit Rig/Fake It wird der
+  HF-Sendeplatz durch Gegenverschiebung erhalten; 250-Hz-Abstufung hält
+  alle 16 Tonmitten innerhalb 1500–2000 Hz. Ohne Split direkte Audioausgabe.
+- Produktions-PCM-Prüfung für Pegelgleichheit mit FT8 und unverzerrte
+  Wandlung ergänzt; bisherige AWGN-Vergleiche behalten gleichen Signalpegel.
+
+### 2026-10-26 — Zusätzlicher REIST16-Schwachsignalempfang
+
+- Mehrere kohärente Frequenzhypothesen und genaue GFSK-Syncreferenz bei
+  Tiefe 3; Suchbudget auch ohne ersten erfolgreichen Decode nutzbar.
+- Begrenzter CQ-Strukturversuch ab Tiefe 2, separat in Decode schaltbar
+  und mit eigener Einstellung; CLI `--no-reist16-ap`. Kein Sender-/Locatorhinweis.
+- Schwächere Sync-Kandidaten nur mit zusätzlichen Energie-/Diversitätsprüfungen;
+  CRC, Rekodierung und Nutzdatenprüfung bleiben aktiv. Funkformat unverändert.
+- Unabhängige gepaarte Prüfung: −22 dB 11/16 statt 7/16 Nachrichten.
+  Kein allgemeiner Gleichwertigkeits- oder −24-dB-Nachweis.
+  [Belege](validation/reist16-multisignal/WEAK-UPGRADE.md).
+
+### 2026-10-26 — REIST16-Mehrsignalempfang
+
+- Produktive Ausgabe von 32 auf 200 Nachrichten je Slot erhöht; erfolgreiche
+  Stationen verbrauchen weder das Such- noch das kohärente Fehlversuchsbudget.
+- Ab Tiefe 2 sofortige Rekonstruktion und Signalabtrennung, danach erneute
+  Spektralsuche; Tiefe 3 für dichte Belegung empfohlen. QSO/2-Funkformat erhalten.
+- Zeit-/Frequenzsuche beschleunigt, LDPC-Ersatzstatus korrigiert, QSO/1 und
+  QSO/2 gleichzeitig in unabhängigen Zuständen empfangen.
+- Regressionen für mehr als 32 Stationen, enge Überlagerung, Pegelunterschiede,
+  Rekonstruktion, API-Puffergrenzen und gleichzeitige Decoderaufrufe ergänzt.
+  [Messbericht und Grenzen](validation/reist16-multisignal/IMPROVEMENTS.md).
+
 ### 2026-10-25 — Experimentelle Websteuerung
 
 - Original-Screenshot von OE3SRO/P beim FT8-Empfang auf 20 m in README DE/EN
@@ -319,6 +364,43 @@ ergänzt. [8bf344fde](https://github.com/rudolfstepan/wsjtx/commit/8bf344fde)
 speichert den FT2-Fortsetzungspunkt; dieser Commit ändert keine Programmfunktion.
 
 ## English
+
+### 2026-10-26 — Release Candidate 3.0.2-oe3sro.7-rc1
+
+- Packages REIST16 multisignal/weak reception, transmit level and documented
+  field findings; [release notes](releases/3.0.2-oe3sro.7-rc1.md).
+- RC tags publish prerelease ZIPs and checksums without replacing stable latest.
+- Build, tests and packaging now use one `build-custom-make` build. Historical
+  measurements are preserved separately; raw recordings and station profiles remain private.
+
+### 2026-10-26 — REIST16 transmit level and audio frequency
+
+- Removed the extra 0.8 QSO/2 attenuation, matching FT8 digital peak level
+  (about +1.94 dB at unchanged output attenuation). Recheck radio drive/ALC.
+- Tx defaults to 1000 Hz on mode selection. Rig/Fake It uses 250-Hz steps to
+  keep all 16 tone centres inside 1500–2000 Hz while preserving the RF position.
+
+### 2026-10-26 — Additional REIST16 weak-signal reception
+
+- Multiple coherent frequency hypotheses and an exact GFSK sync reference
+  at depth 3; full coherent budget usable without an initial successful decode.
+- Optional CQ structure prior at depth 2/3, separate Decode setting and CLI
+  `--no-reist16-ap`; no sender/locator hints. Additional energy/diversity gates
+  protect weaker sync candidates. Existing acceptance checks and wire format remain.
+- Independent paired −22 dB test: 11/16 messages versus 7/16 previously.
+  [Conditions and remaining limits](validation/reist16-multisignal/WEAK-UPGRADE.md).
+
+### 2026-10-26 — REIST16 multisignal reception
+
+- Raised production output capacity from 32 to 200 messages per slot;
+  successful stations preserve both search and coherent failure budgets.
+- Depth 2/3 reconstructs and immediately subtracts validated signals, followed
+  by repeated spectral search. Use depth 3 for dense reception. QSO/2 wire
+  compatibility is preserved.
+- Faster time/frequency refinement, corrected LDPC fallback status, concurrent
+  independent QSO/1 and QSO/2 searches. Added dense-signal, near/far,
+  reconstruction, API buffer-boundary and concurrent-call regressions.
+  [Validation and limitations](validation/reist16-multisignal/IMPROVEMENTS.md).
 
 ### 2026-10-25 — Experimental web control
 

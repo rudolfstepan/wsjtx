@@ -37,7 +37,7 @@ static void unit_tests() {
  }
  reist16::Bits bits{};for(auto& b:bits)b=rng()&1;
  bits[74]=0;bits[75]=0;bits[76]=1;
- for(double frequency:{100.,1500.375,4000.}) {
+ for(double frequency:{100.,500.,1000.,1500.375,4000.}) {
   auto wave=reist16::qso2::waveform(bits,frequency,12000);
   auto full=reist16::qso2::waveform(bits,frequency);
   check(full.size()==614400&&wave.size()==153600,"exact TX budget");
@@ -88,7 +88,7 @@ static void unit_tests() {
  }
  check(delayedExact>oldExact,"longer capture recovers delayed noisy frames");
  std::cout<<"PASS delayed noisy frames: old "<<oldExact<<"/6, extended "<<delayedExact<<"/6"<<std::endl;
- std::cout<<"PASS QSO/2 wire mapping, 12 clean edge/start round trips, 12/48 kHz, ABI and bounds"<<std::endl;
+ std::cout<<"PASS QSO/2 wire mapping, 20 clean edge/start round trips, 12/48 kHz, ABI and bounds"<<std::endl;
 }
 
 int main(int argc,char**argv) {
@@ -113,6 +113,8 @@ int main(int argc,char**argv) {
   int start=4200+int(rng()%5401);
   auto old=reist16::waveform(bits,77,frequency,12000);
   auto next=reist16::qso2::waveform(bits,frequency,12000);
+  // Preserve the historical equal-power AWGN comparison after TX level fix.
+  for(auto& v:next)v*=.8f;
   std::vector<float> ft8(79*1920);
   ft8_native::waveform(tones,79,1920,2,12000,float(frequency),nullptr,ft8.data(),false,int(ft8.size()));
   for(auto& v:ft8)v*=.8f;

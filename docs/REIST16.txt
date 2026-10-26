@@ -1,4 +1,5 @@
-REIST16-QSO/2 — aktueller Stand vom 23. Oktober 2026
+REIST16-QSO/2 — aktueller Stand vom 26. Oktober 2026
+Release Candidate 3.0.2-oe3sro.7-rc1 · build by OE3SRO
 build by OE3SRO
 
 Dieser Build sendet QSO/2: 77 Informationsbits, CRC14 + LDPC(174,91),
@@ -14,6 +15,23 @@ Das neue Format benötigt auf beiden Seiten die aktualisierte Anwendung.
 QSO/1 bleibt im neuen Empfänger unterstützt. FT8 ist ein separates Format.
 Der vollständige neue Profilvertrag und die Messbedingungen stehen in
 docs/REIST16-QSO2.md bzw. REIST16-QSO2.md im Paket.
+
+Mehrsignal-Empfang: bis zu 200 ausgegebene Nachrichten je Slot. Erfolgreiche
+Stationen verbrauchen kein Fehlversuchsbudget mehr. Tiefe 2/3 rekonstruiert
+und subtrahiert erkannte Signale vor weiteren Suchdurchläufen; für dichten
+Betrieb Tiefe 3 wählen. QSO/1 und QSO/2 werden parallel gesucht. Das QSO/2-
+Funkformat und die Sendewellenform bleiben unverändert. Offline wurden mit
+Tiefe 3 u.a. 48 gleichzeitige Stationen bei 50 Hz Abstand erkannt; eine
+allgemeine FT8-Gleichwertigkeit unter realen Kanalbedingungen folgt daraus
+nicht. Einzelheiten und reproduzierbare Belege im verlinkten Profilvertrag.
+
+Zusaetzlicher Schwachsignal-Ausbau: Tiefe 3 prueft weitere Frequenzhypothesen
+und eine genaue GFSK-Synchronisationsreferenz. Die optionale bekannte CQ-
+Struktur hilft ab Tiefe 2; Rufzeichen und Locator bleiben unbekannt.
+Decode -> Enable CQ AP (REIST16), standardmaessig EIN; CLI zum Vergleich
+--no-reist16-ap. Das Funkformat bleibt unveraendert. Im unabhaengigen
+gemischten Test bei -22 dB wurden 11/16 statt 7/16 Nachrichten erkannt.
+Dies ist kein allgemeiner FT8-Gleichwertigkeits- oder -24-dB-Nachweis.
 
 Das folgende Dokument bleibt als historischer QSO/1-Profilvertrag erhalten.
 Sein Hardwarebild und seine Messwerte gelten für QSO/1.
@@ -41,8 +59,16 @@ TCI-Bridge mit eigenem Profil: siehe PLUTO-WSJTX.txt und start-pluto.bat.
 Der Modus hat keine vorgegebene Funkfrequenz; für einen
 Versuch die mit der Gegenstelle vereinbarte Frequenz selbst einstellen.
 Die angezeigte TX-/RX-Audiofrequenz bezeichnet jeweils den untersten Ton.
-Von dort liegen die übrigen 15 Tonmitten bis 375 Hz höher. Bei einem üblichen
-SSB-Audiokanal ist z.B. eine unterste Audiofrequenz von 1500 Hz geeignet.
+Im aktuellen QSO/2 liegen die übrigen 15 Tonmitten bis 75 Hz höher.
+Beim Auswählen von REIST16 wird Tx 1000 Hz voreingestellt; danach frei wählbar.
+Mit Settings -> Radio -> Split Operation -> Rig oder Fake It bleibt der
+gewählte HF-Sendeplatz erhalten, während das Audio automatisch bei
+1500–1749 Hz beginnt und der oberste Ton höchstens 1824 Hz erreicht.
+Ohne Split gilt die gewählte Audiofrequenz direkt. Tiefere Töne sind kein
+allgemeiner Übertragungsvorteil auf KW; der Filterdurchlass ist entscheidend.
+Der QSO/2-Sender hat jetzt denselben digitalen Spitzenpegel wie FT8:
+der zusätzliche Faktor 0,8 entfällt (etwa +1,94 dB Audiopegel). Nach dem
+Update den realen Senderpegel/ALC kontrollieren. Kein gemessener HF-Gewinn.
 
 Tx even/1st wählt die Slots bei :00 und :30, die Gegenstelle verwendet :15
 und :45. CQ, Rufzeichen/Locator, Rapport, R-Rapport, RR73 und 73 verwenden

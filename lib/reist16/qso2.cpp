@@ -2,6 +2,7 @@
 // 16-GFSK, 200 ms symbols, 64 symbols / 12.8 s in a 15-second UTC slot.
 // Reuses this fork's GPLv3 WSJT-X LDPC and Gaussian waveform kernels.
 #include "qso2.hpp"
+#include "subtract.hpp"
 #include "../ft8/native/ft8_ldpc.hpp"
 #include "../ft8/native/ft8_wave.hpp"
 #include <fftw3.h>
@@ -11,7 +12,6 @@
 #include <cmath>
 #include "planner_lock.hpp"
 #include <stdexcept>
-extern "C" void bpdecode174_91_(float const*, int8_t const*, int const*, int8_t*, int8_t*, int*, int*, int*);
 namespace reist16 { namespace qso2 {
 namespace {
 constexpr double pi=3.14159265358979323846;
@@ -90,44 +90,123 @@ std::complex<double> correlation(float const* p,double frequency) {
   for(int i=first;i<last;++i){sum+=double(p[i])*oscillator;oscillator*=delta;}
   return sum;
 }
+
+bool cq_ap_decode(float const* llr,int depth,Bits& bits) {
+  if(depth<2)return false;
+  // Standard CQ token and its /R flag, exactly the pack77 CQ prior also
+  // used by FT8. No sender, locator, report or expected payload is supplied.
+  for(int type:{1,2}) {
+    float assisted[174];std::copy(llr,llr+174,assisted);
+    int8_t mask[174]={},word[174]={};
+    for(int i=0;i<29;++i){mask[i]=1;assisted[i]=i==26?40.f:-40.f;}
+    for(int i=74;i<77;++i){mask[i]=1;assisted[i]=(type&(1<<(76-i)))?40.f:-40.f;}
+    int hard=-1,iteration=0,checks=83;
+    ft8_native::decode(assisted,mask,80,bits.data(),word,hard,iteration,checks,false);
+    bool valid=hard>=0&&checks==0;
+    if(!valid&&depth>=3)valid=osd(assisted,1,word,hard);
+    if(!valid||hard>36||!ft8_native::validCrc(word))continue;
+    bool matches=true;
+    for(int i=0;i<77;++i)if(mask[i]&&word[i]!=(assisted[i]>0))matches=false;
+    if(!matches)continue;
+    int8_t reencoded[174];ft8_native::encode(word,reencoded);
+    if(!std::equal(word,word+174,reencoded))continue;
+    std::copy(word,word+77,bits.begin());return true;
+  }
+  return false;
+}
+
 bool coherent(float const* data,int max_start,int& start,double& frequency,
-              double noise,int depth,Bits& bits) {
+              double noise,int depth,Bits& bits,bool cq_ap,bool matched_template=false,
+              double minimum_coherence=0) {
   int original=start;double original_f=frequency,best=-1;
-  for(int time=std::max(0,original-300);time<=std::min(max_start,original+300);time+=60) {
+  struct Model {int start;double frequency,score;};
+  std::vector<Model> models;
+  models.reserve(matched_template?81*201:11*201);
+  std::vector<std::complex<float>> reference;
+  if(matched_template) {
+    int tones[symbols]={};for(int k=0;k<20;++k)tones[sync_pos[k]]=sync_tone[k];
+    reference.resize(symbols*symbol_samples);
+    ft8_native::waveform(tones,symbols,symbol_samples,4,12000,float(original_f),
+        reference.data(),nullptr,true,int(reference.size()));
+  }
+  int radius=matched_template?1200:300,increment=matched_template?30:60;
+  for(int time=std::max(0,original-radius);time<=std::min(max_start,original+radius);time+=increment) {
     std::complex<double> c[20];
-    for(int k=0;k<20;++k)c[k]=correlation(data+time+sync_pos[k]*symbol_samples,original_f+5*sync_tone[k])
-       *std::polar(1.,-2*pi*original_f*sync_pos[k]/5.);
+    for(int k=0;k<20;++k) {
+      c[k]={};
+      if(matched_template) {
+        int first=(k==0||k==7||k==14)?symbol_samples/2:0;
+        int last=(k==6||k==13||k==19)?symbol_samples/2:symbol_samples;
+        for(int i=first;i<last;++i) {
+          int j=sync_pos[k]*symbol_samples+i;
+          c[k]+=double(data[time+j])*std::conj(std::complex<double>(reference[j]));
+        }
+      } else c[k]=correlation(data+time+sync_pos[k]*symbol_samples,original_f+5*sync_tone[k])
+          *std::polar(1.,-2*pi*original_f*sync_pos[k]/5.);
+    }
     for(int df=-100;df<=100;++df) {
       double offset=df*.01;std::complex<double> sum{};
       for(int k=0;k<20;++k)sum+=c[k]*std::polar(1.,-2*pi*offset*(sync_pos[k]+.5)/5.);
-      if(std::norm(sum)>best){best=std::norm(sum);start=time;frequency=original_f+offset;}
+      double score=std::norm(sum);best=std::max(best,score);
+      models.push_back({time,original_f+offset,score});
     }
   }
+  if(matched_template&&best<minimum_coherence*17*noise)return false;
+  std::stable_sort(models.begin(),models.end(),[](Model const& a,Model const& b){return a.score>b.score;});
+  std::vector<Model> tried;
+  std::vector<Model> soft_models;
+  std::vector<std::array<float,174>> soft;
+  for(auto const& model:models) {
+  if(model.score<.85*best)break;
+  bool repeated=false;for(auto const& old:tried)if(std::abs(model.frequency-old.frequency)<.08)repeated=true;
+  if(repeated)continue;
+  if(tried.size()>=size_t(depth>=3?3:1))break;
+  tried.push_back(model);
+  int trial_start=model.start;double trial_frequency=model.frequency;
   std::complex<double> sum{};
-  for(int k=0;k<20;++k)sum+=correlation(data+start+sync_pos[k]*symbol_samples,frequency+5*sync_tone[k])
-      *std::polar(1.,-2*pi*frequency*sync_pos[k]/5.);
-  if(std::abs(sum)<1e-15)return false;
+  if(matched_template) {
+    int tones[symbols]={};for(int k=0;k<20;++k)tones[sync_pos[k]]=sync_tone[k];
+    ft8_native::waveform(tones,symbols,symbol_samples,4,12000,float(trial_frequency),
+        reference.data(),nullptr,true,int(reference.size()));
+    for(int k=0;k<20;++k) {
+      int first=(k==0||k==7||k==14)?symbol_samples/2:0;
+      int last=(k==6||k==13||k==19)?symbol_samples/2:symbol_samples;
+      for(int i=first;i<last;++i) {
+        int j=sync_pos[k]*symbol_samples+i;
+        sum+=double(data[trial_start+j])*std::conj(std::complex<double>(reference[j]));
+      }
+    }
+  }
+  else for(int k=0;k<20;++k)sum+=correlation(data+trial_start+sync_pos[k]*symbol_samples,trial_frequency+5*sync_tone[k])
+       *std::polar(1.,-2*pi*trial_frequency*sync_pos[k]/5.);
+  if(std::abs(sum)<1e-15)continue;
   auto phase=std::conj(sum/std::abs(sum));
-  double amplitude=std::abs(sum)/20;
+  double amplitude=std::abs(sum)/(matched_template?17:20);
   float llr[174]={};int at=0;
   for(int s=0;s<symbols;++s)if(sync_index(s)<0) {
     double metric[16];
-    auto rotation=phase*std::polar(1.,-2*pi*frequency*s/5.);
+    auto rotation=phase*std::polar(1.,-2*pi*trial_frequency*s/5.);
     for(int w=0;w<16;++w)metric[w]=2*amplitude/(noise)
-       *std::real(correlation(data+start+s*symbol_samples,frequency+5*gray(w))*rotation);
+       *std::real(correlation(data+trial_start+s*symbol_samples,trial_frequency+5*gray(w))*rotation);
     for(int b=0;b<4;++b,++at)if(at<174) {
       double one=-1e100,zero=-1e100;
       for(int w=0;w<16;++w){double& v=(w&(1<<b))?one:zero;v=log_add(v,metric[w]);}
       llr[(43*at)%174]=float(std::max(-24.,std::min(24.,one-zero)));
     }
   }
+  std::array<float,174> saved;std::copy(llr,llr+174,saved.begin());soft.push_back(saved);soft_models.push_back(model);
   int8_t cw[174]={};int hard=-1,checks=83;float reliable[174]={};
   bool valid=ft8_native::decodeReliability(llr,bits.data(),cw,reliable,hard);
   if(!valid&&depth>=2) valid=osd(llr,depth>=3?2:1,cw,hard)||osd(reliable,depth>=3?2:1,cw,hard);
   if(valid){std::copy(cw,cw+77,bits.begin());checks=0;}
-  if(hard<0||hard>36||checks||!ft8_native::validCrc(cw)||std::none_of(cw,cw+174,[](int8_t b){return b!=0;}))return false;
+  if(hard<0||hard>36||checks||!ft8_native::validCrc(cw)||std::none_of(cw,cw+174,[](int8_t b){return b!=0;}))continue;
   int8_t encoded[174];ft8_native::encode(bits.data(),encoded);
-  return std::equal(cw,cw+174,encoded);
+  if(std::equal(cw,cw+174,encoded)){start=trial_start;frequency=trial_frequency;return true;}
+  }
+  if(cq_ap)for(size_t i=0;i<soft.size();++i)if(cq_ap_decode(soft[i].data(),depth,bits)) {
+    start=soft_models[i].start;frequency=soft_models[i].frequency;return true;
+  }
+  return false;
 }
 
 
@@ -163,13 +242,74 @@ std::vector<float> waveform(Bits const& bits,double frequency,int rate) {
   auto tones=encode_tones(bits);int n=rate/5;
   std::vector<float> wave(symbols*n);
   ft8_native::waveform(tones.data(),symbols,n,4.f,float(rate),float(frequency),nullptr,wave.data(),false,int(wave.size()));
-  for(auto& v:wave)v*=.8f;
+  // Match the unit-peak FT8 generator. Output attenuation belongs to the
+  // common audio path; a second mode-specific factor cost REIST16 1.94 dB.
   return wave;
 }
-std::vector<Decode> decode(float const* data,int count,double low,double high,int depth) {
-  if(!data||count<symbols*symbol_samples||count>180000||!std::isfinite(low)||!std::isfinite(high))return {};
-  for(int i=0;i<count;++i)if(!std::isfinite(data[i]))return {};
-  low=std::max(100.,low);high=std::min(4000.,high);if(low>high)return {};
+static double payload_support(float const* data,int count,int& start,double frequency,Bits const& bits,double& uncertainty) {
+  // Predict the data's coherent amplitude from sync symbols only. A CRC hit
+  // among overlapping stations must also be supported by the actual payload.
+  // Central samples avoid transition/ramp bias. The phase slope comes from
+  // sync. Only models close to the best sync peak are admissible; clustered
+  // sync can have ambiguous frequency/phase peaks at low SNR.
+  auto tones=encode_tones(bits);
+  std::vector<std::complex<float>> reference(symbols*symbol_samples);
+  ft8_native::waveform(tones.data(),symbols,symbol_samples,4,12000,float(frequency),
+      reference.data(),nullptr,true,int(reference.size()));
+  auto evaluate=[&]() {
+  std::complex<double> c[symbols]{};
+  for(int s=0;s<symbols;++s)for(int i=300;i<symbol_samples-300;++i) {
+    int j=s*symbol_samples+i;
+    c[s]+=double(data[start+j])*std::conj(std::complex<double>(reference[j]));
+  }
+  struct Model {double offset,drift,power;std::complex<double> sync;};
+  std::vector<Model> models;models.reserve(1701);
+  double best=-1;
+  for(int slope=-10;slope<=10;++slope)for(int df=-40;df<=40;++df) {
+    double hz=df*.0125,rate=slope*.005;std::complex<double> sum{};
+    for(int s:sync_pos) {
+      double t=(s+.5)/5.;sum+=c[s]*std::polar(1.,-2*pi*(hz*t+.5*rate*t*t));
+    }
+    double power=std::norm(sum);best=std::max(best,power);
+    models.push_back({hz,rate,power,sum});
+  }
+  double support=-1e100;
+  for(auto const& model:models) {
+  if(model.power<.85*best)continue;
+  double offset=model.offset,drift=model.drift;auto sync=model.sync;
+  std::complex<double> payload{};
+  for(int s=0;s<symbols;++s)if(sync_index(s)<0) {
+    double t=(s+.5)/5.;payload+=c[s]*std::polar(1.,-2*pi*(offset*t+.5*drift*t*t));
+  }
+  double amplitude=std::abs(sync)/20,variance=0;
+  auto phase=std::conj(sync)/std::max(std::abs(sync),1e-20);
+  for(int s:sync_pos) {
+    double t=(s+.5)/5.;
+    double v=std::real(c[s]*std::polar(1.,-2*pi*(offset*t+.5*drift*t*t))*phase)-amplitude;
+    variance+=v*v;
+  }
+  double ratio=std::real(payload*std::conj(sync))/std::max(std::norm(sync),1e-20)*20./44;
+  if(ratio>support) {
+    support=ratio;
+    uncertainty=std::sqrt(variance/17*(1./20+1./44))/std::max(amplitude,1e-20);
+  }
+  }
+  return support;
+  };
+  double support=evaluate();
+  if(support<.7&&support+3*uncertainty<.9) {
+    // An energy-based start estimate can be good enough for noncoherent
+    // decoding but not for phase comparison across different FSK tones.
+    start=refine_start(data,count,reference,start,true);
+    support=evaluate();
+  }
+  return support;
+}
+
+static std::vector<Decode> decode_pass(std::vector<float>& residual,double low,double high,int depth,
+                                     std::vector<Decode> result,int budget,int& coherent_failures,
+                                     int coherent_limit,bool cq_ap,bool& changed) {
+  float const* data=residual.data();int count=int(residual.size());
   int first=int(std::floor(low/bin_hz)),last=int(std::ceil(high/bin_hz));
   int max_start=std::min(24000,count-symbols*symbol_samples);
   int rows=(count-symbol_samples)/step+1;
@@ -191,26 +331,40 @@ std::vector<Decode> decode(float const* data,int count,double low,double high,in
     if(score>1.8&&wanted>1e-16)candidates.push_back({time*step,bin*bin_hz,score});
   }
   std::stable_sort(candidates.begin(),candidates.end(),[](Candidate const& a,Candidate const& b){return a.score>b.score;});
-  std::vector<Candidate> tried;std::vector<Decode> result;
-  int budget=depth>=3?48:depth>=2?24:12;
+  std::vector<Candidate> tried;
+  // A decoded station must not consume the budget for finding another one.
+  // Bound failed hypotheses separately so empty/noisy slots stay inexpensive.
+  int failures=0;
   for(auto const& candidate:candidates) {
     bool duplicate=false;
     for(auto const& old:tried)if(std::abs(old.frequency-candidate.frequency)<3.75&&std::abs(old.start-candidate.start)<symbol_samples)duplicate=true;
     if(duplicate)continue;
-    if(int(tried.size())>=budget||result.size()>=32)break;
+    for(auto const& old:result)if(std::abs(old.frequency-candidate.frequency)<3.75&&
+        std::abs((old.dt+start_delay)*sample_rate-candidate.start)<symbol_samples)duplicate=true;
+    if(duplicate)continue;
+    if(failures>=budget||tried.size()>=256||result.size()>=max_decodes)break;
     tried.push_back(candidate);
+    ++failures;
     int start=candidate.start;double frequency=candidate.frequency,best=-1;
-    for(int time=std::max(0,start-step);time<=std::min(max_start,candidate.start+step);time+=120)
-      for(int f=-3;f<=3;++f) {
-        double hz=candidate.frequency+f*.625,score=sync_energy(data+time,hz);
-        if(score>best){best=score;start=time;frequency=hz;}
-      }
+    // Alternate time and frequency refinement instead of evaluating their
+    // Cartesian product. The coarse FFT is already within half a 2.5-Hz bin.
+    for(int time=std::max(0,start-step);time<=std::min(max_start,candidate.start+step);time+=120) {
+      double score=sync_energy(data+time,frequency);
+      if(score>best){best=score;start=time;}
+    }
+    for(int f=-3;f<=3;++f) {
+      double hz=candidate.frequency+f*.625,score=sync_energy(data+start,hz);
+      if(score>best){best=score;frequency=hz;}
+    }
     int coarse=start;double coarse_f=frequency;
-    for(int time=std::max(0,coarse-120);time<=std::min(max_start,coarse+120);time+=30)
-      for(int f=-2;f<=2;++f) {
-        double hz=coarse_f+f*.15625,score=sync_energy(data+time,hz);
-        if(score>best){best=score;start=time;frequency=hz;}
-      }
+    for(int time=std::max(0,coarse-120);time<=std::min(max_start,coarse+120);time+=30) {
+      double score=sync_energy(data+time,frequency);
+      if(score>best){best=score;start=time;}
+    }
+    for(int f=-2;f<=2;++f) {
+      double hz=coarse_f+f*.15625,score=sync_energy(data+start,hz);
+      if(score>best){best=score;frequency=hz;}
+    }
     if(frequency<low-1||frequency>high+1)continue;
     double noise=0;int sync_hits=0;
     for(int k=0;k<20;++k) {
@@ -221,46 +375,94 @@ std::vector<Decode> decode(float const* data,int count,double low,double high,in
       }
       if(std::max_element(powers,powers+16)-powers==sync_tone[k])++sync_hits;
     }
-    // A CRC hit alone must not turn stationary interferers into a QSO.
-    if(sync_hits<7)continue;
+    // Weak sync is allowed only through the exact coherent template, with
+    // additional coherent-energy and observed data-diversity checks below.
+    bool weak_sync=sync_hits<7;
+    if(weak_sync&&(depth<3||sync_hits<5))continue;
     noise=std::max(noise/300,1e-20);
     double signal=std::max(best/20-noise,.1*noise);
-    float llr[174]={};int at=0;
+    float llr[174]={};int at=0;unsigned observed_tones=0;
     for(int s=0;s<symbols;++s)if(sync_index(s)<0) {
       double metric[16];
       for(int w=0;w<16;++w)metric[w]=log_i0(2*std::sqrt(signal*energy(data+start+s*symbol_samples,frequency+tone_spacing*gray(w)))/noise);
+      observed_tones|=1u<<gray(int(std::max_element(metric,metric+16)-metric));
       for(int b=0;b<4;++b,++at)if(at<174) {
         double one=-1e100,zero=-1e100;
         for(int w=0;w<16;++w){double& v=(w&(1<<b))?one:zero;v=log_add(v,metric[w]);}
         llr[(43*at)%174]=float(std::max(-24.,std::min(24.,one-zero)));
       }
     }
+    int diversity=0;for(unsigned mask=observed_tones;mask;mask>>=1)diversity+=mask&1u;
+    if(weak_sync&&diversity<6)continue;
     int8_t mask[174]={},cw[174]={};int hard=-1,iter=0,checks=83,maximum=60;
     Decode found{};
-    for(float scale:{1.f,.65f,1.5f}) {
+    if(!weak_sync)for(float scale:{1.f,.65f,1.5f}) {
       float scaled[174];for(int i=0;i<174;++i)scaled[i]=llr[i]*scale;
-      bpdecode174_91_(scaled,mask,&maximum,found.bits.data(),cw,&hard,&iter,&checks);
+      ft8_native::decode(scaled,mask,maximum,found.bits.data(),cw,hard,iter,checks,false);
       if(hard>=0)break;
     }
     float reliable[174]={};
-    if(hard<0)ft8_native::decodeReliability(llr,found.bits.data(),cw,reliable,hard);
-    if(hard<0&&depth>=2&&(osd(llr,depth>=3?2:1,cw,hard)||osd(reliable,depth>=3?2:1,cw,hard))){
+    if(!weak_sync&&hard<0&&ft8_native::decodeReliability(llr,found.bits.data(),cw,reliable,hard))checks=0;
+    if(!weak_sync&&hard<0&&depth>=2&&(osd(llr,depth>=3?2:1,cw,hard)||osd(reliable,depth>=3?2:1,cw,hard))){
       std::copy(cw,cw+77,found.bits.begin());checks=0;
     }
     bool valid=hard>=0&&hard<=36&&checks==0&&ft8_native::validCrc(cw)&&std::any_of(cw,cw+174,[](int8_t b){return b!=0;});
     if(valid){int8_t reencoded[174];ft8_native::encode(found.bits.data(),reencoded);valid=std::equal(cw,cw+174,reencoded);}
-    if(!valid&&tried.size()<=12)valid=coherent(data,max_start,start,frequency,noise,depth,found.bits);
+    bool used_coherent=false;
+    // If no station has been found, no cancellation pass can follow. Spend
+    // the remaining coherent budget now instead of stranding it unused.
+    int available_coherent=result.empty()?12:coherent_limit;
+    if(!valid&&coherent_failures<available_coherent) {
+      used_coherent=true;++coherent_failures;
+      if(weak_sync)valid=coherent(data,max_start,start,frequency,noise,depth,found.bits,cq_ap,true,16);
+      else {
+        valid=coherent(data,max_start,start,frequency,noise,depth,found.bits,cq_ap);
+        if(!valid&&depth>=3)valid=coherent(data,max_start,start,frequency,noise,depth,found.bits,cq_ap,true);
+      }
+    }
+    if(!valid&&!weak_sync&&cq_ap)valid=cq_ap_decode(llr,depth,found.bits);
     if(!valid)continue;
     int message_type=4*found.bits[74]+2*found.bits[75]+found.bits[76];
     if(message_type!=1&&message_type!=2)continue;
+    double uncertainty=0,support=payload_support(data,count,start,frequency,found.bits,uncertainty);
+    // Require a substantial deficit beyond the measured sync scatter before
+    // rejecting: weak/noisy or fading frames need more amplitude tolerance.
+    // This is a receiver acceptance guard, not a formal false-alarm bound.
+    if(support<.7&&support+3*uncertainty<.9)continue;
     found.frequency=frequency;found.dt=double(start)/sample_rate-start_delay;
     found.snr=std::max(-50.,std::min(49.,10*std::log10(signal/noise*5./2500)));
     found.sync=candidate.score;found.sequence=0; // no sequence or header overhead in QSO/2
     bool repeated=false;
     for(auto const& old:result)if(old.bits==found.bits&&std::abs(old.frequency-frequency)<5)repeated=true;
-    if(!repeated)result.push_back(found);
+    if(!repeated) {
+      result.push_back(found);--failures;
+      if(used_coherent)--coherent_failures;
+      // Clean the samples immediately: later candidates in this very pass
+      // can benefit, even before their synchronization spectrum is refreshed.
+      if(depth>=2)changed=subtract(residual,found)||changed;
+    }
   }
   std::sort(result.begin(),result.end(),[](Decode const& a,Decode const& b){return a.frequency<b.frequency;});
+  return result;
+}
+
+std::vector<Decode> decode(float const* data,int count,double low,double high,int depth,bool cq_ap) {
+  if(!data||count<symbols*symbol_samples||count>180000||!std::isfinite(low)||!std::isfinite(high))return {};
+  for(int i=0;i<count;++i)if(!std::isfinite(data[i]))return {};
+  low=std::max(100.,low);high=std::min(4000.,high);if(low>high)return {};
+  std::vector<float> residual(data,data+count);
+  std::vector<Decode> result;
+  int passes=depth>=3?3:depth>=2?2:1,coherent_failures=0;
+  for(int pass=0;pass<passes;++pass) {
+    size_t previous=result.size();bool changed=false;
+    // Keep the total failed-hypothesis work bounded even after cancellation.
+    int budget=depth>=3?16:12;
+    // Reserve coherent failure work for later, cleaner spectra too. Valid
+    // coherent decodes, like valid noncoherent ones, do not exhaust the search.
+    result=decode_pass(residual,low,high,depth,std::move(result),budget,coherent_failures,
+                       (pass+1)*12/passes,cq_ap,changed);
+    if(result.size()==previous||result.size()>=max_decodes||!changed)break;
+  }
   return result;
 }
 } }

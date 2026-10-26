@@ -3,7 +3,7 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $mingw = if ($env:WSJTX_MINGW_PREFIX) { $env:WSJTX_MINGW_PREFIX } else { 'C:\msys64\mingw64' }
 $env:PATH = "$mingw\bin;$env:PATH"
-$build = if ($BuildDirectory) { $BuildDirectory } else { Join-Path $root 'build-custom' }
+$build = if ($BuildDirectory) { $BuildDirectory } else { Join-Path $root 'build-custom-make' }
 $package = if ($Package) { $Package } else { Join-Path $root 'dist-custom\OE3SRO-reist16-pluto' }
 $bin = Join-Path $package 'bin'
 $data = Join-Path $package 'share\wsjtx'
@@ -39,6 +39,11 @@ Copy-Item -LiteralPath (Join-Path $root 'sounds') -Destination $bin -Recurse -Fo
 Copy-Item -LiteralPath (Join-Path $root 'COPYING') -Destination $package -Force
 Copy-Item -LiteralPath (Join-Path $root 'docs\REIST16.txt') -Destination $package -Force
 Copy-Item -LiteralPath (Join-Path $root 'docs\REIST16-QSO2.md') -Destination $package -Force
+$multisignalDocs = Join-Path $package 'validation/reist16-multisignal'
+New-Item -ItemType Directory -Force -Path $multisignalDocs | Out-Null
+Get-ChildItem -LiteralPath (Join-Path $root 'docs/validation/reist16-multisignal') -File |
+    Where-Object { $_.Extension -in @('.md','.csv','.tsv','.json','.jsonl','.txt') } |
+    Copy-Item -Destination $multisignalDocs -Force
 Copy-Item -LiteralPath (Join-Path $root 'docs\PLUTO-WSJTX.txt') -Destination $package -Force
 Copy-Item -LiteralPath (Join-Path $root 'Start-Pluto.ps1'),(Join-Path $root 'start-pluto.bat') -Destination $package -Force
 Copy-Item -LiteralPath (Join-Path $root 'Start-WebSDR.ps1'),(Join-Path $root 'start-websdr.bat'),(Join-Path $root 'docs/WEBSDR-WSJTX.txt') -Destination $package -Force
@@ -62,8 +67,14 @@ foreach ($name in @('qsqlibase.dll', 'qsqlmysql.dll', 'qsqlpsql.dll')) {
     if (Test-Path -LiteralPath $plugin) { Remove-Item -LiteralPath $plugin }
 }
 # OpenSSL is dynamically loaded by Qt and does not appear in PE imports.
-Get-ChildItem -LiteralPath "$mingw\bin" -Filter 'libssl-*.dll' | Copy-Item -Destination $bin -Force
-Get-ChildItem -LiteralPath "$mingw\bin" -Filter 'libcrypto-*.dll' | Copy-Item -Destination $bin -Force
+foreach ($source in @(Get-ChildItem -LiteralPath "$mingw\bin" -Filter 'libssl-*.dll') + @(Get-ChildItem -LiteralPath "$mingw\bin" -Filter 'libcrypto-*.dll')) {
+    $destination = Join-Path $bin $source.Name
+    # An identical DLL can be in use by the running station; no replacement
+    # is necessary. A genuinely different runtime still has to copy safely.
+    if ((Test-Path -LiteralPath $destination) -and
+        (Get-FileHash -LiteralPath $source.FullName).Hash -eq (Get-FileHash -LiteralPath $destination).Hash) { continue }
+    Copy-Item -LiteralPath $source.FullName -Destination $destination -Force
+}
 # Resolve the full PE import closure, including Qt plugins and decoder tools.
 $queue = [Collections.Generic.Queue[string]]::new()
 Get-ChildItem -LiteralPath $bin -Recurse -File | Where-Object { $_.Extension -in '.exe', '.dll' } | ForEach-Object { $queue.Enqueue($_.FullName) }

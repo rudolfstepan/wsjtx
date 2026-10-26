@@ -42,13 +42,6 @@ foreach ($package in $packages) {
     [IO.File]::WriteAllText((Join-Path $package 'build-info.json'), ($info | ConvertTo-Json), [Text.UTF8Encoding]::new($false))
     $results += [pscustomobject]@{package=$package;exeSha256=$hashes['wsjtx'];binariesVerified=$names.Count}
 }
-# Older helper commands still read top-level binaries from build-custom. Keep
-# those outputs current without running the retired local Ninja toolchain.
-$legacy = Join-Path $root 'build-custom'
-if ((Test-Path -LiteralPath $legacy) -and ([IO.Path]::GetFullPath($legacy) -ne [IO.Path]::GetFullPath($build))) {
-    foreach ($name in $names) { Copy-Item -LiteralPath (Join-Path $build "$name.exe") -Destination (Join-Path $legacy "$name.exe") -Force }
-    [IO.File]::WriteAllText((Join-Path $legacy 'CURRENT-BUILD.txt'), "Top-level production EXEs copied from $build after a complete MinGW Makefiles build on $stamp. The existing Ninja cache is retained only as historical build state.", [Text.UTF8Encoding]::new($false))
-}
 $results | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $logs 'packages.json') -Encoding UTF8
 Write-Output "All $($results.Count) packages updated; all $($names.Count) production binaries per package match the clean build."
 Write-Output "EXE SHA256: $($hashes['wsjtx'])"

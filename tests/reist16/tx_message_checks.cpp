@@ -1,4 +1,5 @@
 #include "lib/reist16/tx_message.hpp"
+#include "lib/reist16/qso2.hpp"
 #include <QApplication>
 #include <QComboBox>
 #include <iostream>
@@ -9,6 +10,12 @@ int main (int argc, char** argv)
   qputenv ("QT_QPA_PLATFORM", "offscreen");
   QApplication app (argc, argv);
   try {
+    for(int frequency=0;frequency<=5000;++frequency) {
+      int offset=reist16::qso2::split_offset(frequency);
+      int audio=frequency-offset;
+      check(audio>=1500 && audio+reist16::qso2::tone_span<=2000,"All REIST16 split tones inside filter centre");
+      check(14000000+offset+audio==14000000+frequency,"Split must preserve RF frequency");
+    }
     for (QString message : {"CQ OE3SRO JN88", "CQ TEST OE3SRO JN88", "CQ DX OE3SRO JN88",
          "OE3SRO DL1ABC JO31", "DL1ABC OE3SRO -12", "OE3SRO DL1ABC R-10",
          "DL1ABC OE3SRO RR73", "OE3SRO DL1ABC 73"})

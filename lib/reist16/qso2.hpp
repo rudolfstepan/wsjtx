@@ -8,6 +8,12 @@ constexpr int tx_samples = 614400;
 constexpr double frame_seconds = 12.8;
 constexpr double tone_spacing = 5.;
 constexpr double tone_span = 75.;
+constexpr int default_tx_frequency = 1000;
+// In split mode all 16 tone centres fit inside 1500..2000 Hz, even at
+// the upper end of a tuning step. The RF position remains unchanged.
+constexpr int split_offset(int requested_frequency) {
+  return (requested_frequency / 250) * 250 - 1500;
+}
 // Live receiver FFT cadence is independent of the 2400-sample wire symbols.
 // Receive-only monitoring can spend the reply budget on delayed WebSDR audio.
 // Keep the earlier start in transceive mode for decoding and automatic replies.
@@ -21,7 +27,8 @@ constexpr int capture_half_symbols(bool receive_only) {
 }
 std::vector<int> encode_tones(Bits const& bits);
 std::vector<float> waveform(Bits const& bits, double frequency, int rate = 48000);
-std::vector<Decode> decode(float const*, int count, double low, double high, int depth = 1);
+std::vector<Decode> decode(float const*, int count, double low, double high, int depth = 1,
+                           bool cq_ap = true);
 } }
 extern "C" int reist16_qso2_encode(int8_t const*, int sequence, float frequency, float*, int capacity);
 #endif

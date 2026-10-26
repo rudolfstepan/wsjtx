@@ -8,7 +8,7 @@ $package = if ($Package) { $Package } else { Join-Path $root 'dist-custom\OE3SRO
 $output = Join-Path $root '.local\windows-artifacts'
 $exe = Join-Path $package 'bin\wsjtx.exe'
 if (!(Test-Path -LiteralPath $exe)) { throw 'Run Package-Custom.ps1 first.' }
-if ((Get-FileHash -LiteralPath $exe).Hash -ne (Get-FileHash -LiteralPath "$root\build-custom\wsjtx.exe").Hash) {
+if ((Get-FileHash -LiteralPath $exe).Hash -ne (Get-FileHash -LiteralPath "$root\build-custom-make\wsjtx.exe").Hash) {
     throw 'Packaged EXE does not match the build output.'
 }
 $commit = (& git -C $root rev-parse HEAD | Out-String).Trim()
@@ -60,6 +60,8 @@ Copy-Item -LiteralPath "$root\docs\HACKRF-WSJTX.txt" -Destination $docs -Force
 Copy-Item -LiteralPath "$root\docs\WEBSDR-WSJTX.txt" -Destination $docs -Force
 Copy-Item -LiteralPath "$root\docs\WEB-CONTROL.txt" -Destination $docs -Force
 Copy-Item -LiteralPath "$root\docs\releases" -Destination $docs -Recurse -Force
+New-Item -ItemType Directory -Force -Path "$docs\validation" | Out-Null
+Copy-Item -LiteralPath "$root\docs\validation\reist16-multisignal" -Destination "$docs\validation" -Recurse -Force
 Copy-Item -LiteralPath "$root\docs\WINDOWS-QUICKSTART.html" -Destination "$docs\index.html" -Force
 New-Item -ItemType Directory -Force -Path "$docs\images" | Out-Null
 Copy-Item -LiteralPath "$root\docs\images\ft2-qso-oe3sro-og5o-2026-10-16.png" -Destination "$docs\images" -Force

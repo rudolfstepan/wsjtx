@@ -1,6 +1,6 @@
 # REIST16 — experimentelle Betriebsart / experimental mode
 
-**build by OE3SRO · Stand / updated: 2026-10-24 · Release 3.0.2-oe3sro.5**
+**build by OE3SRO · Stand / updated: 2026-10-26 · lokale Erweiterung nach / local extension after 3.0.2-oe3sro.6**
 
 [Deutsch](../README.md) · [English](../README.en.md) · [Profilvertrag / protocol](REIST16.txt) · [Pluto](PLUTO-WSJTX.txt)
 
@@ -48,6 +48,24 @@ Supported structured messages use pack77 types 1 and 2, including supported
 outside this profile. PSK Reporter spotting is disabled for REIST16.
 
 ## Aktueller Stand: QSO/2
+
+Die lokale Empfängererweiterung vom 26. Oktober erhöht die Ausgabe auf 200
+Nachrichten je Slot und ergänzt ab Tiefe 2 Signalabtrennung mit erneuter
+Suche. Für dichte Belegung Tiefe 3 wählen. In Offline-Mischungen wurden
+48 gleichzeitige Stationen bei 50 Hz Abstand dekodiert. Das Funkformat ist
+unverändert; die endlichen Tests belegen keine allgemeine FT8-Gleichwertigkeit.
+[Änderungen und Messbelege](validation/reist16-multisignal/IMPROVEMENTS.md).
+
+Der anschließende [Schwachsignal-Ausbau](validation/reist16-multisignal/WEAK-UPGRADE.md)
+ergänzt weitere kohärente Hypothesen, eine GFSK-Syncreferenz und abschaltbares
+CQ-AP. Im unabhängigen gemischten −22-dB-Test verbessert sich das Ergebnis
+von 7/16 auf 11/16 Nachrichten. Allgemeine FT8-Gleichwertigkeit bleibt offen.
+
+The local receiver extension dated 26 October raises output capacity to 200
+messages per slot and adds signal cancellation and repeated search at depth
+2/3. Use depth 3 for dense reception. Offline mixtures recovered 48 stations
+at 50 Hz spacing. The wire format is unchanged; these finite tests do not
+establish general RF equivalence to FT8. See the linked validation report.
 
 Dieser Build sendet **QSO/2**: 12,8 s Signalzeit, 15-s-UTC-Slots, 16-GFSK,
 5 Hz Tonabstand, 77 Informationsbits und LDPC(174,91) mit CRC14.

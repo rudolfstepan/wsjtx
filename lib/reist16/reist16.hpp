@@ -12,6 +12,8 @@ constexpr int symbol_samples = 960;
 constexpr int symbols = 120;
 constexpr int tx_samples = 460800; // 48 kHz, including two silent symbols
 constexpr int mode_id = 116;
+// Shared receive capacity; keep decode_reist16's Fortran arrays in step.
+constexpr int max_decodes = 200;
 constexpr uint32_t profile_tag = 0x31515352; // little-endian "RSQ1"
 constexpr double period = 15.0;
 constexpr double start_delay = 0.5;
@@ -36,5 +38,7 @@ extern "C" {
 int reist16_encode(int8_t const* bits, int sequence, float frequency, float* output, int capacity);
 int reist16_decode(int16_t const* samples, int count, int low, int high, int depth,
                    int8_t* bits, float* frequencies, float* times, float* snrs, int capacity);
+int reist16_decode_ex(int16_t const* samples, int count, int low, int high, int depth,
+                   int8_t* bits, float* frequencies, float* times, float* snrs, int capacity, int cq_ap);
 }
 #endif

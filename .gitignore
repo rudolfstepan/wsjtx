@@ -56,3 +56,6 @@ CLAUDE.md
 # Private 12 m measurement campaign (original audio and analysis).
 /samples/REIST16-QSO-2/*12m-20261025.*
 /samples/REIST16-QSO-2/websdr_recording_2026-10-25T*_24986.3kHz.wav
+
+# Private WebSDR reception and diagnostic recordings from 26 October 2026.
+/samples/REIST16-QSO-2/websdr_recording_2026-10-26T*.wav

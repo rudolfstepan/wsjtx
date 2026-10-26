@@ -1,0 +1,24 @@
+PASS REIST16 CQ TEST/QSO preflight, unsupported text rejection, 37-character entry limits, mode restoration and PTT-aware TX indication. No radio/audio opened.
+PASS delayed noisy frames: old 0/6, extended 6/6
+PASS QSO/2 wire mapping, 12 clean edge/start round trips, 12/48 kHz, ABI and bounds
+PASS nine arbitrary-phase reconstructions, frequency/timing errors, >=15 dB suppression and bounds
+PASS 40 stations at depth 1, equal payload on two frequencies, legacy/small ABI capacities and canaries
+PASS four concurrent C-ABI receivers with independent frequency ranges
+PASS 48 overlapping standard CQs at -18 dB, 50 Hz spacing, two seeds, live and full capture, no foreign payloads
+PASS exact Gaussian sync reference is independent of unknown payload symbols
+PASS REIST16: 8 weak-signal frames, 3 simultaneous stations, frequency/DT/SNR, bounds and negative controls; 3.88921 s
+ PASS REIST16: six QSO waveforms and unsupported-message rejection.
+Live IPC slot 0, start 0.5 s, capture 13.824 s, depth 3, worker 523 ms
+Live IPC slot 1, start -8.33333e-05 s, capture 13.824 s, depth 3, worker 46 ms
+Live IPC slot 2, start 1.1 s, capture 14.4 s, depth 3, worker 466 ms
+Live IPC slot 3, start 1.3 s, capture 14.4 s, depth 3, worker 468 ms
+Live IPC slot 4, start 1.5 s, capture 14.4 s, depth 3, worker 466 ms
+Live IPC slot 5, start 0.5 s, capture 13.824 s, depth 3, worker 467 ms
+PASS REIST16: mode IDs, UTC parity, 7 production PCM round trips, QSO parser, live IPC worker lifecycle.
+Negative slots 32/128, no false decodes
+Negative slots 64/128, no false decodes
+Negative slots 96/128, no false decodes
+Negative slots 128/128, no false decodes
+Channel measurement: 5/8 phase/drift/fading frames exact. PASS 128 noise/interference slots, 3 mixed-profile stations
+
+Separat bestandener Guard-Test: reist16_weak_checks --unit; acht CQ TEST/RST, portable CQ und QSO-Frames bei -18/-24 dB, keine CQ-Ersetzungen; starke Frames erhalten.

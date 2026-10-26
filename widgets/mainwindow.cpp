@@ -1694,6 +1694,7 @@ void MainWindow::writeSettings()
   m_settings->setValue("pwrBandTxMemory",m_pwrBandTxMemory);
   m_settings->setValue("pwrBandTuneMemory",m_pwrBandTuneMemory);
   m_settings->setValue ("FT8AP", ui->actionEnable_AP_FT8->isChecked ());
+  m_settings->setValue ("REIST16AP", ui->actionEnable_AP_REIST16->isChecked ());
   m_settings->setValue ("JT65AP", ui->actionEnable_AP_JT65->isChecked ());
   m_settings->setValue ("AutoClearAvg", ui->actionAuto_Clear_Avg->isChecked ());
   m_settings->setValue ("DisableClicksOnWaterfall", ui->actionDisable_clicks_on_waterfall->isChecked ());
@@ -2124,6 +2125,7 @@ void MainWindow::readSettings()
   m_pwrBandTxMemory=m_settings->value("pwrBandTxMemory").toHash();
   m_pwrBandTuneMemory=m_settings->value("pwrBandTuneMemory").toHash();
   ui->actionEnable_AP_FT8->setChecked (m_settings->value ("FT8AP", false).toBool());
+  ui->actionEnable_AP_REIST16->setChecked (m_settings->value ("REIST16AP", true).toBool());
   ui->actionEnable_AP_JT65->setChecked (m_settings->value ("JT65AP", false).toBool());
   ui->actionAuto_Clear_Avg->setChecked (m_settings->value ("AutoClearAvg", false).toBool());
   ui->actionDisable_clicks_on_waterfall->setChecked (m_settings->value ("DisableClicksOnWaterfall", false).toBool());
@@ -5604,6 +5606,7 @@ void MainWindow::decode()                                       //decode()
   }
   if(m_mode=="FT8") dec_data.params.nmode=8;
   if(m_mode=="REIST16") dec_data.params.nmode=116;
+  if(m_mode=="REIST16") dec_data.params.lft8apon=ui->actionEnable_AP_REIST16->isChecked();
   if(m_mode=="FT8") dec_data.params.lft8apon = ui->actionEnable_AP_FT8->isVisible () &&
       ui->actionEnable_AP_FT8->isChecked ();
   if(m_mode=="FT8") dec_data.params.napwid=50;
@@ -11162,6 +11165,8 @@ void MainWindow::on_actionREIST16_triggered()
   ui->cbAutoSeq->setEnabled(true);
   ui->tx1->setEnabled(true);
   ui->txb1->setEnabled(true);
+  ui->TxFreqSpinBox->setValue(reist16::qso2::default_tx_frequency);
+  setXIT(ui->TxFreqSpinBox->value());
   statusChanged();
   monitor(wasMonitoring);
 }
@@ -12003,6 +12008,7 @@ void MainWindow::on_actionFreqCal_triggered()
 
 void MainWindow::switch_mode (Mode mode)
 {
+  ui->actionEnable_AP_REIST16->setVisible(mode==Modes::REIST16);
   for (auto field : {ui->tx1, ui->tx2, ui->tx3, ui->tx4, ui->tx5->lineEdit (), ui->tx6})
     reist16::setMessageLimit (field, mode==Modes::REIST16);
   no_a7_decodes = true;  // Don't allow a7 decodes during the first period because they can be leftovers from the previous mode
@@ -12718,7 +12724,9 @@ void MainWindow::setXIT(int n, Frequency base)
     if (m_config.split_mode () && (!m_config.enable_VHF_features () ||
         isFT4Family() || m_mode == "FT8" || m_mode == "REIST16" || m_mode=="FST4")) {
       // Don't use XIT for VHF & up
-      m_XIT=(n/500)*500 - 1500;
+      // REIST16 spans 75 Hz; 250-Hz steps keep every tone centre in
+      // 1500..2000 Hz, including selections at the top of a tuning step.
+      m_XIT=m_mode=="REIST16" ? reist16::qso2::split_offset(n) : (n/500)*500 - 1500;
     }
 
     if ((m_monitoring || m_transmitting)

@@ -10,9 +10,9 @@ import subprocess
 import zipfile
 
 root=Path(__file__).resolve().parents[1]
-out=root/'build-custom/ft8-threshold-comparison'
+out=root/'build-custom-make/ft8-threshold-comparison'
 out.mkdir(exist_ok=False)
-build=root/'build-custom'
+build=root/'build-custom-make'
 prefix=Path(os.environ.get('WSJTX_MINGW_PREFIX',r'C:\msys64\mingw64'))
 env=dict(os.environ,PATH=str(prefix/'bin')+os.pathsep+os.environ['PATH'],OMP_NUM_THREADS='4')
 # Share the exact WAV/quantization/noise convention of the preceding QSO/2 set.
@@ -38,9 +38,9 @@ int main(){try{
  }catch(std::exception const& e){std::cerr<<e.what()<<std::endl;return 1;}return 0;}
 '''
 (out/'generate.cpp').write_text(source,encoding='utf-8')
-text=(build/'build.ninja').read_text()
-section=text.split('build reist16_qso2_checks.exe:',1)[1].split('\n\n',1)[0]
-libraries=next(line.split('=',1)[1].strip() for line in section.splitlines() if line.strip().startswith('LINK_LIBRARIES ='))
+libraries=(build/'CMakeFiles/reist16_qso2_checks.dir/linkLibs.rsp').read_text().strip()
+if not (build/'libwsjt_fort.a').exists():
+    libraries=libraries.replace('libwsjt_fort.a','libwsjt_fort_omp.a')
 subprocess.run([str(prefix/'bin/g++.exe'),'-std=c++11','-O3','-fopenmp','-I'+str(root),str(out/'generate.cpp'),'-o',str(out/'generate.exe'),*shlex.split(libraries)],cwd=build,env=env,check=True)
 subprocess.run([str(out/'generate.exe')],cwd=out,env=env,check=True)
 rows=[json.loads(line) for line in (out/'generated.jsonl').read_text().splitlines()]

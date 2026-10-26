@@ -12,8 +12,8 @@ $previousPrefix = $env:MSYSTEM_PREFIX
 try {
     $env:PATH = "$mingw\bin;$env:PATH"
     $env:MSYSTEM_PREFIX = $mingw.Replace('\', '/')
-    $audioBuild = Join-Path $root 'build-custom\txaudio-checks'
-    & "$mingw\bin\cmake.exe" -S "$root/tests/txaudio" -B $audioBuild -G Ninja "-DCMAKE_PREFIX_PATH=$mingw"
+    $audioBuild = Join-Path $root 'build-custom-make\txaudio-checks'
+    & "$mingw\bin\cmake.exe" -S "$root/tests/txaudio" -B $audioBuild -G "MinGW Makefiles" "-DCMAKE_PREFIX_PATH=$mingw"
     if ($LASTEXITCODE) { throw 'TX audio test configuration failed.' }
     & "$mingw\bin\cmake.exe" --build $audioBuild --parallel 4
     if ($LASTEXITCODE) { throw 'TX audio test build failed.' }
@@ -26,7 +26,7 @@ try {
         if ($testExit) { throw 'TX audio regression tests failed.' }
     } finally { Pop-Location }
     if ($AudioOnly) { return }
-    $build = Join-Path $root 'build-custom'
+    $build = Join-Path $root 'build-custom-make'
     & "$mingw\bin\cmake.exe" --build $build --target ft8_wave_checks ft8_native_checks ft8_reference_decoder jt9 --parallel 6
     if ($LASTEXITCODE) { throw 'FT8 waveform test build failed.' }
     $work = Join-Path $root '.local\ft8-tx-checks'

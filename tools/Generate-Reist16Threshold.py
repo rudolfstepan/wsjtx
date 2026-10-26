@@ -9,18 +9,18 @@ import subprocess
 
 root=Path(__file__).resolve().parents[1]
 parser=argparse.ArgumentParser()
-parser.add_argument('--output',default='build-custom/reist16-threshold-minus89db')
+parser.add_argument('--output',default='build-custom-make/reist16-threshold-minus89db')
 args=parser.parse_args()
 out=(root/args.output).resolve()
-if not out.is_relative_to((root/'build-custom').resolve()):
-    raise SystemExit('Output must be under build-custom')
+if not out.is_relative_to((root/'build-custom-make').resolve()):
+    raise SystemExit('Output must be under build-custom-make')
 out.mkdir(parents=True,exist_ok=False)
-build=root/'build-custom'
+build=root/'build-custom-make'
 prefix=Path(os.environ.get('WSJTX_MINGW_PREFIX',r'C:\msys64\mingw64'))
 env=dict(os.environ,PATH=str(prefix/'bin')+os.pathsep+os.environ['PATH'],OMP_NUM_THREADS='4')
-text=(build/'build.ninja').read_text()
-section=text.split('build reist16_qso2_checks.exe:',1)[1].split('\n\n',1)[0]
-libraries=next(line.split('=',1)[1].strip() for line in section.splitlines() if line.strip().startswith('LINK_LIBRARIES ='))
+libraries=(build/'CMakeFiles/reist16_qso2_checks.dir/linkLibs.rsp').read_text().strip()
+if not (build/'libwsjt_fort.a').exists():
+    libraries=libraries.replace('libwsjt_fort.a','libwsjt_fort_omp.a')
 command=[str(prefix/'bin/g++.exe'),'-std=c++11','-O3','-fopenmp','-I'+str(root),str(root/'tools/Generate-Reist16Threshold.cpp'),'-o',str(out/'generate.exe'),*shlex.split(libraries)]
 subprocess.run(command,cwd=build,env=env,check=True)
 with (out/'generator.log').open('w') as log:

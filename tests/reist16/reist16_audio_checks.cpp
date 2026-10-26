@@ -1,5 +1,6 @@
 #include "lib/reist16/qso2.hpp"
 #include "lib/reist16/qso_address.hpp"
+#include "lib/ft8/native/ft8_wave.hpp"
 #include "Modulator/Modulator.hpp"
 #include "Audio/soundout.h"
 #include "Decoder/decodedtext.h"
@@ -27,6 +28,7 @@ BOOST_LOG_GLOBAL_LOGGER_CTOR_ARGS(sys,
 extern "C" {
   decltype(foxcom_) foxcom_;
   void gen_reist16_(char*,char*,float*,int*,float*,int*,fortran_charlen_t,fortran_charlen_t);
+  void genft8_(char*,int*,int*,char*,char*,int*,fortran_charlen_t,fortran_charlen_t);
 }
 int volatile itone[250]={};
 int volatile icw[250]={};
@@ -64,6 +66,42 @@ int main(int argc,char**argv) {
     int sequence=731,ok=0;
     gen_reist16_(message.data(),sent.data(),&frequency,&sequence,wave.data(),&ok,37,37);
     check(ok==1 && sent==message,"Fortran QSO encoder");
+    // Compare actual PCM after the common modulator, including lower audio
+    // frequencies. This catches both hidden gain factors and int16 overflow.
+    char packed[77]; int ft8Tones[79],i3=0,n3=0;
+    genft8_(message.data(),&i3,&n3,sent.data(),packed,ft8Tones,37,37);
+    for(float base : {500.f,1000.f,1500.375f,2000.f}) {
+      double rms[2]={};
+      for(int mode=0;mode<2;++mode) {
+        int length=mode?79*7680:reist16::qso2::tx_samples;
+        QVector<float> frame(length);
+        if(mode) ft8_native::waveform(ft8Tones,79,7680,2,48000,base,nullptr,frame.data(),false,length);
+        else gen_reist16_(message.data(),sent.data(),&base,&sequence,frame.data(),&ok,37,37);
+        check(mode||ok==1,"lower-tone production encoder");
+        double peak=0;
+        for(float v:frame) {check(std::isfinite(v)&&std::abs(v)<=1,"bounded TX waveform");peak=std::max(peak,double(std::abs(v)));}
+        check(peak>.999,"TX uses full digital peak range");
+        MemoryOutput output; TestModulator modulator; modulator.now=500;
+        modulator.setWaveform(frame);
+        modulator.start(mode?"FT8":"REIST16",mode?79:64,mode?1920.:2400.,base,
+                        mode?-3.:-4.,&output,AudioDevice::Mono,true,false,99.,15.);
+        QByteArray pcm;while(true){auto block=modulator.read(4096);if(block.isEmpty())break;pcm+=block;}
+        check(pcm.size()==2*length,"TX PCM exact length");
+        auto samples=reinterpret_cast<int16_t const*>(pcm.constData());
+        double power=0;
+        // Ignore the different endpoint ramps; compare the active envelope.
+        for(int i=4800;i<length-4800;++i) {
+          int expected=int(std::lround(32767.*frame[i]));
+          check(std::abs(int(samples[i])-expected)<=1,"TX PCM preserves waveform without wrap or clipping");
+          power+=double(samples[i])*samples[i];
+        }
+        rms[mode]=std::sqrt(power/(length-9600))/32767.;
+      }
+      double difference=20*std::log10(rms[0]/rms[1]);
+      check(std::abs(difference)<.01,"REIST16/FT8 active PCM RMS parity");
+      std::cout<<"TX "<<base<<" Hz REIST16/FT8 RMS "<<rms[0]<<" / "<<rms[1]
+               <<" delta_dB "<<difference<<std::endl;
+    }
     for(qint64 now : {0LL,300LL,500LL,800LL,1000LL,15000LL,30500LL}) {
       MemoryOutput output;
       TestModulator modulator;
@@ -181,6 +219,7 @@ int main(int argc,char**argv) {
       int captureHalfSymbols=reist16::qso2::capture_half_symbols(monitorOnly);
       int captureSamples=captureHalfSymbols*reist16::qso2::rx_block_samples;
       shared->params.kin=captureSamples;
+      shared->params.lft8apon=slot%2==0; // Exercise both REIST16 AP states through IPC.
       shared->params.nzhsym=captureHalfSymbols;
       std::fill(shared->d2,shared->d2+180000,0);
       if(starts[slot]>=0) {

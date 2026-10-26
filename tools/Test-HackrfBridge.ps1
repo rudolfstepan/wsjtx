@@ -1,7 +1,7 @@
 param([switch]$SkipBuild,[string]$BuildDirectory = '')
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot -Parent
-$build=if($BuildDirectory){$BuildDirectory}else{Join-Path $root 'build-custom'}
+$build=if($BuildDirectory){$BuildDirectory}else{Join-Path $root 'build-custom-make'}
 $mingw=if($env:WSJTX_MINGW_PREFIX){$env:WSJTX_MINGW_PREFIX}else{'C:\msys64\mingw64'}
 $previousPath=$env:PATH
 try{

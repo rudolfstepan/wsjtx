@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'Existing release tag (oe3sro-vX.Y.Z-N); leave empty for a build only'
+        description: 'Existing release tag (oe3sro-vX.Y.Z-N[-rcM]); leave empty for a build only'
         required: false
         type: string
 
@@ -24,6 +24,7 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
       release_tag: ${{ steps.version.outputs.release_tag }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
       commit: ${{ steps.version.outputs.commit }}
     runs-on: windows-2022
     timeout-minutes: 60
@@ -51,13 +52,18 @@ jobs:
           if ($LASTEXITCODE) { throw 'Cannot read source revision.' }
           $version = "$($match.Groups[1].Value)-devel-$commit-build$env:GITHUB_RUN_NUMBER.$env:GITHUB_RUN_ATTEMPT"
           $releaseTag = $env:REQUESTED_RELEASE_TAG
+          $prerelease = 'false'
           if (!$releaseTag -and $env:GITHUB_REF_TYPE -eq 'tag' -and $env:GITHUB_REF_NAME.StartsWith('oe3sro-v')) {
             $releaseTag = $env:GITHUB_REF_NAME
           }
           if ($releaseTag) {
-            $tag = [regex]::Match($releaseTag, '^oe3sro-v(\d+\.\d+\.\d+)-([1-9]\d*)$')
-            if (!$tag.Success -or $tag.Groups[1].Value -ne $match.Groups[1].Value) { throw 'Release tag must match oe3sro-vX.Y.Z-N and the CMake version.' }
+            $tag = [regex]::Match($releaseTag, '^oe3sro-v(\d+\.\d+\.\d+)-([1-9]\d*)(?:-rc([1-9]\d*))?$')
+            if (!$tag.Success -or $tag.Groups[1].Value -ne $match.Groups[1].Value) { throw 'Release tag must match oe3sro-vX.Y.Z-N[-rcM] and the CMake version.' }
             $version = "$($tag.Groups[1].Value)-oe3sro.$($tag.Groups[2].Value)"
+            if ($tag.Groups[3].Success) {
+              $version += "-rc$($tag.Groups[3].Value)"
+              $prerelease = 'true'
+            }
             $tagCommit = (git rev-parse "refs/tags/$releaseTag^{commit}").Trim()
             if ($LASTEXITCODE -or $tagCommit -ne (git rev-parse HEAD).Trim()) { throw 'Release must build the existing tag commit.' }
             $notes = "docs/releases/$version.md"
@@ -67,6 +73,7 @@ jobs:
           }
           "version=$version" >> $env:GITHUB_OUTPUT
           "release_tag=$releaseTag" >> $env:GITHUB_OUTPUT
+          "prerelease=$prerelease" >> $env:GITHUB_OUTPUT
           "commit=$((git rev-parse HEAD).Trim())" >> $env:GITHUB_OUTPUT
 
       - name: Install UCRT64 and Qt dependencies
@@ -80,6 +87,7 @@ jobs:
             mingw-w64-ucrt-x86_64-gcc
             mingw-w64-ucrt-x86_64-gcc-fortran
             mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-make
             mingw-w64-ucrt-x86_64-ninja
             mingw-w64-ucrt-x86_64-qt5-base
             mingw-w64-ucrt-x86_64-qt5-multimedia
@@ -198,6 +206,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ needs.windows.outputs.release_tag }}
           RELEASE_VERSION: ${{ needs.windows.outputs.version }}
+          RELEASE_PRERELEASE: ${{ needs.windows.outputs.prerelease }}
         run: |
           set -euo pipefail
           notes="docs/releases/${RELEASE_VERSION}.md"
@@ -216,8 +225,12 @@ jobs:
             fi
           else
             gh release create "$RELEASE_TAG" --verify-tag --draft \
+              --prerelease="$RELEASE_PRERELEASE" \
               --title "WSJT-X OE3SRO Custom ${RELEASE_VERSION}" --notes-file "$notes"
           fi
           gh release upload "$RELEASE_TAG" release-assets/*.zip release-assets/*.sha256 --clobber
-          gh release edit "$RELEASE_TAG" --draft=false --latest \
+          latest=true
+          if [ "$RELEASE_PRERELEASE" = true ]; then latest=false; fi
+          gh release edit "$RELEASE_TAG" --draft=false --latest="$latest" \
+            --prerelease="$RELEASE_PRERELEASE" \
             --title "WSJT-X OE3SRO Custom ${RELEASE_VERSION}" --notes-file "$notes"

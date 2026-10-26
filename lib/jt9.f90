@@ -32,8 +32,9 @@ program jt9
   logical :: read_files = .true., tx9 = .false., display_help = .false.,     &
        bLowSidelobes = .false., nexp_decode_set = .false.,                   &
        have_ntol = .false.,multift8 = .false.,hidedupes = .false.,           &
-       lft8lowth = .true.,lft8subpass = .true.,lwidedxcsearch = .true.
-  type (option) :: long_options(43) = [                                      &
+       lft8lowth = .true.,lft8subpass = .true.,lwidedxcsearch = .true.,       &
+       reist16_ap = .true.
+  type (option) :: long_options(44) = [                                      &
     option ('help', .false., 'h', 'Display this help message', ''),          &
     option ('shmem',.true.,'s','Use shared memory for sample data','KEY'),   &
     option ('tr-period', .true., 'p', 'Tx/Rx period, default SECONDS=60',    &
@@ -85,6 +86,7 @@ program jt9
     option ('jt4', .false., '4', 'JT4 mode', ''),                            &
     option ('ft2', .false., '2', 'FT2 mode (3.75-second periods)', ''),      &
     option ('reist16', .false., 'I', 'REIST16 QSO mode (15-second periods)', ''), &
+    option ('no-reist16-ap', .false., 'B', 'Disable REIST16 CQ a-priori decoding', ''), &
     option ('ft4', .false., '5', 'FT4 mode', ''),                            &
     option ('jt65', .false.,'6', 'JT65 mode', ''),                           &
     option ('fst4', .false., '7', 'FST4 mode', ''),                          &
@@ -121,7 +123,7 @@ program jt9
   TRperiod=60.d0
 
   do
-     call getopt('hs:e:a:b:r:m:p:d:f:F:w:t:98765432IWYqkTMUSZL:S:H:c:G:x:g:X:Q:C:R:N:E:D:',     &
+     call getopt('hs:e:a:b:r:m:p:d:f:F:w:t:98765432IBWYqkTMUSZL:S:H:c:G:x:g:X:Q:C:R:N:E:D:',     &
           long_options,c,optarg,arglen,stat,offset,remain,.true.)
      if (stat .ne. 0) then
         exit
@@ -220,6 +222,8 @@ program jt9
         case ('X')
            read (optarg(:arglen), *) nexp_decode
            nexp_decode_set = .true.
+        case ('B')
+           reist16_ap = .false.
      end select
   end do
   
@@ -359,6 +363,7 @@ program jt9
      shared_data%params%nzhsym=nhsym
      shared_data%params%ndepth=ndepth
      shared_data%params%lft8apon=.true.
+     if(mode.eq.116) shared_data%params%lft8apon=reist16_ap
      shared_data%params%ljt65apon=.true.
      shared_data%params%napwid=75
      shared_data%params%dttol=3.

@@ -1,6 +1,6 @@
 # REIST16-QSO/2 — 15-Sekunden-Weak-Signal-Profil
 
-Stand: 24. Oktober 2026 · Release 3.0.2-oe3sro.5 · build by OE3SRO
+Stand: 26. Oktober 2026 · Release Candidate 3.0.2-oe3sro.7-rc1 · build by OE3SRO
 
 Unter **Mode → REIST16** sendet dieser Stand QSO/2. Ein kompletter Rahmen
 dauert 12,8 s und enthält eine Standardnachricht mit 77 Informationsbits.
@@ -25,6 +25,27 @@ FT8 bleibt eine getrennte Betriebsart.
 Bandbreite. Die Gauß-Pulsform hat BT=4; die Hüllkurve wird an beiden Enden
 über 25 ms ein-/ausgeblendet. Der unterste Audioton ist zwischen 100 und
 4000 Hz einstellbar. Ein üblicher SSB-Audioweg muss alle Töne durchlassen.
+
+Beim Auswählen von REIST16 wird **Tx 1000 Hz** voreingestellt; danach bleibt
+der Sendeplatz frei wählbar. Mit **Settings → Radio → Split Operation → Rig**
+oder **Fake It** wird die Audioausgabe automatisch in die Filtermitte gelegt.
+REIST16 verwendet dafür 250-Hz-Schritte: der unterste ausgegebene Ton liegt
+bei 1500–1749 Hz, der oberste höchstens bei 1824 Hz. Alle Tonmitten liegen
+damit innerhalb von 1500–2000 Hz; die gewählte HF-Frequenz bleibt erhalten.
+Die Grenzen bezeichnen Tonmitten, keine harte Begrenzung des Spektrums.
+Ohne Split wird die gewählte Audiofrequenz direkt ausgegeben. Tiefere Töne
+sind kein allgemeiner Ausbreitungsvorteil auf KW; entscheidend ist auch der
+Durchlassbereich des jeweiligen Audio-/SSB-Filters. Die Filtermitte dient
+hier dazu, Audiooberwellen außerhalb des Sendefilters zu halten; siehe das
+[WSJT-X-Handbuch, Split Operation](https://wsjt.sourceforge.io/wsjtx-main_en.html#RADIO).
+
+Der QSO/2-Sender nutzt jetzt dieselbe digitale Spitzenaussteuerung wie FT8.
+Der bisherige zusätzliche Faktor 0,8 entfällt. Bei gleicher nachgeschalteter
+Pegelstellung erhöht dies die Audioamplitude um den Faktor 1,25 bzw. etwa
+1,94 dB. Die gemeinsame Ausgangsdämpfung bleibt einstellbar. Das ist eine
+Pegelkorrektur am Sender, kein Gewinn an Decoderempfindlichkeit bei gleichem
+Empfangs-SNR und keine gemessene Erhöhung der HF-Leistung. Nach dem Update
+den realen Senderpegel und ALC neu kontrollieren.
 
 Neue PTT-Anforderungen bleiben auf die ersten 300 ms des zugewiesenen Slots
 beschränkt. Audio darf bis +1,000 s beginnen: der Rahmen endet dann bei
@@ -68,9 +89,12 @@ Das bisherige QSO/1-Kanalformat bleibt für den Empfang erhalten.
 ## Empfänger
 
 Die Suche verwendet die über den Rahmen verteilte Synchronisation.
-Mindestens sieben von zwanzig bekannten Tönen müssen jeweils der stärkste
-der sechzehn Töne sein. Dies verhindert, dass eine zufällige CRC-Übereinstimmung
-unter stationären Störträgern allein als Signal akzeptiert wird.
+Im normalen Pfad müssen mindestens sieben von zwanzig bekannten Tönen jeweils
+der stärkste der sechzehn Töne sein. Tiefe 3 ergänzt einen schwächeren Pfad
+mit fünf oder sechs Treffern, der zusätzlich eine genaue GFSK-Syncreferenz,
+Mindest-Kohärenzenergie und mindestens sechs verschiedene beobachtete
+Nutzdatentöne verlangt. CRC, Rekodierung und Nutzdatenplausibilität bleiben
+erforderlich. [Schwachsignal-Erweiterung und Grenzen](validation/reist16-multisignal/WEAK-UPGRADE.md).
 
 Die erste Demodulation verwendet nichtkohärente Softwerte. Zusätzlich kann
 der Empfänger Phase und Frequenz aus der Synchronisation schätzen und
@@ -80,14 +104,56 @@ Ordnung 2. Tiefe 1 arbeitet ohne OSD. Die Suche prüft den besten Codewortkandid
 basis gegen die CRC. Sie erhält weder die erwartete Nachricht noch eine
 Rufzeichenliste. Zugelassen sind anschließend nur pack77-Typen 1 und 2.
 
-Die Suche verarbeitet höchstens 180000 RX-Samples, 48 Kandidaten bei Tiefe 3
-und 32 Ergebnisse je Profil. Die kohärente Ergänzung ist auf zwölf Kandidaten
-begrenzt. Gemeinsame FFTW-Planung ist gesperrt; Daten und LDPC-Zustände sind
-aufruflokal. Angezeigte SNR-Werte sind Schätzungen. Bei starken Signalen
+Die Suche verarbeitet höchstens 180000 RX-Samples. Die produktive Ausgabe
+fasst jetzt 200 Nachrichten je Slot. Erfolgreiche Stationen verbrauchen kein
+Fehlversuchsbudget: Tiefe 1 prüft bis zu zwölf erfolglose Hypothesen; Tiefe 2
+hat bis zu zwei Durchläufe mit je zwölf, Tiefe 3 bis zu drei mit je sechzehn.
+Je Durchlauf gelten zusätzlich höchstens 256 geprüfte Kandidaten und 200
+QSO/2-Ergebnisse. Die kohärente Ergänzung erlaubt über alle Durchläufe zwölf
+Fehlversuche; erfolgreiche kohärente Decodes verbrauchen dieses Budget nicht.
+Ein Teil der Fehlversuche bleibt für spätere, bereinigte Durchläufe reserviert.
+Nach einem Durchlauf ohne neue Ergebnisse endet die Suche.
+Solange noch keine Station akzeptiert wurde, darf der erste Durchlauf die
+zwölf kohärenten Fehlversuche ausschöpfen. Bei Tiefe 3 werden mehrere
+Frequenzhypothesen und eine genaue GFSK-Syncreferenz geprüft. CQ-AP ergänzt
+ab Tiefe 2 die bekannte CQ-Struktur, ohne Sender oder Locator vorzugeben.
+Es ist separat unter **Decode → Enable CQ AP (REIST16)** beziehungsweise
+in der CLI mit `--no-reist16-ap` abschaltbar und standardmäßig aktiv.
+
+Ab Tiefe 2 rekonstruiert der Empfänger vollständig geprüfte Nachrichten als
+komplexe GFSK-Wellenform, verfeinert deren Startzeit und schätzt eine langsam
+veränderliche komplexe Amplitude. Erkannte Signale werden sofort abgezogen,
+damit schon weitere Kandidaten desselben Durchlaufs davon profitieren.
+Zusätzliche Durchläufe erneuern das Suchspektrum. CRC, vollständige Rekodierung,
+Synchronisationsprüfung und zugelassene Nachrichtentypen bleiben erforderlich.
+Ein erfolgreicher nativer LDPC-Ersatzdurchlauf setzt jetzt auch seinen
+Prüfstatus korrekt. Zeit und Frequenz werden abwechselnd verfeinert, um
+Rechenarbeit zu sparen. QSO/1 und QSO/2 empfangen gleichzeitig in getrennten
+Arbeitszuständen; bei fehlendem Worker ist ein serieller Rückfall möglich.
+
+Zusätzlich muss die rekonstruierte Nutzdatenphase zur Synchronisation passen.
+Die Prüfung berücksichtigt plausible Frequenz-/Driftmodelle der Synchronisation
+und deren Amplitudenstreuung; bei ungenauer nichtkohärenter Startzeit wird
+diese zunächst allein aus den bekannten Synchronisationsblöcken verfeinert.
+So wird ein in dichter Überlagerung gefundener falscher CRC-Treffer verworfen,
+ohne nur auf das formal gültige Codewort zu vertrauen. Die endlichen
+Kontrollversuche sind kein allgemeiner Nachweis einer Fehlalarmrate.
+
+Gemeinsame FFTW-Planung ist gesperrt; Daten und LDPC-Zustände sind aufruflokal.
+Angezeigte SNR-Werte sind Schätzungen. Bei starken Signalen
 bezieht die Rauschschätzung auch Pulsform-Leckage ein und kann zu niedrig
 ausfallen; für Messreihen gilt der eingespeiste SNR2500-Wert.
 
 ## Reproduzierbare Messung
+
+Die [Mehrsignal-Erweiterung vom 26. Oktober 2026](validation/reist16-multisignal/IMPROVEMENTS.md)
+vergleicht den neuen Empfänger mit dem dokumentierten Ausgangsstand und FT8.
+Mit Tiefe 3 wurden 40 Stationen bei 60 Hz, 48 bei 50 Hz und 60 bei 60 Hz
+Abstand gemeinsam erkannt. Die Wellenformen überlappen teilweise spektral;
+75 Hz Tonmitten-Spanne ist kein harter Mindestabstand. Das Funkformat bleibt
+QSO/2-kompatibel. Diese Offlineversuche belegen keine allgemeine Gleichheit
+der praktischen Bandkapazität mit FT8; Frequenzbedarf, Kanalbedingungen und
+Antwortzeit bleiben zu berücksichtigen. Für dichten Betrieb Tiefe 3 wählen.
 
 `tools/Test-Reist16Weak.ps1` erzeugt zufällige Standard-CQs und PCM16-WAVs
 mit unbekannter Startzeit und gebrochener Audiofrequenz. QSO/1, QSO/2 und FT8
@@ -96,6 +162,10 @@ aktive Signalleistung. Die Dauer der Funkformate bleibt unterschiedlich.
 FT8 wird durch den tatsächlichen `jt9 -8 -d 3`-Decoder geprüft, einschließlich
 seiner normalen CLI-AP-Einstellung. Es wird kein passender Rufzeichenhinweis
 oder erwarteter Nachrichtentext an den Decoder übergeben.
+
+Die folgende ursprüngliche AWGN-Reihe stammt aus dem Stand vor der
+CQ-AP-/Syncreferenz-Erweiterung. Der neue unabhängige CQ/QSO-Vergleich
+steht im oben verlinkten Schwachsignalbericht.
 
 Bei 12 kHz Abtastrate belegt reelles weißes Rauschen 6000 Hz. Mit
 Signalverstärkung g und ungerampter Leistung 0,32*g² wird die Rauschvarianz
@@ -124,8 +194,8 @@ Pegel. Er folgt auf die Ergänzung der unabhängigen Synchronisationsprüfung.
 Frühere Entwicklungsläufe bleiben unter ihren eigenen Verzeichnissen erhalten.
 
 ```powershell
-.\tools\Test-Reist16Weak.ps1 -OutputDirectory build-custom\reist16-weak\new-confirmation -Trials 32 -Seed 2026102212
-.\tools\Test-Reist16Weak.ps1 -OutputDirectory build-custom\reist16-weak\new-channel -ChannelOnly
+.\tools\Test-Reist16Weak.ps1 -OutputDirectory build-custom-make\reist16-weak\new-confirmation -Trials 32 -Seed 2026102212
+.\tools\Test-Reist16Weak.ps1 -OutputDirectory build-custom-make\reist16-weak\new-channel -ChannelOnly
 .\tools\Test-Reist16.ps1
 .\tools\Test-PlutoBridge.ps1
 .\tools\Test-TxQuality.ps1
@@ -153,6 +223,16 @@ Soft-Decodierung erläutern Franke, Somerville und Taylor in
 Gemeinsamer Kanalcode macht die beiden Funkformate nicht austauschbar.
 
 ## English
+
+The additional [weak-signal receiver](validation/reist16-multisignal/WEAK-UPGRADE.md)
+tests several coherent frequency hypotheses and an exact Gaussian sync
+reference at depth 3. Weaker five/six-hit sync candidates require additional
+coherent-energy and observed-tone-diversity gates. An optional standard-CQ
+prior, enabled by default at depth 2/3, leaves sender and locator unknown;
+disable it in Decode or with `--no-reist16-ap`. The wire format is unchanged.
+The historical AWGN table predates this extension. The new independent mixed
+test improves −22 dB recovery from 7/16 to 11/16, without establishing a
+general sensitivity threshold or universal FT8 equivalence.
 
 This build transmits **REIST16-QSO/2** in the existing 15-second UTC mode:
 77 information bits, CRC14, LDPC(174,91), sixteen continuous-phase Gaussian
@@ -188,3 +268,27 @@ Yaesu/Pluto screenshot demonstrates QSO/1. Later QSO/2 WebSDR recordings and
 capture-window checks are documented in [REIST16.md](REIST16.md); these do
 not establish a complete bidirectional QSO/2 hardware contact.
 See the retained validation files for the final counts and exact conditions.
+
+The local receiver extension dated 26 October 2026 raises the production
+output capacity to 200 messages, counts failed hypotheses separately from
+successful stations, and adds up to two/three search passes with signal
+cancellation at depth 2/3. Complex GFSK reconstruction estimates timing and
+a slowly varying complex amplitude; CRC, re-encoding, synchronization and
+message-type checks remain required. A successful native LDPC fallback now
+correctly updates its check status. Alternating time/frequency refinement and
+concurrent independent QSO/1 and QSO/2 searches reduce latency. The coherent
+fallback allows twelve failed attempts across all passes; successful coherent
+decodes leave that budget intact, and some failure work is reserved for later
+passes. Signals are subtracted immediately to help subsequent candidates
+before the next spectral search. Failed-hypothesis limits are
+12 per pass at depth 1/2 and 16 per pass at depth 3; each pass also has a
+256-candidate and 200-result ceiling. A pass with no new results ends the search.
+An additional payload-phase check uses plausible synchronization frequency/
+drift models and measured amplitude scatter. If needed, timing is refined
+from known synchronization blocks before validation. This rejects a false
+CRC hit found in a dense mixture; finite controls do not establish a general
+false-alarm rate.
+The wire format is unchanged. Offline depth-3 mixtures recovered 40 stations
+at 60 Hz spacing, 48 at 50 Hz, and 60 at 60 Hz; these finite tests do not
+establish equal general RF capacity to FT8. Use depth 3 for dense reception.
+See the linked [implementation and validation report](validation/reist16-multisignal/IMPROVEMENTS.md).

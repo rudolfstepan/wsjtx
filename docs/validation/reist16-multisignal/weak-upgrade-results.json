@@ -1,0 +1,3258 @@
+[
+  {
+    "seed": 2026102629,
+    "trial": 0,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL1RAP JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.2 2480 %  CQ DL1RAP JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 0,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL1RAP JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.2 2480 %  CQ DL1RAP JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 1,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE5ZLM DL8RWL JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20 -0.1 1194 %  OE5ZLM DL8RWL JO31                   "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 1,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE5ZLM DL8RWL JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20 -0.1 1194 %  OE5ZLM DL8RWL JO31                   "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 0,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL1RAP JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.2 2480 ~  CQ DL1RAP JO31                          "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 2,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL7WNT JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -21  0.0 1652 %  CQ DL7WNT JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 1,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE5ZLM DL8RWL JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -19 -0.1 1194 ~  OE5ZLM DL8RWL JO31                      "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 2,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL7WNT JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -21  0.0 1652 %  CQ DL7WNT JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 3,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE3HXX DL6HRY -12",
+    "drift_hz_s": 0.02,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -19 -0.1  669 %  OE3HXX DL6HRY -12                    "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 2,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL7WNT JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.0 1652 ~  CQ DL7WNT JO31                          "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 3,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE3HXX DL6HRY -12",
+    "drift_hz_s": 0.02,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -19 -0.1  669 %  OE3HXX DL6HRY -12                    "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 3,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE3HXX DL6HRY -12",
+    "drift_hz_s": 0.02,
+    "method": "ft8",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -19 -0.1  669 ~  OE3HXX DL6HRY -12                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 4,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL7HZF JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.2 2235 %  CQ DL7HZF JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 4,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL7HZF JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.2 2235 %  CQ DL7HZF JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 5,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE2JNW DL4MQP R-10",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -19  0.2 1115 %  OE2JNW DL4MQP R-10                   "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 4,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL7HZF JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.2 2235 ~  CQ DL7HZF JO31                          "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 5,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE2JNW DL4MQP R-10",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -19  0.2 1115 %  OE2JNW DL4MQP R-10                   "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 6,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL4ALX/P JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -21  0.3 1577 %  CQ DL4ALX/P JO31                     "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 5,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE2JNW DL4MQP R-10",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.2 1115 ~  OE2JNW DL4MQP R-10                      "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 6,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL4ALX/P JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -21  0.3 1577 %  CQ DL4ALX/P JO31                     "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 6,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL4ALX/P JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.3 1577 ~  CQ DL4ALX/P JO31                        "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 7,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE1VRV DL7GMX RR73",
+    "drift_hz_s": 0.02,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 7,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE1VRV DL7GMX RR73",
+    "drift_hz_s": 0.02,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 8,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL4QYI JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -19  0.1 1008 %  CQ DL4QYI JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 7,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE1VRV DL7GMX RR73",
+    "drift_hz_s": 0.02,
+    "method": "ft8",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20 -0.1 1970 ~  OE1VRV DL7GMX RR73                      "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 8,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL4QYI JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -19  0.1 1008 %  CQ DL4QYI JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 9,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE2UPX DL1SUG 73",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20 -0.1 2074 %  OE2UPX DL1SUG 73                     "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 8,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL4QYI JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.1 1007 ~  CQ DL4QYI JO31                          "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 9,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE2UPX DL1SUG 73",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20 -0.1 2074 %  OE2UPX DL1SUG 73                     "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 9,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE2UPX DL1SUG 73",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20 -0.1 2075 ~  OE2UPX DL1SUG 73                        "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 10,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL2ZAU JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -19  0.2 2514 %  CQ DL2ZAU JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 10,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL2ZAU JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -19  0.2 2514 %  CQ DL2ZAU JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 11,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE5PLC DL3DJP JO31",
+    "drift_hz_s": 0.02,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -19 -0.1 2137 %  OE5PLC DL3DJP JO31                   "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 10,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL2ZAU JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.2 2515 ~  CQ DL2ZAU JO31                          "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 11,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE5PLC DL3DJP JO31",
+    "drift_hz_s": 0.02,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -19 -0.1 2137 %  OE5PLC DL3DJP JO31                   "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 12,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL6MSC JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -22  0.2  718 %  CQ DL6MSC JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 11,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE5PLC DL3DJP JO31",
+    "drift_hz_s": 0.02,
+    "method": "ft8",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20 -0.1 2137 ~  OE5PLC DL3DJP JO31                      "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 12,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL6MSC JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -22  0.2  718 %  CQ DL6MSC JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 13,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE8TPX DL6OKI/P -12",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.2 1462 %  OE8TPX DL6OKI/P -12                  "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 12,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL6MSC JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.2  718 ~  CQ DL6MSC JO31                        a1"
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 13,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE8TPX DL6OKI/P -12",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.2 1462 %  OE8TPX DL6OKI/P -12                  "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 13,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE8TPX DL6OKI/P -12",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.2 1463 ~  OE8TPX DL6OKI/P -12                     "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 14,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL9WXV JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20 -0.1 2455 %  CQ DL9WXV JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 14,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL9WXV JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20 -0.1 2455 %  CQ DL9WXV JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 15,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE2JCB DL3ILQ R-10",
+    "drift_hz_s": 0.02,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.2 1121 %  OE2JCB DL3ILQ R-10                   "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 14,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL9WXV JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20 -0.1 2456 ~  CQ DL9WXV JO31                          "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 15,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE2JCB DL3ILQ R-10",
+    "drift_hz_s": 0.02,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.2 1121 %  OE2JCB DL3ILQ R-10                   "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 0,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL2RSM JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -23  0.1 2995 %  CQ DL2RSM JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 15,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE2JCB DL3ILQ R-10",
+    "drift_hz_s": 0.02,
+    "method": "ft8",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.2 1121 ~  OE2JCB DL3ILQ R-10                      "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 0,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL2RSM JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -23  0.1 2995 %  CQ DL2RSM JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 1,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE2TOS DL4CZP JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 0,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL2RSM JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -21  0.1 2995 ~  CQ DL2RSM JO31                        a1"
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 1,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE2TOS DL4CZP JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -22  0.2 2053 %  OE2TOS DL4CZP JO31                   "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 2,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL3KQI JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -21  0.1  430 %  CQ DL3KQI JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 1,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE2TOS DL4CZP JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 2,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL3KQI JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -21  0.1  430 %  CQ DL3KQI JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 3,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE4ZGQ DL7TGM -12",
+    "drift_hz_s": 0.02,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 2,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL3KQI JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 3,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE4ZGQ DL7TGM -12",
+    "drift_hz_s": 0.02,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 3,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE4ZGQ DL7TGM -12",
+    "drift_hz_s": 0.02,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 4,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL8HPK JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 4,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL8HPK JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -22  0.0 2133 %  CQ DL8HPK JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 5,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE4UDQ DL2LJT R-10",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.3  593 %  OE4UDQ DL2LJT R-10                   "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 4,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL8HPK JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -22  0.0 2133 ~  CQ DL8HPK JO31                          "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 5,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE4UDQ DL2LJT R-10",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.3  593 %  OE4UDQ DL2LJT R-10                   "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 6,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL1VGQ/P JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -21  0.0 1422 %  CQ DL1VGQ/P JO31                     "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 5,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE4UDQ DL2LJT R-10",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 6,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL1VGQ/P JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -21  0.0 1422 %  CQ DL1VGQ/P JO31                     "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 7,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE2IIF DL8LQR RR73",
+    "drift_hz_s": 0.02,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 6,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL1VGQ/P JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 7,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE2IIF DL8LQR RR73",
+    "drift_hz_s": 0.02,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 7,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE2IIF DL8LQR RR73",
+    "drift_hz_s": 0.02,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 8,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL3ZCY JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -22 -0.0 2407 %  CQ DL3ZCY JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 8,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL3ZCY JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -22 -0.0 2407 %  CQ DL3ZCY JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 9,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE5LPD DL6XKT 73",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 8,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL3ZCY JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 9,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE5LPD DL6XKT 73",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 10,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL7PMK JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20 -0.0 3010 %  CQ DL7PMK JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 9,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE5LPD DL6XKT 73",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 10,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL7PMK JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20 -0.0 3010 %  CQ DL7PMK JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 11,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE8GUH DL8ICW JO31",
+    "drift_hz_s": 0.02,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 10,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL7PMK JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -21 -0.0 3010 ~  CQ DL7PMK JO31                        a1"
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 11,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE8GUH DL8ICW JO31",
+    "drift_hz_s": 0.02,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 12,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL3ALC JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 11,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE8GUH DL8ICW JO31",
+    "drift_hz_s": 0.02,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 12,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL3ALC JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -22  0.1 2116 %  CQ DL3ALC JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 13,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE3MYI DL3KLS/P -12",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -21  0.0 2944 %  OE3MYI DL3KLS/P -12                  "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 12,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL3ALC JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 13,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE3MYI DL3KLS/P -12",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -21  0.0 2944 %  OE3MYI DL3KLS/P -12                  "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 14,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL7TYX JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 13,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE3MYI DL3KLS/P -12",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 14,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL7TYX JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -23 -0.1 2701 %  CQ DL7TYX JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 15,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE6CVB DL2IYD R-10",
+    "drift_hz_s": 0.02,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 14,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL7TYX JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 15,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE6CVB DL2IYD R-10",
+    "drift_hz_s": 0.02,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 15,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE6CVB DL2IYD R-10",
+    "drift_hz_s": 0.02,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 0,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL7YMA JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 0,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL7YMA JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 0,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL7YMA JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 1,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE1BYT DL5KIT JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 1,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE1BYT DL5KIT JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 2,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL6DMZ JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 1,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE1BYT DL5KIT JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 2,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL6DMZ JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 2,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL6DMZ JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 3,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE7TPH DL3MCP -12",
+    "drift_hz_s": 0.02,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 3,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE7TPH DL3MCP -12",
+    "drift_hz_s": 0.02,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 3,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE7TPH DL3MCP -12",
+    "drift_hz_s": 0.02,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 4,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL8ZBY JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 4,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL8ZBY JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 4,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL8ZBY JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 5,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE1LUV DL9YQN R-10",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 5,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE1LUV DL9YQN R-10",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 6,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL2MIB/P JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 5,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE1LUV DL9YQN R-10",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 6,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL2MIB/P JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 7,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE2RAT DL6ILK RR73",
+    "drift_hz_s": 0.02,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 6,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL2MIB/P JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 7,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE2RAT DL6ILK RR73",
+    "drift_hz_s": 0.02,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 7,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE2RAT DL6ILK RR73",
+    "drift_hz_s": 0.02,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 8,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL9KBX JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 8,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL9KBX JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 8,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL9KBX JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 9,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE6XTH DL2BCR 73",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 9,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE6XTH DL2BCR 73",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 10,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL7RNB JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 9,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE6XTH DL2BCR 73",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 10,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL7RNB JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 10,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL7RNB JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 11,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE7SMC DL8SCG JO31",
+    "drift_hz_s": 0.02,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 11,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE7SMC DL8SCG JO31",
+    "drift_hz_s": 0.02,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 11,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE7SMC DL8SCG JO31",
+    "drift_hz_s": 0.02,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 12,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL3TAX JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 12,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL3TAX JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 12,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL3TAX JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 13,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE2HSL DL2SMS/P -12",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 13,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE2HSL DL2SMS/P -12",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 14,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL8ERU JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 13,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE2HSL DL2SMS/P -12",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 14,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL8ERU JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 14,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL8ERU JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 15,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE8HFS DL8KZH R-10",
+    "drift_hz_s": 0.02,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 15,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE8HFS DL8KZH R-10",
+    "drift_hz_s": 0.02,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 15,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE8HFS DL8KZH R-10",
+    "drift_hz_s": 0.02,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 0,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL1YKJ JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 0,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL1YKJ JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 0,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL1YKJ JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 1,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE7LUG DL7PEM JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 1,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE7LUG DL7PEM JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 2,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL4QDK JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 1,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE7LUG DL7PEM JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 2,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL4QDK JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 2,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL4QDK JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 3,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE9FOE DL8ZMM -12",
+    "drift_hz_s": 0.02,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 3,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE9FOE DL8ZMM -12",
+    "drift_hz_s": 0.02,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 3,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE9FOE DL8ZMM -12",
+    "drift_hz_s": 0.02,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 4,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL2MTK JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 4,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL2MTK JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 4,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL2MTK JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 5,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE2VSR DL4WWU R-10",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 5,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE2VSR DL4WWU R-10",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 5,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE2VSR DL4WWU R-10",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 6,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL8LQC/P JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 6,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL8LQC/P JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 7,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE6GHQ DL2FIF RR73",
+    "drift_hz_s": 0.02,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 6,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL8LQC/P JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 7,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE6GHQ DL2FIF RR73",
+    "drift_hz_s": 0.02,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 7,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE6GHQ DL2FIF RR73",
+    "drift_hz_s": 0.02,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 8,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL1ORU JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 8,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL1ORU JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 9,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE4ORK DL5IOI 73",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 8,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL1ORU JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 9,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE4ORK DL5IOI 73",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 9,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE4ORK DL5IOI 73",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 10,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL3WPG JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 10,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL3WPG JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 10,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL3WPG JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 11,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE6NYM DL4ELN JO31",
+    "drift_hz_s": 0.02,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 11,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE6NYM DL4ELN JO31",
+    "drift_hz_s": 0.02,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 12,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL3APO JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 11,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE6NYM DL4ELN JO31",
+    "drift_hz_s": 0.02,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 12,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL3APO JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 12,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL3APO JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 13,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE2NIS DL6CCK/P -12",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 13,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE2NIS DL6CCK/P -12",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 13,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE2NIS DL6CCK/P -12",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 14,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL1LIB JO31",
+    "drift_hz_s": 0,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 14,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL1LIB JO31",
+    "drift_hz_s": 0,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 14,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL1LIB JO31",
+    "drift_hz_s": 0,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 15,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE5JIS DL3PGF R-10",
+    "drift_hz_s": 0.02,
+    "method": "before",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 15,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE5JIS DL3PGF R-10",
+    "drift_hz_s": 0.02,
+    "method": "after",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 15,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE5JIS DL3PGF R-10",
+    "drift_hz_s": 0.02,
+    "method": "ft8",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 0,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL1RAP JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.2 2480 %  CQ DL1RAP JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 1,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE5ZLM DL8RWL JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20 -0.1 1194 %  OE5ZLM DL8RWL JO31                   "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 2,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL7WNT JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -21  0.0 1652 %  CQ DL7WNT JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 3,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE3HXX DL6HRY -12",
+    "drift_hz_s": 0.02,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -19 -0.1  669 %  OE3HXX DL6HRY -12                    "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 4,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL7HZF JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.2 2235 %  CQ DL7HZF JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 5,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE2JNW DL4MQP R-10",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -19  0.2 1115 %  OE2JNW DL4MQP R-10                   "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 6,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL4ALX/P JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -21  0.3 1577 %  CQ DL4ALX/P JO31                     "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 7,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE1VRV DL7GMX RR73",
+    "drift_hz_s": 0.02,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 8,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL4QYI JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -19  0.1 1008 %  CQ DL4QYI JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 9,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE2UPX DL1SUG 73",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20 -0.1 2074 %  OE2UPX DL1SUG 73                     "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 10,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL2ZAU JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -19  0.2 2514 %  CQ DL2ZAU JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 11,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE5PLC DL3DJP JO31",
+    "drift_hz_s": 0.02,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -19 -0.1 2137 %  OE5PLC DL3DJP JO31                   "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 13,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE8TPX DL6OKI/P -12",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.2 1462 %  OE8TPX DL6OKI/P -12                  "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 12,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL6MSC JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -22  0.2  718 %  CQ DL6MSC JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 14,
+    "kind": "CQ",
+    "snr2500": -20,
+    "message": "CQ DL9WXV JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20 -0.1 2455 %  CQ DL9WXV JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 15,
+    "kind": "QSO",
+    "snr2500": -20,
+    "message": "OE2JCB DL3ILQ R-10",
+    "drift_hz_s": 0.02,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.2 1121 %  OE2JCB DL3ILQ R-10                   "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 0,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL2RSM JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -23  0.1 2995 %  CQ DL2RSM JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 1,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE2TOS DL4CZP JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -22  0.2 2053 %  OE2TOS DL4CZP JO31                   "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 2,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL3KQI JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -21  0.1  430 %  CQ DL3KQI JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 3,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE4ZGQ DL7TGM -12",
+    "drift_hz_s": 0.02,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 4,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL8HPK JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 5,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE4UDQ DL2LJT R-10",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20  0.3  593 %  OE4UDQ DL2LJT R-10                   "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 6,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL1VGQ/P JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -21  0.0 1422 %  CQ DL1VGQ/P JO31                     "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 7,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE2IIF DL8LQR RR73",
+    "drift_hz_s": 0.02,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 8,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL3ZCY JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -22 -0.0 2407 %  CQ DL3ZCY JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 9,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE5LPD DL6XKT 73",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 10,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL7PMK JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -20 -0.0 3010 %  CQ DL7PMK JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 11,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE8GUH DL8ICW JO31",
+    "drift_hz_s": 0.02,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 12,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL3ALC JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -22  0.1 2116 %  CQ DL3ALC JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 13,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE3MYI DL3KLS/P -12",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -21  0.0 2944 %  OE3MYI DL3KLS/P -12                  "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 14,
+    "kind": "CQ",
+    "snr2500": -22,
+    "message": "CQ DL7TYX JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": true,
+    "foreign": [],
+    "output": [
+      "000000 -23 -0.1 2701 %  CQ DL7TYX JO31                       "
+    ]
+  },
+  {
+    "seed": 2026102629,
+    "trial": 15,
+    "kind": "QSO",
+    "snr2500": -22,
+    "message": "OE6CVB DL2IYD R-10",
+    "drift_hz_s": 0.02,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 0,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL7YMA JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 1,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE1BYT DL5KIT JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 2,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL6DMZ JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 3,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE7TPH DL3MCP -12",
+    "drift_hz_s": 0.02,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 4,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL8ZBY JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 5,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE1LUV DL9YQN R-10",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 6,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL2MIB/P JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 7,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE2RAT DL6ILK RR73",
+    "drift_hz_s": 0.02,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 8,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL9KBX JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 9,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE6XTH DL2BCR 73",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 10,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL7RNB JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 11,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE7SMC DL8SCG JO31",
+    "drift_hz_s": 0.02,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 12,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL3TAX JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 13,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE2HSL DL2SMS/P -12",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 14,
+    "kind": "CQ",
+    "snr2500": -24,
+    "message": "CQ DL8ERU JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 15,
+    "kind": "QSO",
+    "snr2500": -24,
+    "message": "OE8HFS DL8KZH R-10",
+    "drift_hz_s": 0.02,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 0,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL1YKJ JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 1,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE7LUG DL7PEM JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 2,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL4QDK JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 3,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE9FOE DL8ZMM -12",
+    "drift_hz_s": 0.02,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 4,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL2MTK JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 5,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE2VSR DL4WWU R-10",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 6,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL8LQC/P JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 7,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE6GHQ DL2FIF RR73",
+    "drift_hz_s": 0.02,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 8,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL1ORU JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 9,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE4ORK DL5IOI 73",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 10,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL3WPG JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 11,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE6NYM DL4ELN JO31",
+    "drift_hz_s": 0.02,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 12,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL3APO JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 13,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE2NIS DL6CCK/P -12",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 14,
+    "kind": "CQ",
+    "snr2500": -26,
+    "message": "CQ DL1LIB JO31",
+    "drift_hz_s": 0,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  },
+  {
+    "seed": 2026102629,
+    "trial": 15,
+    "kind": "QSO",
+    "snr2500": -26,
+    "message": "OE5JIS DL3PGF R-10",
+    "drift_hz_s": 0.02,
+    "method": "after_no_ap",
+    "exact": false,
+    "foreign": [],
+    "output": []
+  }
+]

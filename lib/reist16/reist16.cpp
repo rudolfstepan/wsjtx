@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <future>
 #include <limits>
 #include "planner_lock.hpp"
 #include <stdexcept>
@@ -223,7 +224,7 @@ std::vector<Decode> decode(float const* data, int count, double low, double high
       if (std::abs(old.frequency-candidate.frequency) < 12.5 && std::abs(old.start-candidate.start) < 960)
         duplicate = true;
     if (duplicate) continue;
-    if (int(tried.size()) >= budget || result.size() >= 32) break;
+    if (int(tried.size()) >= budget || result.size() >= max_decodes) break;
     tried.push_back(candidate);
     double best = -1;
     int start = candidate.start;
@@ -282,12 +283,24 @@ extern "C" int reist16_encode(int8_t const* bits, int sequence, float frequency,
 }
 extern "C" int reist16_decode(int16_t const* samples, int count, int low, int high, int depth,
                                int8_t* bits, float* frequencies, float* times, float* snrs, int capacity) {
+  return reist16_decode_ex(samples,count,low,high,depth,bits,frequencies,times,snrs,capacity,1);
+}
+extern "C" int reist16_decode_ex(int16_t const* samples, int count, int low, int high, int depth,
+                               int8_t* bits, float* frequencies, float* times, float* snrs, int capacity,int cq_ap) {
   if (!samples || !bits || !frequencies || !times || !snrs || count < 0 || count > 180000 || capacity < 1) return -1;
   try {
     std::vector<float> data(count);
     for (int i = 0; i < count; ++i) data[i] = samples[i] / 32768.f;
-    auto found = reist16::qso2::decode(data.data(), count, low, high, depth);
-    auto legacy = reist16::decode(data.data(), count, low, high, depth);
+    // The legacy receiver has independent state. Preserve compatibility
+    // without adding its complete search time to the QSO/2 reply budget.
+    std::future<std::vector<reist16::Decode>> legacy_task;
+    try {
+      legacy_task=std::async(std::launch::async,[&] {
+        return reist16::decode(data.data(),count,low,high,depth);
+      });
+    } catch(std::system_error const&) { /* Fall back if a worker cannot start. */ }
+    auto found = reist16::qso2::decode(data.data(), count, low, high, depth,cq_ap!=0);
+    auto legacy = legacy_task.valid()?legacy_task.get():reist16::decode(data.data(),count,low,high,depth);
     found.insert(found.end(),legacy.begin(),legacy.end());
     std::sort(found.begin(),found.end(),[](reist16::Decode const& a,reist16::Decode const& b){return a.frequency<b.frequency;});
     int n = std::min(int(found.size()), capacity);

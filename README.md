@@ -6,6 +6,11 @@
 
 [![Windows-Build](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml/badge.svg)](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml)
 
+**[REIST16 Release Candidate 3.0.2-oe3sro.7-rc1](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-7-rc1)** —
+Mehrsignalempfang mit Abtrennung, zusätzliche Schwachsignalverfahren und
+an FT8 angeglichener digitaler Sendepegel. [Änderungen und Prüfgrenzen](docs/releases/3.0.2-oe3sro.7-rc1.md).
+Für Praxistests vorgesehen; die stabile Version bleibt separat verfügbar.
+
 **[Windows-Release herunterladen](https://github.com/rudolfstepan/wsjtx/releases/latest)** —
 das **windows-x64.zip** enthält die Anwendung und die deutsche/englische
 Anleitung. Vollständig entpacken und **Start-WSJT-X.bat** öffnen.
@@ -45,6 +50,8 @@ Projektversion, den Quellcommit, die Buildnummer und den Wiederholungsversuch;
 `build-info.json` und eine SHA256-Datei dokumentieren den Download.
 Release-Tags `oe3sro-vX.Y.Z-N` veröffentlichen nach erfolgreichen Prüfungen
 zusätzlich ein dauerhaftes GitHub-Release mit beiden ZIPs und Prüfsummen.
+Die Endung `-rcM` veröffentlicht einen Vorabkandidaten, ohne das stabile
+„Latest“-Release zu ersetzen.
 
 Die [Änderungshistorie des Forks](docs/CHANGES.md) dokumentiert die Custom-
 Erweiterungen und ihre Implementierungscommits. Die [FT2-Dokumentation](docs/FT2.md)
@@ -113,6 +120,14 @@ Das ist keine gemessene belegte Bandbreite. REIST16 ist mit FT8 nicht
 funkkompatibel. Beide Gegenstellen benötigen QSO/2; der neue Empfänger
 versteht zusätzlich das ältere QSO/1. Freitext und Contest-Sonderformate
 gehören nicht zum unterstützten Nachrichtenprofil.
+
+Die lokale Weiterentwicklung vom 26. Oktober erweitert den Empfänger auf
+200 Nachrichten je Slot und ergänzt ab Decodiertiefe 2 Signalabtrennung mit
+erneuter Suche. Für dichten Empfang Tiefe 3 wählen. Das QSO/2-Funkformat bleibt
+unverändert. [Änderungen, Offlinevergleiche und Grenzen](docs/validation/reist16-multisignal/IMPROVEMENTS.md).
+Zusätzliche Schwachsignalverfahren und das abschaltbare CQ-AP verbessern
+den unabhängigen gemischten −22-dB-Test von 7/16 auf 11/16 Nachrichten.
+[Messbedingungen und verbleibende Grenzen](docs/validation/reist16-multisignal/WEAK-UPGRADE.md).
 
 Für den Einstieg beide Systemuhren synchronisieren, dieselbe USB-Frequenz
 vereinbaren und entgegengesetzte TX-Slots wählen (`:00/:30` bzw. `:15/:45`).
@@ -279,7 +294,7 @@ Der Befehl verwendet `build-custom-make`, erneuert die Programmdateien und
 Laufzeitbibliotheken aller Varianten und prüft ihre SHA256-Werte. Stationsprofile
 werden nicht importiert. Logs und Paketübersicht liegen unter `tmp/rebuild-all-…`.
 
-Der Release-Build liegt unter `build-custom`; das Paket mit Laufzeitbibliotheken,
+Der einzige Custom-Build liegt unter `build-custom-make`; das Paket mit Laufzeitbibliotheken,
 Decodern und Stationsdaten unter `dist-custom\OE3SRO-reist16-pluto`.
 Der zusätzliche Modus **REIST16** verwendet 15-Sekunden-Slots für kurze CQ-/QSO-
 Nachrichten; Bedienung, Profilvertrag und Testgrenzen stehen in [REIST16.txt](docs/REIST16.txt).

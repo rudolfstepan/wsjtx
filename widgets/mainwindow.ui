@@ -4855,6 +4855,7 @@ QPushButton[state=&quot;ok&quot;] {
     <addaction name="actionInclude_averaging"/>
     <addaction name="actionInclude_correlation"/>
     <addaction name="actionEnable_AP_FT8"/>
+    <addaction name="actionEnable_AP_REIST16"/>
     <addaction name="actionEnable_AP_JT65"/>
     <addaction name="actionEnable_AP_DXcall"/>
     <addaction name="actionHide_AP_info"/>
@@ -5336,6 +5337,20 @@ QPushButton[state=&quot;ok&quot;] {
    </property>
    <property name="text">
     <string>Enable AP</string>
+   </property>
+  </action>
+  <action name="actionEnable_AP_REIST16">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Enable CQ AP (REIST16)</string>
+   </property>
+   <property name="toolTip">
+    <string>Try the standard CQ structure for weak REIST16 signals at decoding depth 2 or 3. Callsign and locator remain unknown.</string>
    </property>
   </action>
   <action name="actionSolve_FreqCal">

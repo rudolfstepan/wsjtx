@@ -1,7 +1,7 @@
 param(
     [switch]$ConfigureOnly,
     [switch]$Clean,
-    [ValidateSet('Ninja','MinGW Makefiles')][string]$Generator = 'Ninja',
+    [ValidateSet('Ninja','MinGW Makefiles')][string]$Generator = 'MinGW Makefiles',
     [string]$BuildDirectory = ''
 )
 $ErrorActionPreference = 'Stop'
@@ -10,7 +10,7 @@ $mingw = if ($env:WSJTX_MINGW_PREFIX) { $env:WSJTX_MINGW_PREFIX } else { 'C:\msy
 $env:PATH = "$mingw\bin;$env:PATH"
 $env:MSYSTEM_PREFIX = $mingw.Replace('\', '/')
 $hamlib = Join-Path $root '.tools\hamlib\hamlib-w64-4.7.2'
-$build = if ($BuildDirectory) { $BuildDirectory } elseif ($Generator -eq 'Ninja') { Join-Path $root 'build-custom' } else { Join-Path $root 'build-custom-make' }
+$build = if ($BuildDirectory) { $BuildDirectory } else { Join-Path $root 'build-custom-make' }
 & "$mingw\bin\cmake.exe" -S $root -B $build -G $Generator `
     '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_POLICY_VERSION_MINIMUM=3.5' `
     "-DCMAKE_PREFIX_PATH=$mingw;$hamlib" "-DCMAKE_INSTALL_PREFIX=$root/dist-custom" `

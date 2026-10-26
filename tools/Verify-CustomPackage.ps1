@@ -5,7 +5,7 @@ $packageRoot = if ($Package) { $Package } else { Join-Path $root 'dist-custom\OE
 $bin = Join-Path $packageRoot 'bin'
 $checker = Join-Path $bin 'pskreporter-runtime-check.exe'
 $previousPath = $env:PATH
-Copy-Item -LiteralPath "$root\build-custom\pskreporter-checks\pskreporter_checks.exe" -Destination $checker -Force
+Copy-Item -LiteralPath "$root\build-custom-make\pskreporter-checks\pskreporter_checks.exe" -Destination $checker -Force
 try {
     # Verify that the package works without the development tools on PATH.
     $env:PATH = "$env:WINDIR\System32;$env:WINDIR"

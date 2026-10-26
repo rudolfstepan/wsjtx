@@ -4,7 +4,7 @@ $root = Split-Path $PSScriptRoot -Parent
 $mingw = if ($env:WSJTX_MINGW_PREFIX) { $env:WSJTX_MINGW_PREFIX } else { 'C:\msys64\mingw64' }
 $env:PATH = "$mingw\bin;$env:PATH"
 $env:MSYSTEM_PREFIX = $mingw.Replace('\', '/')
-$build = Join-Path $root 'build-custom'
+$build = Join-Path $root 'build-custom-make'
 $work = Join-Path $root '.local\ft2-checks'
 if (!(Test-Path -LiteralPath "$build\CMakeCache.txt")) { throw 'Run Build-Custom.ps1 first.' }
 & "$mingw\bin\cmake.exe" --build $build --target ft2_wave_checks ft2_ui_checks ft8_native_checks ft8_reference_decoder jt9 --parallel 6

@@ -8,14 +8,14 @@ import subprocess
 import zipfile
 
 root=Path(__file__).resolve().parents[1]
-out=root/'build-custom/ft8-threshold-comparison'
+out=root/'build-custom-make/ft8-threshold-comparison'
 env=dict(os.environ,PATH=r'C:\msys64\mingw64\bin'+os.pathsep+os.environ['PATH'],OMP_NUM_THREADS='4')
 rows=[]
 for level in range(1,18):
     file=f'ft8_level{level}_slot1_000000.wav'
     log=out/(Path(file).stem+'.decode.txt')
     if not log.exists():
-        result=subprocess.run([str(root/'build-custom/jt9.exe'),'-8','-d','3','-L','100','-H','4000',file],cwd=out,env=env,capture_output=True,text=True,check=True,timeout=60)
+        result=subprocess.run([str(root/'build-custom-make/jt9.exe'),'-8','-d','3','-L','100','-H','4000',file],cwd=out,env=env,capture_output=True,text=True,check=True,timeout=60)
         log.write_text(result.stdout+result.stderr,encoding='utf-8')
     text=log.read_text(encoding='utf-8')
     exact='CQ OE3SRO JN88' in text
