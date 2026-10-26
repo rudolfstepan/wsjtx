@@ -1,5 +1,7 @@
 # Screenshots und Praxisbilder
 
+[Deutsch](Screenshots) | [English](Screenshots-EN)
+
 Die folgenden Bilder sind unveränderte, bereits im Repository veröffentlichte Aufnahmen. Bildunterschriften unterscheiden echte Betriebsaufnahmen von Testdaten und älteren Profilständen. Zum Vergrößern das jeweilige Bild öffnen.
 
 ## FT8 im Browser — Deutsch

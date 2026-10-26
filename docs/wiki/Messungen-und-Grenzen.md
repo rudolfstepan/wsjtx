@@ -1,5 +1,7 @@
 # Messungen, Praxistests und Grenzen
 
+[Deutsch](Messungen-und-Grenzen) | [English](Measurements-and-limits)
+
 Die Custom-Version wird mit reproduzierbaren Softwaretests und realen Empfangsaufnahmen geprüft. Diese Nachweise haben unterschiedliche Aussagebereiche.
 
 ## REIST16

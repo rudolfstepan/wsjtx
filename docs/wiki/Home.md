@@ -1,5 +1,7 @@
 # WSJT-X OE3SRO Custom
 
+[Deutsch](Home) | [English](English)
+
 **build by OE3SRO** · Digitale Betriebsarten, eigene Empfangswerkzeuge und SDR-Anbindung.
 
 Diese Version ergänzt WSJT-X um **REIST16**, optimierte FT8-/FT4-/FT2-Kerne, eine integrierte PSK-Reporter-Empfängerliste, persönliche DX-Zeitfenster und eine Weboberfläche für den Stationsbetrieb im LAN.

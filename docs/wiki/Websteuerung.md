@@ -1,5 +1,7 @@
 # Websteuerung im LAN
 
+[Deutsch](Websteuerung) | [English](Web-control)
+
 Die experimentelle Weboberfläche bildet den Hauptbedienbereich der laufenden WSJT-X-Instanz nach. Desktop und Browser verwenden denselben Decoder, dieselbe CAT-/Audio-Verbindung und dieselbe QSO-Sitzung.
 
 ## Starten

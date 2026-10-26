@@ -1,5 +1,7 @@
 # Installation und erster Empfang
 
+[Deutsch](Schnellstart) | [English](Quick-start)
+
 ## Windows-Paket installieren
 
 1. Das [neueste Release](https://github.com/rudolfstepan/wsjtx/releases/latest) öffnen und **windows-x64.zip** herunterladen.

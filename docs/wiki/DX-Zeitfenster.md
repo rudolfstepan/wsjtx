@@ -1,5 +1,7 @@
 # Persönliche DX-Zeitfenster
 
+[Deutsch](DX-Zeitfenster) | [English](Personal-DX-windows)
+
 Im Fenster **Who hears me?** öffnet **Personal DX windows** eine lokale Empfangshistorie. Sie hilft, wiederholt beobachtete Verbindungen nach DXCC-Land, Band, UTC-Stunde und Monat zu finden.
 
 ## Daten sammeln

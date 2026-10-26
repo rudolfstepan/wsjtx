@@ -1,5 +1,7 @@
 # Funkgeräte, Audio und Profile
 
+[Deutsch](Funkgeraete-und-Audio) | [English](Radio-and-audio)
+
 Alle lokalen Starter verwenden dasselbe Paket unter **dist-custom/bin**. Unterschiedliche Geräte oder Aufgaben werden durch eigene WSJT-X-Profile getrennt, nicht durch Kopien der EXE.
 
 | Aufgabe | Profil | Verbindung |

@@ -1,5 +1,7 @@
 # PSK Reporter — Who hears me?
 
+[Deutsch](PSK-Reporter) | [English](PSK-Reporter-EN)
+
 **View → PSK Reporter — Who hears me?** zeigt Stationen, die dein ausgesendetes Signal gemeldet haben. Rufzeichen, Modus und Band kommen aus der laufenden Anwendung. Die Ansicht nutzt die letzten 30 Minuten und zeigt pro Empfänger dessen neueste passende Meldung.
 
 ![Who hears me mit Favoriten, Filtern und Anrufhistorie](https://raw.githubusercontent.com/rudolfstepan/wsjtx/oe3sro-v3.0.2-7-rc3/docs/images/psk-reporter-who-hears-me.png)

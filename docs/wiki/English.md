@@ -1,29 +1,37 @@
-# WSJT-X OE3SRO Custom — English overview
+# WSJT-X OE3SRO Custom
 
-**build by OE3SRO** · [Download latest release](https://github.com/rudolfstepan/wsjtx/releases/latest) · [Deutsch](Home)
+[Deutsch](Home) | [English](English)
 
-Current download: **3.0.2-oe3sro.7-rc3**, based on **WSJT-X 3.0.2-devel**. RC3 is designated Latest on GitHub at the project owner's request. Its RC3 version name is retained; REIST16 and LAN web control remain experimental. The release was built and verified locally while GitHub Actions is disabled.
+**build by OE3SRO** · Digital modes, reception tools and SDR integration.
 
-![English LAN web interface with FT8 reception](https://raw.githubusercontent.com/rudolfstepan/wsjtx/oe3sro-v3.0.2-7-rc3/docs/images/web-control-ft8-en-2026-10-25.png)
+This version extends WSJT-X with **REIST16**, optimized FT8/FT4/FT2 kernels, an integrated PSK Reporter receiver list, personal DX windows, and a browser interface for LAN station operation.
 
-*Original screenshot, 25 October 2026: FT8 reception on 20 m. It demonstrates the browser interface, not a completed QSO.*
+**[Download for Windows](https://github.com/rudolfstepan/wsjtx/releases/latest)** · [Quick start](Quick-start) · [All features](Features)
 
-## Features
+Current download: **3.0.2-oe3sro.7-rc3**, based on **WSJT-X 3.0.2-devel**. RC3 is designated GitHub **Latest** at the project owner's request; its RC3 version name is retained. REIST16 and web control remain experimental extensions. The current download was built and validated locally; GitHub Actions is disabled at present.
 
-- **[REIST16-QSO/2](REIST16):** experimental structured CQ/QSO mode, 15-second slots, multisignal decoding with cancellation, additional weak-signal methods and optional CQ-structure AP. Select Mode → REIST16 and Decode → Deep. It is not compatible with FT8 on air.
-- **[FT8 / FT4 / FT2](FT8-FT4-FT2):** native C++ kernels, parallel processing and TX diagnostics. This is not a complete C++ rewrite. FT2 was adapted from DG2YCB's GPLv3 WSJT-X Improved implementation.
-- **[Who hears me?](PSK-Reporter):** integrated PSK Reporter receiver list, logbook colours, filters, favourites, recent calls and direct calling tools.
-- **[Personal DX windows](DX-Zeitfenster):** local empirical reception history, not a live propagation or QSO-probability forecast.
-- **[LAN web control](Websteuerung):** German/English main operating panel, logging and a real desktop waterfall image. Setup remains on the desktop.
-- **[Pluto / HackRF](Funkgeraete-und-Audio):** separate profiles with local TCI bridges for control and audio.
-- **[WebSDR / WASAPI](WebSDR-und-WASAPI):** decode browser audio directly, using an additional receive-only instance or the combined Yaesu-TX/WebSDR-RX option.
+![English browser interface with FT8 reception and live waterfall](https://raw.githubusercontent.com/rudolfstepan/wsjtx/oe3sro-v3.0.2-7-rc3/docs/images/web-control-ft8-en-2026-10-25.png)
 
-## Install and update
+*Original screenshot, 25 October 2026: FT8 reception on 20 m. Desktop and browser operate the same running station. This image does not document a completed QSO.*
 
-Extract the **entire windows-x64.zip** and run **Start-WSJT-X.bat**. Keep the DLLs and data with the program. Configure your station, radio and audio in Settings. The offline guide is `docs/index.html`; a separate documentation ZIP and SHA256 checksums are provided. Existing Custom profiles are reused without a fresh import.
+## Main extensions
 
-The REIST16 transmit level is approximately **1.94 dB higher** than the earlier version at unchanged downstream attenuation. Recheck radio drive and ALC. Rig/Fake It keeps all REIST16 tone centres inside 1500–2000 Hz while preserving the selected RF position.
+| Area | What the Custom version provides |
+| --- | --- |
+| [REIST16](REIST16-EN) | Dedicated CQ/QSO mode, multisignal reception, cancellation and additional weak-signal methods. |
+| [FT8 / FT4 / FT2](FT8-FT4-FT2-EN) | Native C++ kernels, parallel processing and shared TX diagnostics. |
+| [PSK Reporter](PSK-Reporter-EN) | Who hears me? with logbook colours, filters, favourites and direct calling tools. |
+| [Personal DX windows](Personal-DX-windows) | Local reception history by DXCC, band, UTC hour and station setup. |
+| [Web control](Web-control) | Main operating panel and live waterfall in the browser, in German and English. |
+| [Radios and audio](Radio-and-audio) | Conventional CAT/USB audio and dedicated Pluto/HackRF bridges. |
+| [WebSDR / WASAPI](WebSDR-and-WASAPI) | Decode browser audio directly, including an additional receiver window. |
 
-## Evidence and scope
+## Find your way
 
-Fixed synthetic comparisons and real WebSDR reception show improvements, including additional successful weak REIST16 decodes. They do not establish universal FT8 superiority or real-time performance under all conditions. Raw field recordings remain private. [Measurements and limits](Messungen-und-Grenzen) · [English repository README](https://github.com/rudolfstepan/wsjtx/blob/master/README.en.md).
+- **Getting started:** [Installation and first reception](Quick-start).
+- **Explore the interface:** [Screenshots with explanations](Screenshots-EN).
+- **Assess the evidence:** [Measurements, field tests and limits](Measurements-and-limits).
+- **Build it yourself:** [Build and development](Build-and-development).
+- **Troubleshoot:** [Frequently asked questions](FAQ-EN).
+
+The Custom version builds on the work of the WSJT Development Team. FT2 was adapted from the GPLv3 implementation by **DG2YCB / WSJT-X Improved**. [Source and licence](https://github.com/rudolfstepan/wsjtx) · [Change history, DE/EN](https://github.com/rudolfstepan/wsjtx/blob/master/docs/CHANGES.md).

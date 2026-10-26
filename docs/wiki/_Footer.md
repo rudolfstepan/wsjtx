@@ -1,1 +1,1 @@
-**build by OE3SRO** · Stand: 26. Oktober 2026 · [Download](https://github.com/rudolfstepan/wsjtx/releases/latest) · [Quellcode / GPLv3](https://github.com/rudolfstepan/wsjtx) · [Markenhinweise](https://github.com/rudolfstepan/wsjtx/blob/master/TRADEMARK.md)
+**build by OE3SRO** · Stand / Updated: 26 October 2026 · [Deutsch](Home) · [English](English) · [Download](https://github.com/rudolfstepan/wsjtx/releases/latest) · [Quellcode / Source / GPLv3](https://github.com/rudolfstepan/wsjtx) · [Marken / Trademarks](https://github.com/rudolfstepan/wsjtx/blob/master/TRADEMARK.md)

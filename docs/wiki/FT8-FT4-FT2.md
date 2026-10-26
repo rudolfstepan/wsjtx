@@ -1,5 +1,7 @@
 # FT8, FT4 und FT2
 
+[Deutsch](FT8-FT4-FT2) | [English](FT8-FT4-FT2-EN)
+
 Die Custom-Version behält die vorhandenen Funkformate bei und ersetzt bestimmte rechenintensive Routinen durch native C++-Kerne. Nachrichtenpackung, Teile der Synchronisation und weitere Decoderstufen verwenden weiterhin Fortran. Es ist keine vollständige C++-Portierung.
 
 | Modus | Zyklus | Custom-Erweiterungen |

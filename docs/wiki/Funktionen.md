@@ -1,5 +1,7 @@
 # Funktionsübersicht
 
+[Deutsch](Funktionen) | [English](Features)
+
 Die Custom-Erweiterungen ergänzen die vorhandenen WSJT-X-Betriebsarten. Diese Übersicht unterscheidet die zusätzlichen Funktionen vom experimentellen Entwicklungsstand.
 
 ## Betriebsarten und Signalverarbeitung

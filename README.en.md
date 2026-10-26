@@ -5,8 +5,8 @@
 **build by OE3SRO**
 
 **[Wiki: guides, features and screenshots](https://github.com/rudolfstepan/wsjtx/wiki)** ·
-[English overview](https://github.com/rudolfstepan/wsjtx/wiki/English) ·
-[Screenshot gallery](https://github.com/rudolfstepan/wsjtx/wiki/Screenshots)
+[English wiki](https://github.com/rudolfstepan/wsjtx/wiki/English) ·
+[Screenshot gallery](https://github.com/rudolfstepan/wsjtx/wiki/Screenshots-EN)
 
 [![Windows build](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml/badge.svg)](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml)
 

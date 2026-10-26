@@ -1,5 +1,7 @@
 # WebSDR und WASAPI-Loopback
 
+[Deutsch](WebSDR-und-WASAPI) | [English](WebSDR-and-WASAPI)
+
 WASAPI-Loopback erfasst direkt den Windows-Wiedergabeausgang, auf dem der Browser spielt. Ein virtuelles Audiokabel und ein Stereo-Mix-Eingang sind dafür nicht erforderlich.
 
 ## Zusätzlicher Empfänger

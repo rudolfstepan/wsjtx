@@ -10,6 +10,15 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'docs/wiki'
 METADATA = ROOT / '.local/wiki-publish.git'
 REMOTE = 'https://github.com/rudolfstepan/wsjtx.wiki.git'
+LANGUAGE_PAIRS = {
+    'Home': 'English', 'Schnellstart': 'Quick-start', 'Funktionen': 'Features',
+    'REIST16': 'REIST16-EN', 'FT8-FT4-FT2': 'FT8-FT4-FT2-EN',
+    'PSK-Reporter': 'PSK-Reporter-EN', 'DX-Zeitfenster': 'Personal-DX-windows',
+    'Websteuerung': 'Web-control', 'Funkgeraete-und-Audio': 'Radio-and-audio',
+    'WebSDR-und-WASAPI': 'WebSDR-and-WASAPI', 'Screenshots': 'Screenshots-EN',
+    'Messungen-und-Grenzen': 'Measurements-and-limits',
+    'Build-und-Entwicklung': 'Build-and-development', 'FAQ': 'FAQ-EN',
+}
 
 
 def git(*args, data=None, wiki=False, env=None):
@@ -26,6 +35,16 @@ def validate():
     names = {p.stem for p in pages}
     if not {'Home', '_Sidebar', '_Footer'}.issubset(names):
         raise SystemExit('Home, sidebar and footer are required.')
+    unpaired = names - set(LANGUAGE_PAIRS) - set(LANGUAGE_PAIRS.values()) - {'_Sidebar', '_Footer'}
+    if unpaired:
+        raise SystemExit('Add language pairs for: ' + ', '.join(sorted(unpaired)))
+    for german, english in LANGUAGE_PAIRS.items():
+        for name in (german, english):
+            if name not in names:
+                raise SystemExit(f'Missing language counterpart: {name}')
+            text = (SOURCE / (name + '.md')).read_text(encoding='utf-8')
+            if f'[Deutsch]({german})' not in text or f'[English]({english})' not in text:
+                raise SystemExit(f'Missing direct language switch: {name}')
     images = set()
     for page in pages:
         text = page.read_text(encoding='utf-8')

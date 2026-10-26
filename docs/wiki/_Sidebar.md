@@ -1,27 +1,27 @@
 **WSJT-X OE3SRO Custom**
 
-[Startseite](Home) · [English](English)
+[Deutsch](Home) · [English](English)
 
-**Einstieg**
+**Einstieg / Getting started**
 
 - [Download](https://github.com/rudolfstepan/wsjtx/releases/latest)
-- [Schnellstart](Schnellstart)
-- [Alle Funktionen](Funktionen)
-- [Screenshots](Screenshots)
+- [Schnellstart](Schnellstart) · [Quick start](Quick-start)
+- [Funktionen](Funktionen) · [Features](Features)
+- [Bilder](Screenshots) · [Screenshots](Screenshots-EN)
 
-**Betrieb**
+**Betrieb / Operation**
 
-- [REIST16](REIST16)
-- [FT8 / FT4 / FT2](FT8-FT4-FT2)
-- [PSK Reporter](PSK-Reporter)
-- [DX-Zeitfenster](DX-Zeitfenster)
-- [Websteuerung](Websteuerung)
-- [Funkgeräte und Audio](Funkgeraete-und-Audio)
-- [WebSDR / WASAPI](WebSDR-und-WASAPI)
+- REIST16: [DE](REIST16) · [EN](REIST16-EN)
+- FT8 / FT4 / FT2: [DE](FT8-FT4-FT2) · [EN](FT8-FT4-FT2-EN)
+- PSK Reporter: [DE](PSK-Reporter) · [EN](PSK-Reporter-EN)
+- [DX-Zeitfenster](DX-Zeitfenster) · [DX windows](Personal-DX-windows)
+- [Websteuerung](Websteuerung) · [Web control](Web-control)
+- [Funkgeräte / Audio](Funkgeraete-und-Audio) · [Radios / audio](Radio-and-audio)
+- WebSDR / WASAPI: [DE](WebSDR-und-WASAPI) · [EN](WebSDR-and-WASAPI)
 
-**Hintergrund**
+**Hintergrund / Reference**
 
-- [Messungen und Grenzen](Messungen-und-Grenzen)
-- [Build und Entwicklung](Build-und-Entwicklung)
-- [FAQ](FAQ)
-- [Quellcode](https://github.com/rudolfstepan/wsjtx)
+- [Messungen](Messungen-und-Grenzen) · [Measurements](Measurements-and-limits)
+- [Entwicklung](Build-und-Entwicklung) · [Development](Build-and-development)
+- FAQ: [DE](FAQ) · [EN](FAQ-EN)
+- [Quellcode / Source](https://github.com/rudolfstepan/wsjtx)

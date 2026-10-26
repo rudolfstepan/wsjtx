@@ -1,5 +1,7 @@
 # REIST16-QSO/2
 
+[Deutsch](REIST16) | [English](REIST16-EN)
+
 REIST16 ist eine experimentelle Betriebsart von OE3SRO für kurze strukturierte Amateurfunkgespräche. **QSO/2 ist das aktuelle Funkformat.** Es ist nicht mit FT8 funkkompatibel. Beide Gegenstellen benötigen QSO/2; der aktuelle Empfänger erkennt zusätzlich das ältere QSO/1.
 
 ## Einrichten

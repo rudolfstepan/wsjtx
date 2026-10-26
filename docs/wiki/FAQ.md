@@ -1,5 +1,7 @@
 # Häufige Fragen und Fehlersuche
 
+[Deutsch](FAQ) | [English](FAQ-EN)
+
 ## REIST16 steht auf Fast oder Normal
 
 Für die zusätzlichen Schwachsignalverfahren **Decode → Deep** wählen. CQ-AP wird getrennt unter **Enable CQ AP (REIST16)** geschaltet. Die Einstellungen gelten pro Instanz beziehungsweise Profil.

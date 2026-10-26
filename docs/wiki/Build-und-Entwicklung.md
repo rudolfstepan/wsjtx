@@ -1,5 +1,7 @@
 # Build und Entwicklung
 
+[Deutsch](Build-und-Entwicklung) | [English](Build-and-development)
+
 ## Ein Build, ein Programmpaket
 
 | Verzeichnis | Zweck |
@@ -48,6 +50,6 @@ GitHub Actions ist derzeit absichtlich deaktiviert. **RC3 wurde lokal gebaut und
 
 ## Wiki pflegen
 
-Die bearbeitbaren Wiki-Quellen liegen im Hauptrepository unter `docs/wiki`. Nach einer inhaltlichen Änderung können sie mit `python tools/Publish-Wiki.py` ins GitHub-Wiki veröffentlicht werden. Der Publisher erhält unbekannte vorhandene Wiki-Seiten und verwendet keinen zweiten Quellcheckout oder Git-Worktree.
+Die bearbeitbaren Wiki-Quellen liegen im Hauptrepository unter `docs/wiki`. Inhaltliche Änderungen zuerst committen und anschließend mit `python tools/Publish-Wiki.py` ins GitHub-Wiki veröffentlichen. Der Publisher erhält unbekannte vorhandene Wiki-Seiten und verwendet keinen zweiten Quellcheckout oder Git-Worktree. Jeder Themenbereich besitzt eine deutsche und eine englische Fassung mit direktem Sprachwechsel; `--check` prüft die Gegenstücke und Links vor der Veröffentlichung.
 
 [Builddetails](https://github.com/rudolfstepan/wsjtx/blob/master/CUSTOM-BUILD.md) · [Lizenz](https://github.com/rudolfstepan/wsjtx/blob/master/COPYING) · [Markenhinweise](https://github.com/rudolfstepan/wsjtx/blob/master/TRADEMARK.md)
