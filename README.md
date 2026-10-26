@@ -4,12 +4,16 @@
 
 **build by OE3SRO**
 
+**[Wiki: Anleitung, Funktionen und Screenshots](https://github.com/rudolfstepan/wsjtx/wiki)** ·
+[Schnellstart](https://github.com/rudolfstepan/wsjtx/wiki/Schnellstart) ·
+[Funktionsübersicht](https://github.com/rudolfstepan/wsjtx/wiki/Funktionen)
+
 [![Windows-Build](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml/badge.svg)](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml)
 
 **[REIST16 Release Candidate 3.0.2-oe3sro.7-rc3](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-7-rc3)** —
 Mehrsignalempfang mit Abtrennung, zusätzliche Schwachsignalverfahren und
 an FT8 angeglichener digitaler Sendepegel. [Änderungen und Prüfgrenzen](docs/releases/3.0.2-oe3sro.7-rc3.md).
-Für Praxistests vorgesehen; die stabile Version bleibt separat verfügbar.
+Für Praxistests vorgesehen und als **Latest** veröffentlicht; die Versionsbezeichnung RC3 bleibt erhalten.
 
 **[Windows-Release herunterladen](https://github.com/rudolfstepan/wsjtx/releases/latest)** —
 das **windows-x64.zip** enthält die Anwendung und die deutsche/englische
@@ -22,7 +26,8 @@ sie ist auch separat als **documentation.zip** verfügbar.
 PSK-Reporter-Werkzeuge, persönliche DX-Zeitfenster und FT8-/FT4-/FT2-
 Optimierungen bleiben enthalten. REIST16 bleibt experimentell.
 
-**[Neueste CI-Builds](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml):**
+**GitHub Actions ist derzeit deaktiviert; RC3 wurde lokal gebaut und geprüft.**
+Für ältere oder künftig wieder aktivierte [CI-Builds](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml):
 Den neuesten erfolgreichen Lauf öffnen und unter **Artifacts** das versionierte
 `wsjtx-OE3SRO-…-windows-x64`-Paket herunterladen. GitHub-Anmeldung erforderlich.
 Das Artefakt und das darin enthaltene ZIP entpacken, dann **Start-WSJT-X.bat**
@@ -44,7 +49,7 @@ GPLv3-Implementierung von **DG2YCB / WSJT-X Improved** adaptiert. Die Versionsan
 das About-Fenster und der Splashscreen tragen den Zusatz **build by OE3SRO**.
 Der Custom-Build basiert derzeit auf **WSJT-X 3.0.2-devel**; die hier
 beschriebenen Build-Skripte und Paketprüfungen sind für Windows ausgelegt.
-GitHub Actions baut dieses Paket automatisch bei jedem Push, einschließlich
+Bei aktivierten Actions baut der vorhandene Workflow das Paket bei jedem Push, einschließlich
 Tags, sowie für Pull Requests und manuelle Starts. Der Dateiname enthält die
 Projektversion, den Quellcommit, die Buildnummer und den Wiederholungsversuch;
 `build-info.json` und eine SHA256-Datei dokumentieren den Download.

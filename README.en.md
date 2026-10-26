@@ -4,12 +4,16 @@
 
 **build by OE3SRO**
 
+**[Wiki: guides, features and screenshots](https://github.com/rudolfstepan/wsjtx/wiki)** ·
+[English overview](https://github.com/rudolfstepan/wsjtx/wiki/English) ·
+[Screenshot gallery](https://github.com/rudolfstepan/wsjtx/wiki/Screenshots)
+
 [![Windows build](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml/badge.svg)](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml)
 
 **[REIST16 Release Candidate 3.0.2-oe3sro.7-rc3](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-7-rc3)** —
 Multisignal decoding with cancellation, additional weak-signal methods and
 digital transmit level matched to FT8. [Changes and validation limits](docs/releases/3.0.2-oe3sro.7-rc3.md).
-Intended for field testing; the stable release remains available separately.
+Intended for field testing and designated **Latest**; the RC3 version name is retained.
 
 **[Download Windows release](https://github.com/rudolfstepan/wsjtx/releases/latest)** —
 the **windows-x64.zip** includes the application and German/English documentation.
@@ -22,7 +26,8 @@ with **REIST16-QSO/2**, Pluto/HackRF integration and browser WebSDR reception.
 PSK Reporter tools, personal DX windows and FT8/FT4/FT2 optimizations remain
 included. REIST16 remains experimental.
 
-**[Latest CI builds](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml):**
+**GitHub Actions is currently disabled; RC3 was built and validated locally.**
+For older or subsequently re-enabled [CI builds](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml):
 Open the latest successful run and download the versioned
 `wsjtx-OE3SRO-…-windows-x64` package under **Artifacts**. GitHub login is required.
 Extract the artifact and its enclosed ZIP, then launch **Start-WSJT-X.bat**.
@@ -44,7 +49,7 @@ by **DG2YCB / WSJT-X Improved**. The version display, window title,
 About dialog, and splash screen include **build by OE3SRO**.
 The custom build currently uses **WSJT-X 3.0.2-devel** as its base; the build
 scripts and package checks described here target Windows.
-GitHub Actions builds the package automatically on every push, including tags,
+When Actions is enabled, the workflow builds the package on every push, including tags,
 as well as pull requests and manual runs. Filenames include the project version,
 source commit, build number, and attempt; `build-info.json` and a SHA256 file
 identify and verify the download.
