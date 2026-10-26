@@ -6,9 +6,9 @@
 
 [![Windows-Build](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml/badge.svg)](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml)
 
-**[REIST16 Release Candidate 3.0.2-oe3sro.7-rc2](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-7-rc2)** —
+**[REIST16 Release Candidate 3.0.2-oe3sro.7-rc3](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-7-rc3)** —
 Mehrsignalempfang mit Abtrennung, zusätzliche Schwachsignalverfahren und
-an FT8 angeglichener digitaler Sendepegel. [Änderungen und Prüfgrenzen](docs/releases/3.0.2-oe3sro.7-rc2.md).
+an FT8 angeglichener digitaler Sendepegel. [Änderungen und Prüfgrenzen](docs/releases/3.0.2-oe3sro.7-rc3.md).
 Für Praxistests vorgesehen; die stabile Version bleibt separat verfügbar.
 
 **[Windows-Release herunterladen](https://github.com/rudolfstepan/wsjtx/releases/latest)** —

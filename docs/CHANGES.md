@@ -4,6 +4,15 @@
 
 ## Deutsch
 
+### 2026-10-26 — Veröffentlichter Download-Kandidat RC3
+
+- [3.0.2-oe3sro.7-rc3](releases/3.0.2-oe3sro.7-rc3.md) enthält die gesamte
+  REIST16-Weiterentwicklung und die Build-/Paketbereinigung.
+- Unabhängige Fortran-Referenzkerne werden im Vergleichstest auch unter
+  MinGW Makefiles explizit präprozessiert. Produktionskern unverändert.
+- Lokaler Build und lokale Releaseprüfungen; GitHub Actions ist deaktiviert.
+  RC1/RC2 bleiben Quelltags ohne Download-Release. Private Rohaufnahmen bleiben lokal.
+
 ### 2026-10-26 — RC2 mit gemeinsamem Programmpaket
 
 - Ergänzt die nach dem RC1-Quelltag beauftragte Paketbereinigung:
@@ -373,6 +382,14 @@ ergänzt. [8bf344fde](https://github.com/rudolfstepan/wsjtx/commit/8bf344fde)
 speichert den FT2-Fortsetzungspunkt; dieser Commit ändert keine Programmfunktion.
 
 ## English
+
+### 2026-10-26 — Download candidate RC3
+
+- [3.0.2-oe3sro.7-rc3](releases/3.0.2-oe3sro.7-rc3.md) includes all REIST16
+  improvements and build/package consolidation. Explicit Fortran preprocessing
+  also supports independent reference tests with MinGW Makefiles.
+- Built and release-tested locally because GitHub Actions is disabled.
+  RC1/RC2 remain source tags without download releases; raw recordings stay private.
 
 ### 2026-10-26 — RC2 with one shared program package
 

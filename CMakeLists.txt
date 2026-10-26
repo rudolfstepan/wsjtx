@@ -1708,6 +1708,9 @@ target_compile_definitions (ft8_native_checks PRIVATE gen_ft8wave=gen_ft8wave_re
   bpdecode174_91var=bpdecode174_91var_reference gen_ft8wavevar=gen_ft8wavevar_reference
   encode174_91var=encode174_91var_reference gen_ft4wave=gen_ft4wave_reference
   sync4d=sync4d_reference sync4d_search=sync4d_search_reference)
+# Renaming the original kernels requires preprocessing with every generator.
+# Ninja does this for dependency scanning; MinGW Makefiles needs it explicit.
+set_target_properties (ft8_native_checks PROPERTIES Fortran_PREPROCESS ON)
 target_include_directories (ft8_native_checks PRIVATE ${CMAKE_SOURCE_DIR})
 if (OPENMP_FOUND)
   target_include_directories (ft8_native_checks PRIVATE ${CMAKE_BINARY_DIR}/fortran_modules_omp)

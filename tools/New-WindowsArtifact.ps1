@@ -15,6 +15,26 @@ $commit = (& git -C $root rev-parse HEAD | Out-String).Trim()
 if ($LASTEXITCODE) { throw 'Cannot read source commit.' }
 New-Item -ItemType Directory -Force -Path $output | Out-Null
 $utf8 = [Text.UTF8Encoding]::new($false)
+# A running station may still hold a renamed EXE from an earlier update.
+# Stream the ZIP without a second package tree and omit those stale binaries.
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+function Write-PortableZip([string]$Destination, [string]$RootDirectory, [string[]]$Inputs) {
+    $base = [IO.Path]::GetFullPath($RootDirectory).TrimEnd('\','/')
+    if (Test-Path -LiteralPath $Destination) { Remove-Item -LiteralPath $Destination -Force }
+    $archive = [IO.Compression.ZipFile]::Open($Destination, [IO.Compression.ZipArchiveMode]::Create)
+    try {
+        foreach ($inputPath in $Inputs) {
+            $item = Get-Item -LiteralPath $inputPath
+            $files = if ($item.PSIsContainer) { Get-ChildItem -LiteralPath $item.FullName -Recurse -File } else { @($item) }
+            foreach ($file in $files) {
+                if ($file.Name -like '*-before-update-*.exe') { continue }
+                if (!$file.FullName.StartsWith($base + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw 'ZIP input outside package.' }
+                $name = $file.FullName.Substring($base.Length + 1).Replace('\','/')
+                [IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive, $file.FullName, $name, [IO.Compression.CompressionLevel]::Optimal) | Out-Null
+            }
+        }
+    } finally { $archive.Dispose() }
+}
 # This launcher also works on a clean computer: WSJT-X creates the Custom profile.
 # No personal configuration, callsign, logbook, or repository paths are shipped.
 [IO.File]::WriteAllText((Join-Path $package 'Start-WSJT-X.bat'), "@echo off`r`ncd /d `"%~dp0bin`"`r`nstart `"WSJT-X OE3SRO`" wsjtx.exe --rig-name Custom`r`n", $utf8)
@@ -44,6 +64,8 @@ $manifest = [ordered]@{
     platform = 'windows-x64'
     commit = $commit
     sourceDirty = [bool](& git -C $root status --porcelain --untracked-files=normal)
+    buildOrigin = if ($env:GITHUB_ACTIONS -eq 'true') { 'github-actions' } else { 'local' }
+    builtAtUtc = [DateTime]::UtcNow.ToString('o')
     experimentalMode = 'REIST16-QSO/2'
     plutoBridge = (Test-Path -LiteralPath (Join-Path $package 'bin\pluto\libiio.dll'))
     hackrfBridge = (Test-Path -LiteralPath (Join-Path $package 'bin\hackrf\hackrf-0.dll'))
@@ -80,12 +102,12 @@ foreach ($document in @('FT2.md', 'FT8.md', 'REIST16.md', 'REIST16-QSO2.md', 'CH
 }
 $name = "wsjtx-OE3SRO-$Version-windows-x64"
 $zip = Join-Path $output "$name.zip"
-Compress-Archive -Path (Join-Path $package '*') -DestinationPath $zip -CompressionLevel Optimal -Force
+Write-PortableZip $zip $package @($package)
 $hash = (Get-FileHash -LiteralPath $zip).Hash.ToLowerInvariant()
 [IO.File]::WriteAllText((Join-Path $output "$name.sha256"), "$hash  $name.zip`n", $utf8)
 $docsName = "wsjtx-OE3SRO-$Version-documentation"
 $docsZip = Join-Path $output "$docsName.zip"
-Compress-Archive -Path $docs, (Join-Path $package 'COPYING'), (Join-Path $package 'README-Windows.txt'), (Join-Path $package 'build-info.json') -DestinationPath $docsZip -CompressionLevel Optimal -Force
+Write-PortableZip $docsZip $package @($docs, (Join-Path $package 'COPYING'), (Join-Path $package 'README-Windows.txt'), (Join-Path $package 'build-info.json'))
 $docsHash = (Get-FileHash -LiteralPath $docsZip).Hash.ToLowerInvariant()
 [IO.File]::WriteAllText((Join-Path $output "$docsName.sha256"), "$docsHash  $docsName.zip`n", $utf8)
 Write-Output "Windows artifact ready: $zip"

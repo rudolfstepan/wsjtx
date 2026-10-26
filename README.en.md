@@ -6,9 +6,9 @@
 
 [![Windows build](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml/badge.svg)](https://github.com/rudolfstepan/wsjtx/actions/workflows/custom-windows.yml)
 
-**[REIST16 Release Candidate 3.0.2-oe3sro.7-rc2](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-7-rc2)** —
+**[REIST16 Release Candidate 3.0.2-oe3sro.7-rc3](https://github.com/rudolfstepan/wsjtx/releases/tag/oe3sro-v3.0.2-7-rc3)** —
 Multisignal decoding with cancellation, additional weak-signal methods and
-digital transmit level matched to FT8. [Changes and validation limits](docs/releases/3.0.2-oe3sro.7-rc2.md).
+digital transmit level matched to FT8. [Changes and validation limits](docs/releases/3.0.2-oe3sro.7-rc3.md).
 Intended for field testing; the stable release remains available separately.
 
 **[Download Windows release](https://github.com/rudolfstepan/wsjtx/releases/latest)** —
